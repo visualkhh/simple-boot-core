@@ -7,9 +7,6 @@ export type RefModuleItem = {dest?: any, params: any[], callBack: Function };
 
 export class Module implements IntentEvent, LifeCycle {
     public _refModule = new Map<string, Map<Module, RefModuleItem[]> >();
-    constructor() {
-        console.log('module')
-    }
 
     onChangedRender(): void {
     }
