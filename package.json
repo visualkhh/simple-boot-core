@@ -1,6 +1,6 @@
 {
   "name": "simple-boot-core",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "SimpleApplication.js",
   "license": "MIT",
   "description": "front end SPA frameworks",
@@ -17,9 +17,9 @@
     "Hoil-Gang (https://github.com/khl1154)",
     "hwangsero (https://github.com/hwangsero)"
   ],
-  "homepage": "https://github.com/visualkhh/simple-boot-front",
+  "homepage": "https://github.com/visualkhh/simple-boot-core",
   "bugs": {
-    "url": "https://github.com/visualkhh/simple-boot-front",
+    "url": "https://github.com/visualkhh/simple-boot-core",
     "email": "visualkhh@gmail.com"
   },
   "repository": {
