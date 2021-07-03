@@ -21,6 +21,7 @@ export class SimstanceManager implements Runnable {
 
     constructor(option: SimOption) {
         this._storage.set(SimstanceManager, this);
+        this._storage.set((option as any).constructor, option);
         this._storage.set(SimOption, option);
     }
 

@@ -4,13 +4,14 @@ import {A} from "./A";
 import {UserNotFound} from "./exceptions/UserNotFound";
 import {After, Before} from "simple-boot-core/decorators/aop/AOPDecorator";
 import {Intent} from "simple-boot-core/intent/Intent";
+import {CustomSimOption} from "./CustomSimOption";
 
 @Sim()
 export class B extends Module {
 
-    constructor(private a: A) {
+    constructor(private a: A, private option: CustomSimOption) {
         super();
-        console.log('--->b')
+        console.log('--->b', option)
     }
 
     print(){
