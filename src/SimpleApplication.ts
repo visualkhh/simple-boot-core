@@ -10,8 +10,7 @@ export class SimpleApplication implements Runnable {
     constructor(public option: SimOption) {
         this.simstanceManager = new SimstanceManager(option)
         this.intentManager = new IntentManager(this.simstanceManager);
-
-        SimGlobal.application = this;
+        SimGlobal().application = this;
     }
 
     public run() {

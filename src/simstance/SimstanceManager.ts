@@ -184,7 +184,7 @@ export class SimstanceManager implements Runnable {
     }
 
     run() {
-        SimGlobal.storage.forEach(data => {
+        SimGlobal().storage.forEach((data: any) => {
             this.register(data);
         })
         this.callBindPostConstruct(this);

@@ -15,7 +15,7 @@ export class SimProxyHandler extends SimProxy {
 
     constructor(private simOption: SimOption) {
         super()
-        this.simstanceManager = SimGlobal.application?.simstanceManager;
+        this.simstanceManager = SimGlobal().application?.simstanceManager;
     }
 
     public get(target: any, name: string): any {

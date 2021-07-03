@@ -4,7 +4,7 @@ import {getSim, SimConfig} from '../decorators/SimDecorator';
 import {SimstanceManager} from './SimstanceManager';
 
 export class SimAtomic<T> {
-    constructor(public type: ConstructorType<T>, private simstanceManager: SimstanceManager = SimGlobal.application?.simstanceManager!) {
+    constructor(public type: ConstructorType<T>, private simstanceManager: SimstanceManager = SimGlobal().application?.simstanceManager!) {
     }
 
     get config(): SimConfig | undefined {

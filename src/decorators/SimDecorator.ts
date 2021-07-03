@@ -23,7 +23,7 @@ export const Sim = (config?: SimConfig): GenericClassDecorator<ConstructorType<a
     return (target: ConstructorType<any>) => {
         ReflectUtils.defineMetadata(SimMetadataKey, config, target);
         // Reflect.defineMetadata(SimMetadataKey, config, target.prototype);
-        SimGlobal.storage.add(target);
+        SimGlobal().storage.add(target);
         // return Reflect.metadata(SimMetadataKey, config);
         // Reflect.metadata(SimMetadataKey, config);
     }
