@@ -1,16 +1,29 @@
 import {SimpleApplication} from "simple-boot-core/SimpleApplication";
-import {A} from "./A";
-import {B} from "./B";
-import {SimOption} from "simple-boot-core/SimOption";
 import {GlobalAdvice} from "./GlobalAdvice";
-import {ConstructorType} from "simple-boot-core/types/Types";
 import {CustomSimOption} from "./CustomSimOption";
-
+import {AppRouter} from "./AppRouter";
+import {Intent} from "simple-boot-core/intent/Intent";
+import {CustomModule} from "./CustomModule";
+import {B} from "./B";
+import {CustomRouter} from "./CustomRouter";
 
 const option = new CustomSimOption([GlobalAdvice]);
-const simpleApplication = new SimpleApplication(option);
+// const simpleApplication = new SimpleApplication<AppRouter, CustomModule>(AppRouter, option);
+const simpleApplication = new SimpleApplication(AppRouter, option);
+// const simpleApplication = new SimpleApplication(AppRouter, option);
 simpleApplication.run();
-console.log('-->', simpleApplication)
-let orNewSim = simpleApplication.simstanceManager.getOrNewSim(B);
-orNewSim?.print();
-orNewSim.err();
+simpleApplication.routing<CustomRouter, CustomModule>(new Intent('/b')).then(it => {
+    it.router;
+    const m = it.module
+    let moduleInstance = it.getModuleInstance<B>();
+    moduleInstance.err();
+    console.log('-22->', moduleInstance, it.router);
+
+    simpleApplication.publishIntent(new Intent('A://gogo?a=55', 'ddddddddddd'));
+});
+
+//
+// console.log('-->', simpleApplication)
+// let orNewSim = simpleApplication.simstanceManager.getOrNewSim(B);
+// orNewSim?.print();
+// orNewSim.err();

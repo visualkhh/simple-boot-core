@@ -3,18 +3,33 @@ import {Runnable} from './run/Runnable';
 import {SimstanceManager} from "./simstance/SimstanceManager";
 import {SimOption} from "./SimOption";
 import {IntentManager} from "./intent/IntentManager";
+import {RouterManager} from "./route/RouterManager";
+import {Intent} from "./intent/Intent";
+import {Router} from "./route/Router";
+import {Module} from "./module/Module";
+import {ConstructorType} from "./types/Types";
+import {RouterModule} from "./route/RouterModule";
 
 export class SimpleApplication implements Runnable {
     public simstanceManager: SimstanceManager;
-    public intentManager: IntentManager;
-    constructor(public option: SimOption) {
+    private intentManager: IntentManager;
+    private routerManager: RouterManager;
+    constructor(public rootRouter: ConstructorType<Router>, public option = new SimOption()) {
         this.simstanceManager = new SimstanceManager(option)
         this.intentManager = new IntentManager(this.simstanceManager);
+        this.routerManager = new RouterManager(this.rootRouter, this.simstanceManager);
         SimGlobal().application = this;
     }
 
     public run() {
         this.simstanceManager.run();
-        this.intentManager.run();
+    }
+
+    public publishIntent(i: Intent) {
+        return this.intentManager.publish(i);
+    }
+    public async routing<R extends Router = Router, M extends Module = Module>(i: Intent) {
+        let promise = await this.routerManager.routing(i);
+        return promise as RouterModule<R, M>;
     }
 }

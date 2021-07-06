@@ -1,5 +1,7 @@
 import {ConstructorType} from "./types/Types";
 import {SimProxy} from "./proxy/SimProxy";
+import {Router} from "./route/Router";
+import {Module} from "./module/Module";
 
 
 export class SimOption {

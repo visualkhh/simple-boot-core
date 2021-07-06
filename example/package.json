@@ -36,13 +36,10 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.3.1",
-    "less": "^4.1.1",
-    "parcel-bundler": "^1.12.5",
-    "parcel-plugin-css-to-string": "^2.5.2",
     "ts-node": "^10.0.0",
-    "tsconfig-paths": "^3.9.0"
+    "tsconfig-paths": "^3.9.0",
+    "typescript": "^4.2.3"
   },
   "dependencies": {
-    "typescript": "^4.2.3"
   }
 }
