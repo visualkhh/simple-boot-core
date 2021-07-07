@@ -21,7 +21,7 @@ export class Module implements IntentEvent, LifeCycle {
     }
 
     publish(intent: Intent): void {
-        SimGlobal().application?.publishSimIntent(intent);
+        SimGlobal().application?.publishIntent(intent);
     }
 
     subscribe(intent: Intent): void {
