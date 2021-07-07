@@ -12,7 +12,7 @@ const option = new CustomSimOption([GlobalAdvice]);
 const simpleApplication = new SimpleApplication(AppRouter, option);
 // const simpleApplication = new SimpleApplication(AppRouter, option);
 simpleApplication.run();
-simpleApplication.routing<CustomRouter, CustomModule>(new Intent('/b')).then(it => {
+simpleApplication.routing<CustomRouter, CustomModule>(new Intent('/zzb')).then(it => {
     it.router;
     const m = it.module
     let moduleInstance = it.getModuleInstance<B>();

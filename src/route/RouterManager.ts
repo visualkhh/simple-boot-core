@@ -21,17 +21,20 @@ export class RouterManager {
             // notfound find
             let notFound;
             for (const route of routers.slice().reverse()) {
-                const nf = route.notFound(intent);
-                if (nf) {
-                    notFound = nf;
-                    break;
+                if (route !== rootRouter) {
+                    const nf = route.notFound(intent);
+                    if (nf) {
+                        notFound = nf;
+                        break;
+                    }
                 }
             }
             notFound = notFound ?? rootRouter?.notFound(intent);
-            return new RouterModule(rootRouter, notFound);
+            return new RouterModule(rootRouter, notFound, routers);
         }
 
         if (executeModule.router) {
+            executeModule.routerChains = routers;
             executeModule.module = await executeModule.router.canActivate(intent, executeModule);
             return executeModule;
         } else {
