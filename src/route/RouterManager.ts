@@ -7,6 +7,7 @@ import {ConstructorType} from "../types/Types";
 import {RouterModule} from "./RouterModule";
 
 export class RouterManager {
+    public activeRouterModule?:RouterModule;
     constructor(private rootRouter: ConstructorType<Router>, private simstanceManager: SimstanceManager) {
     }
 
@@ -30,13 +31,13 @@ export class RouterManager {
                 }
             }
             notFound = notFound ?? rootRouter?.notFound(intent);
-            return new RouterModule(rootRouter, notFound, routers);
+            return this.activeRouterModule = new RouterModule(rootRouter, notFound, routers);
         }
 
         if (executeModule.router) {
             executeModule.routerChains = routers;
             executeModule.module = await executeModule.router.canActivate(intent, executeModule);
-            return executeModule;
+            return this.activeRouterModule = executeModule;
         } else {
            return undefined;
         }

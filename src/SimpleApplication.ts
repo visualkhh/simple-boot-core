@@ -18,6 +18,9 @@ export class SimpleApplication implements Runnable {
         this.simstanceManager = new SimstanceManager(option)
         this.intentManager = new IntentManager(this.simstanceManager);
         this.routerManager = new RouterManager(this.rootRouter, this.simstanceManager);
+        this.simstanceManager.storage.set(SimstanceManager, this.simstanceManager);
+        this.simstanceManager.storage.set(IntentManager, this.intentManager);
+        this.simstanceManager.storage.set(RouterManager, this.routerManager);
         SimGlobal().application = this;
     }
 
