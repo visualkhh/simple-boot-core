@@ -1,8 +1,5 @@
 import {SimpleApplication} from '../SimpleApplication';
 import {ConstructorType} from '../types/Types';
-import any = jasmine.any;
-import {Router} from "../route/Router";
-import {Module} from "../module/Module";
 declare var global: any;
 declare var window: any;
 

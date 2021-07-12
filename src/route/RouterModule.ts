@@ -4,6 +4,7 @@ import {ConstructorType} from "../types/Types";
 import {SimGlobal} from "../global/SimGlobal";
 
 export class RouterModule<R extends Router = Router, M extends Module = Module> {
+    public pathData?: {[name: string]: string};
     constructor(public router?: R, public module?: ConstructorType<M>, public routerChains: R[] = []) {
     }
 

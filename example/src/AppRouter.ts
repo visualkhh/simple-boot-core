@@ -13,6 +13,7 @@ export class AppRouter extends CustomRouter {
     '' = A;
     '/' = A;
     '/b' = B;
+    '/b/:aa/vv' = B;
 
 
     notFound(url: Intent): ConstructorType<Module> | undefined {

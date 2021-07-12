@@ -37,4 +37,25 @@ export class Intent<T = any, E = any> {
         })
         return param;
     }
+
+    getPathnameData(urlExpression: string) {
+        const urls = this.pathname.split('/');
+        const urlExpressions = urlExpression.split('/');
+        if (urls.length != urlExpressions.length) {
+            return;
+        }
+        const data: {[name: string]: string } = {}
+        for (let i = 0; i < urlExpressions.length; i++) {
+            const it = urlExpressions[i];
+            const urlit = urls[i];
+            if (!it.startsWith(':')) {
+                if (it !== urlit) {
+                    return;
+                }
+                continue;
+            }
+            data[it.slice(1)] = urlit;
+        }
+        return data;
+    }
 }

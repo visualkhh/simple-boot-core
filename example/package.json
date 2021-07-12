@@ -1,5 +1,5 @@
 {
-  "name": "simple-boot-core-example",
+  "name": "dev",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
@@ -41,5 +41,6 @@
     "typescript": "^4.2.3"
   },
   "dependencies": {
+    "simple-boot-core": "1.0.11"
   }
 }
