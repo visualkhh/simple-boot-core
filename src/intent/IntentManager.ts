@@ -10,7 +10,7 @@ export class IntentManager {
     }
 
     public publish(it: Intent) {
-        this.simstanceManager?.getSimConfig(it.scheme).forEach((data) => {
+        this.simstanceManager.getSimConfig(it.scheme).forEach((data) => {
             let orNewSim = this.simstanceManager?.getOrNewSim(data.type) as any;
             if (orNewSim) {
                 // console.log('-->', orNewSim, it.paths)

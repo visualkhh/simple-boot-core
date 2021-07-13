@@ -5,17 +5,17 @@ import {Module} from "../module/Module";
 import {Intent} from "../intent/Intent";
 import {ConstructorType} from "../types/Types";
 import {RouterModule} from "./RouterModule";
+import {Subject} from "rxjs";
 
 export class RouterManager {
     public activeRouterModule?:RouterModule;
+    // public subject = new Subject<Intent>()
     constructor(private rootRouter: ConstructorType<Router>, private simstanceManager: SimstanceManager) {
     }
 
 
     public async routing(intent: Intent): Promise<RouterModule | undefined> {
-        // const url = new Url
         const routers: Router[] = [];
-        // const navigation = this.simstanceManager.getOrNewSim(Navigation)!;
         const rootRouter = this.simstanceManager.getOrNewSim(this.rootRouter);
         let executeModule = rootRouter?.getExecuteModule(intent, routers);
         if (!executeModule) {
