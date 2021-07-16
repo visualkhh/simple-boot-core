@@ -50,7 +50,7 @@ export class Router implements IntentEvent {
         const regex = new RegExp('^' + urlRoot, 'i')
         // path = path.replace(regex, '')
         for (const it of Object.keys(this).filter(it => !it.startsWith('_'))) {
-            let pathnameData = intent.getPathnameData(it);
+            let pathnameData = intent.getPathnameData(urlRoot + it);
             if (pathnameData) {
                 const rm = new RouterModule(this, this[it]);
                 rm.pathData = pathnameData;

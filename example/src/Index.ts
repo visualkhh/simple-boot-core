@@ -10,9 +10,11 @@ import {CustomRouter} from "./CustomRouter";
 const option = new CustomSimOption([GlobalAdvice]);
 const simpleApplication = new SimpleApplication(AppRouter, option);
 simpleApplication.run();
-simpleApplication.routing<CustomRouter, CustomModule>(new Intent('/b/asdf/vv')).then(it => {
-    it.router;
-    const m = it.module
+const url = '/users/ddd';
+// const url = '/b/asdf/vv';
+simpleApplication.routing<CustomRouter, CustomModule>(new Intent(url)).then(it => {
+    // it.router;
+    // const m = it.module
     console.log('--->', it.pathData);
     let moduleInstance = it.getModuleInstance<B>();
     moduleInstance.print();

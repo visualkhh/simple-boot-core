@@ -7,6 +7,7 @@ import {Sim} from "simple-boot-core/decorators/SimDecorator";
 import {CustomRouter} from "./CustomRouter";
 import {Intent} from "simple-boot-core/intent/Intent";
 import {ConstructorType} from "simple-boot-core/types/Types";
+import {UserRouter} from "./users/UserRouter";
 
 @Sim()
 export class AppRouter extends CustomRouter {
@@ -15,6 +16,10 @@ export class AppRouter extends CustomRouter {
     '/b' = B;
     '/b/:aa/vv' = B;
 
+
+    constructor() {
+        super('', [UserRouter]);
+    }
 
     notFound(url: Intent): ConstructorType<Module> | undefined {
         console.log('notfound--->');

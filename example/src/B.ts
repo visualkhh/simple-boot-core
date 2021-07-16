@@ -12,7 +12,7 @@ export class B extends CustomModule {
 
     constructor(private a: A, private option: CustomSimOption, private routerManager: RouterManager, private simstanceManager: SimstanceManager) {
         super();
-        console.log('--->b', option, routerManager, simstanceManager)
+        //console.log('--->b', option, routerManager, simstanceManager)
     }
 
     print() {
