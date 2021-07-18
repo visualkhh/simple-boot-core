@@ -36,7 +36,7 @@ export class RouterManager {
 
         if (executeModule.router) {
             executeModule.routerChains = routers;
-            executeModule.module = await executeModule.router.canActivate(intent, executeModule);
+            executeModule.module = (await executeModule.router.canActivate(intent, executeModule)) ?? executeModule.module;
             return this.activeRouterModule = executeModule;
         } else {
            return undefined;

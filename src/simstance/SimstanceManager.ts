@@ -83,7 +83,11 @@ export class SimstanceManager implements Runnable {
         }
 
         if (this._storage.has(target) && undefined === registed) {
-            return this.newSim(target, (data) => this._storage.set(target, data))
+            const newSim = this.newSim(target, (data) => this._storage.set(target, data));
+            if (newSim && newSim.onCreate) {
+                newSim.onCreate();
+            }
+            return newSim
         }
         throw new SimNoSuch('no simple instance ' + target)
     }

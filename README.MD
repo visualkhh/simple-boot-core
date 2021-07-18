@@ -1,6 +1,9 @@
 SIMPLE-BOOT-CORE
 ===
 
+## Sim LifeCycle
+* onCreate: Object create 
+
 ```typescript
 const option = new CustomSimOption([GlobalAdvice]);
 const simpleApplication = new SimpleApplication(AppRouter, option);
