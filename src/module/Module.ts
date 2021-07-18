@@ -8,16 +8,7 @@ export type RefModuleItem = {dest?: any, params: any[], callBack: Function };
 export class Module implements IntentEvent, LifeCycle {
     public _refModule = new Map<string, Map<Module, RefModuleItem[]> >();
 
-    onChangedRender(): void {
-    }
-
-    onFinish(): void {
-    }
-
-    onInit(): void {
-    }
-
-    onInitedChild(): void {
+    onCreate(): void {
     }
 
     publish(intent: Intent): void {

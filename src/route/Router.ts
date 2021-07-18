@@ -5,13 +5,18 @@ import {SimstanceManager} from "../simstance/SimstanceManager";
 import {SimGlobal} from "../global/SimGlobal";
 import {Intent} from "../intent/Intent";
 import {RouterModule} from "./RouterModule";
+import { LifeCycle } from '../module/LifeCycle';
 
-export class Router implements IntentEvent {
+export class Router implements IntentEvent, LifeCycle{
     [name: string]: ConstructorType<Module> | any;
     private _simstanceManager: SimstanceManager;
     constructor(public _path: string = '', public _childs: ConstructorType<Router>[] = []) {
         this._simstanceManager = SimGlobal().application?.simstanceManager!;
     }
+
+    onCreate(): void {
+    }
+
     publish(intent: Intent): void {
         SimGlobal().application?.publishIntent(intent);
     }
@@ -43,8 +48,8 @@ export class Router implements IntentEvent {
     public isRootUrl(parentRoots: string[], url: string): boolean {
         return url.startsWith(parentRoots.join('') + (this._path || ''))
     }
-
     // my field find
+
     public routing(parentRoots: string[], intent: Intent): RouterModule | undefined {
         const urlRoot = parentRoots.join('') + this._path
         const regex = new RegExp('^' + urlRoot, 'i')
