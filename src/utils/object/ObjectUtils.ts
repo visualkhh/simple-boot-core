@@ -82,4 +82,29 @@ export class ObjectUtils {
     //         it.setAttribute(key, value);
     //     }
     // }
+
+    /* prototype 상속 처리하기
+        class A {
+            say() {
+                console.log('say')
+            }
+        }
+
+        class B {
+            wow() {
+                console.log('wow')
+            }
+        }
+
+        const a = new A();
+        const b = new B();
+
+        const c = Object.assign(a, b);
+        console.log(a, b, c);
+
+
+        const zz = Object.setPrototypeOf(A.prototype, B.prototype);
+        console.log(zz)
+        new A().wow();
+    *  */
 }
