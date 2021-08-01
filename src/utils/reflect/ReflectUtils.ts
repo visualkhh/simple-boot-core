@@ -15,6 +15,14 @@ export class ReflectUtils {
         }
     }
 
+    static getMetadataKeys(target: any) {
+        return Reflect.getMetadataKeys(target);
+    }
+
+    static getMetadatas(target: any) {
+        return this.getMetadataKeys(target).map(it => ReflectUtils.getMetadata(it, target));
+    }
+
     static metadata(metadataKey: any, data: any) {
         return Reflect.metadata(metadataKey, data);
     }

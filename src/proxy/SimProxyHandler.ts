@@ -1,4 +1,3 @@
-import {Module} from '../module/Module'
 import {SimstanceManager} from '../simstance/SimstanceManager'
 import {ConstructorType} from '../types/Types'
 import {SimGlobal} from '../global/SimGlobal';
@@ -26,7 +25,7 @@ export class SimProxyHandler extends SimProxy {
 
     public set(obj: any, prop: string, value: any, receiver: any): boolean {
         // console.log('proxy set-->')
-        value = this.simstanceManager?.proxy(value, Module)
+        value = this.simstanceManager?.proxy(value, Object)
         // this.aopBefore(AOPAction.set, obj, prop, value);
         obj[prop] = value
 

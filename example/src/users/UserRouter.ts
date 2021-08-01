@@ -1,16 +1,19 @@
-import {CustomRouter} from "../CustomRouter";
-import {User} from "./User";
-import {UserDetaile} from "./UserDetaile";
-import {Sim} from "simple-boot-core/decorators/SimDecorator";
+import {User} from './User';
+import {UserDetaile} from 'src/users/UserDetaile';
+import { Router, RouterConfig, Sim } from 'simple-boot-core/decorators/SimDecorator';
+import { A } from 'src/A';
+import { B } from 'src/B';
 
 @Sim()
-export class UserRouter extends CustomRouter {
-    '' = User
-    '/' = User
-    '/:no' = User
-    '/:no/detaile' = UserDetaile
+@Router({
+    childs: {
+        '': User,
+        '/': User,
+        '/:no': User,
+        '/:no/detaile': UserDetaile,
+    },
+    path: '/users'
+})
+export class UserRouter{
 
-    constructor() {
-        super('/users');
-    }
 }

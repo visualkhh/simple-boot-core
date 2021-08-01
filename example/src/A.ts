@@ -1,4 +1,3 @@
-import {Module} from 'simple-boot-core/module/Module';
 import {Sim} from "simple-boot-core/decorators/SimDecorator";
 import {Intent} from "simple-boot-core/intent/Intent";
 import {CustomModule} from "./CustomModule";

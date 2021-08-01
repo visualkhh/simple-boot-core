@@ -1,9 +1,6 @@
 import 'reflect-metadata'
-import {AsyncSubject, fromEvent, Subject} from 'rxjs';
 import {Intent} from './Intent';
-import {ConstructorType} from '../types/Types';
 import {SimstanceManager} from '../simstance/SimstanceManager';
-import {Runnable} from '../run/Runnable';
 
 export class IntentManager {
     constructor(public simstanceManager: SimstanceManager) {

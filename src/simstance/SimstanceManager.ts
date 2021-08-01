@@ -1,17 +1,15 @@
 import 'reflect-metadata'
 import {ConstructorType} from '../types/Types'
 import {SimNoSuch} from '../throwable/SimNoSuch'
-import {Module} from '../module/Module'
-import {getPostConstruct, PostConstruct} from '../decorators/SimDecorator';
+import { getPostConstruct, getSim, PostConstruct, SimConfig, SimMetadataKey } from '../decorators/SimDecorator';
 import {Runnable} from '../run/Runnable';
 import {SimGlobal} from '../global/SimGlobal';
 import {ObjectUtils} from '../utils/object/ObjectUtils';
 import {SimAtomic} from './SimAtomic';
 import {ReflectUtils} from '../utils/reflect/ReflectUtils';
 import {FunctionUtils} from '../utils/function/FunctionUtils';
-import {getInject} from '../decorators/Inject';
+import {getInject} from '../decorators/inject/Inject';
 import {SimProxy} from "../proxy/SimProxy";
-import {SimObjectProxyHandler} from "../proxy/SimObjectProxyHandler";
 import {SimOption} from "../SimOption";
 import {SimProxyHandler} from "../proxy/SimProxyHandler";
 
@@ -29,15 +27,42 @@ export class SimstanceManager implements Runnable {
         return this._storage
     }
 
-    getSimAtomics(): SimAtomic<any>[] {
-        return Array.from(this._storage.keys()).map(it => new SimAtomic(it, this));
+    // getSimAtomicDataCheck<DT>(type: ConstructorType<any>, dataType: ConstructorType<DT>): SimAtomic<DT> {
+    //     const simConfig = getSim(type);
+    //     if (simConfig?.data instanceof dataType) {
+    //         return new SimAtomic<DT>(type, this)
+    //     }
+    //     throw new SimNoSuch('no simple getSimAtomicDataCheck ' + simConfig)
+    // }
+    //
+    // getSimAtomic(type: ConstructorType<any>): SimAtomic {
+    //     return new SimAtomic(type, this)
+    // }
+
+    // getSimAtomic<C extends SimConfig, T extends Object = Object>(type: ConstructorType<T>, key = SimMetadataKey): SimAtomic<C, T> {
+    //     return new SimAtomic<C, T>(type, key);
+    // }
+
+    getSimAtomics(): SimAtomic[] {
+        return Array.from(this._storage.keys()).map(it => new SimAtomic(it));
     }
 
     getSimConfig(scheme: string | undefined): SimAtomic<any>[] {
-        const newVar = this.getSimAtomics().filter(it => scheme && it && scheme === it?.config?.scheme) || [];
+        const newVar = this.getSimAtomics().filter(it => scheme && it && scheme === it?.getConfig()?.scheme) || [];
         return newVar;
     }
 
+    // getOrNewSimSet<T>(k: ConstructorType<T>): T {
+    //
+    // }
+    // getOrNewSimDataCheck<T>(k: ConstructorType<T>): T {
+    //     const orNewSim = this.getOrNewSim(k);
+    //     if (orNewSim) {
+    //     } else {
+    //         throw new SimNoSuch('no simple instance (getOrNewSimDataCheck) ' + orNewSim)
+    //     }
+    //     return orNewSim;
+    // }
     // this.resolve(k) exception 내야하나..? throws... 안쪽에서 undifined해야되는거 아닌가?
     // 아니다 익명 Module이 있을수 있으니 매번 오류메시지 낼필요없다.
     getOrNewSim<T>(k?: ConstructorType<T>): T | undefined {
@@ -96,13 +121,13 @@ export class SimstanceManager implements Runnable {
         const r = new target(...this.getParameterSim(target))
         this.callBindPostConstruct(r);
         //this.settingEventListener(r);
-        const p = this.proxy(r, Module);
+        const p = this.proxy(r, Object);
         // 순환참조 막기위한 콜백 처리
         simCreateAfter?.(p);
         // object in module proxy
-        if (p instanceof Module) {
-            this.moduleObjectPropProxy(p);
-        }
+        // if (p instanceof Module) {
+        //     this.moduleObjectPropProxy(p);
+        // }
         return p;
     }
 
@@ -141,51 +166,40 @@ export class SimstanceManager implements Runnable {
 
 
     public proxy<T>(target: T, type?: ConstructorType<any>): T {
-        if ((type ? target instanceof type : true) && (!('isProxy' in target))) {
-            for (const key in target) {
-                // console.log('target->', target, key)
-                target[key] = this.proxy(target[key], type);
-            }
-            const protoTypeName = ObjectUtils.getProtoTypeName(target);
-            protoTypeName.forEach(it => {
-                (target as any)[it] = new Proxy((target as any)[it], this.simProxyHandler!);
-            });
-            target = new Proxy(target, this.simProxyHandler!);
-            // const simProxyHandler = this.getSimProxyHandler();
-            // if (simProxyHandler) {
-            //     protoTypeName.forEach(it => {
-            //         (target as any)[it] = new Proxy((target as any)[it], simProxyHandler!);
-            //     });
-            //     target = new Proxy(target, simProxyHandler);
-            // }
-        }
+        // if ((type ? target instanceof type : true) && (!('isProxy' in target))) {
+        //     for (const key in target) {
+        //         // console.log('target->', target, key)
+        //         target[key] = this.proxy(target[key], type);
+        //     }
+        //     const protoTypeName = ObjectUtils.getProtoTypeName(target);
+        //     protoTypeName.forEach(it => {
+        //         (target as any)[it] = new Proxy((target as any)[it], this.simProxyHandler!);
+        //     });
+        //     target = new Proxy(target, this.simProxyHandler!);
+        // }
         return target;
     }
 
-    public moduleObjectPropProxy(target: Module): Module {
-        // console.log('isProxy-->', ('isProxy' in target));
-        // if (target instanceof Object && !('isProxy' in target)) {
-        for (const key in target) {
-            const prop = (target as any)[key];
-            if (prop instanceof Module) {
-                this.moduleObjectPropProxy(prop)
-            } else if (prop && typeof prop === 'object' && !(prop instanceof Map)) {
-                // map Object는 proxy 안걸린다 왜그러는건가?
-                if (!('isProxy' in prop)) {
-                    (target as any)[key] = new Proxy(prop, new SimObjectProxyHandler());
-                }
-                const _refModule = ((target as any)[key]).simObjectProxyHandler_refModule;
-                if (_refModule) {
-                    _refModule.set(key, target)
-                }
-                // console.log('----->', _refModule)
-                // console.log('kk-->', target, (target as any).id, (target as any)[key], ',', key, ('isProxy' in prop))
-            }
-            // target[key] = this.moduleProxy(target[key]);
-        }
-
-        return target;
-    }
+    // public moduleObjectPropProxy(target: Module): Module {
+    //     // console.log('isProxy-->', ('isProxy' in target));
+    //     // if (target instanceof Object && !('isProxy' in target)) {
+    //     for (const key in target) {
+    //         const prop = (target as any)[key];
+    //         if (prop instanceof Module) {
+    //             this.moduleObjectPropProxy(prop)
+    //         } else if (prop && typeof prop === 'object' && !(prop instanceof Map)) {
+    //             // map Object는 proxy 안걸린다 왜그러는건가?
+    //             if (!('isProxy' in prop)) {
+    //                 (target as any)[key] = new Proxy(prop, new SimObjectProxyHandler());
+    //             }
+    //             const _refModule = ((target as any)[key]).simObjectProxyHandler_refModule;
+    //             if (_refModule) {
+    //                 _refModule.set(key, target)
+    //             }
+    //         }
+    //     }
+    //     return target;
+    // }
 
     run() {
         SimGlobal().storage.forEach((data: any) => {

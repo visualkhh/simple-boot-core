@@ -1,6 +1,6 @@
-import {ConstructorType, GenericClassDecorator, MethodParameter} from '../types/Types'
-import {ReflectUtils} from '../utils/reflect/ReflectUtils';
-import {FunctionUtils} from "../utils/function/FunctionUtils";
+import {ConstructorType, GenericClassDecorator, MethodParameter} from '../../types/Types'
+import {ReflectUtils} from '../../utils/reflect/ReflectUtils';
+import {FunctionUtils} from "../../utils/function/FunctionUtils";
 
 const InjectMetadataKey = Symbol('Inject');
 export const Inject = (type?: ConstructorType<any>): MethodParameter => {

@@ -1,9 +1,7 @@
-import {Router} from './Router';
-import {Module} from "../module/Module";
-import {ConstructorType} from "../types/Types";
-import {SimGlobal} from "../global/SimGlobal";
+import {ConstructorType} from '../types/Types';
+import {SimGlobal} from '../global/SimGlobal';
 
-export class RouterModule<R extends Router = Router, M extends Module = Module> {
+export class RouterModule<R extends Object = Object, M extends Object = Object> {
     public pathData?: {[name: string]: string};
     constructor(public router?: R, public module?: ConstructorType<M>, public routerChains: R[] = []) {
     }

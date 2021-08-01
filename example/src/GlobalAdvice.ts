@@ -1,12 +1,10 @@
-import {Module} from 'simple-boot-core/module/Module';
 import {Sim} from "simple-boot-core/decorators/SimDecorator";
 import {ExceptionHandler} from "simple-boot-core/decorators/exception/ExceptionDecorator";
 
 @Sim()
-export class GlobalAdvice extends Module {
+export class GlobalAdvice {
 
     constructor() {
-        super();
     }
 
     @ExceptionHandler()
