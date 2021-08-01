@@ -34,7 +34,6 @@ export const RouterMetadataKey = Symbol('Router');
 export const Router = (config?: RouterConfig): GenericClassDecorator<ConstructorType<any>> => {
     return (target: ConstructorType<any>) => {
         ReflectUtils.defineMetadata(RouterMetadataKey, config, target);
-        SimGlobal().storage.add(target);
     }
 }
 
