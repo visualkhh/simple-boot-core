@@ -29,8 +29,9 @@ export class SimpleApplication implements Runnable {
     public publishIntent(i: Intent) {
         return this.intentManager.publish(i);
     }
+
     public async routing<R extends Object = Object, M extends Object = Object>(i: Intent) {
-        let promise = await this.routerManager.routing(i);
+        const promise = await this.routerManager.routing(i);
         return promise as RouterModule<R, M>;
     }
 }

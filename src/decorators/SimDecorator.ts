@@ -26,8 +26,8 @@ export const Sim = (config?: SimConfig): GenericClassDecorator<ConstructorType<a
 }
 
 export const getSim = (target: ConstructorType<any> | Function | any): SimConfig | undefined => {
-    if (typeof target === 'object') {target = target.constructor;}
-    try {return ReflectUtils.getMetadata(SimMetadataKey, target);} catch (e) {}
+    if (typeof target === 'object') { target = target.constructor; }
+    try { return ReflectUtils.getMetadata(SimMetadataKey, target); } catch (e) {}
 }
 
 export const RouterMetadataKey = Symbol('Router');
@@ -38,8 +38,8 @@ export const Router = (config?: RouterConfig): GenericClassDecorator<Constructor
 }
 
 export const getRouter = (target: ConstructorType<any> | Function | any): RouterConfig | undefined => {
-    if (typeof target === 'object') {target = target.constructor;}
-    try {return ReflectUtils.getMetadata(RouterMetadataKey, target);} catch (e) {}
+    if (typeof target === 'object') { target = target.constructor; }
+    try { return ReflectUtils.getMetadata(RouterMetadataKey, target); } catch (e) {}
 }
 
 const PostConstructMetadataKey = Symbol('PostConstruct');

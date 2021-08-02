@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import {ConstructorType} from '../types/Types'
 import {SimNoSuch} from '../throwable/SimNoSuch'
-import { getPostConstruct, getSim, PostConstruct, SimConfig, SimMetadataKey } from '../decorators/SimDecorator';
+import { getPostConstruct, PostConstruct } from '../decorators/SimDecorator';
 import {Runnable} from '../run/Runnable';
 import {SimGlobal} from '../global/SimGlobal';
 import {ObjectUtils} from '../utils/object/ObjectUtils';
@@ -9,15 +9,14 @@ import {SimAtomic} from './SimAtomic';
 import {ReflectUtils} from '../utils/reflect/ReflectUtils';
 import {FunctionUtils} from '../utils/function/FunctionUtils';
 import {getInject} from '../decorators/inject/Inject';
-import {SimProxy} from "../proxy/SimProxy";
-import {SimOption} from "../SimOption";
-import {SimProxyHandler} from "../proxy/SimProxyHandler";
+import {SimOption} from '../SimOption';
+import {SimProxyHandler} from '../proxy/SimProxyHandler';
 
 export class SimstanceManager implements Runnable {
     private _storage = new Map<ConstructorType<any>, any>()
     private simProxyHandler: SimProxyHandler | undefined;
 
-    constructor(option: SimOption) {
+    constructor(private option: SimOption) {
         this._storage.set(SimstanceManager, this);
         this._storage.set((option as any).constructor, option);
         this._storage.set(SimOption, option);
@@ -120,8 +119,8 @@ export class SimstanceManager implements Runnable {
     public newSim<T>(target: ConstructorType<T>, simCreateAfter?: (data: T) => void): T {
         const r = new target(...this.getParameterSim(target))
         this.callBindPostConstruct(r);
-        //this.settingEventListener(r);
-        const p = this.proxy(r, Object);
+        // this.settingEventListener(r);
+        const p = this.proxy(r);
         // 순환참조 막기위한 콜백 처리
         simCreateAfter?.(p);
         // object in module proxy
@@ -142,8 +141,6 @@ export class SimstanceManager implements Runnable {
         })
     }
 
-
-
     public getParameterSim(target: Object, targetKey?: string | symbol): any[] {
         const paramTypes = ReflectUtils.getParameterTypes(target, targetKey);
         const paramNames = FunctionUtils.getParameterNames(target, targetKey);
@@ -155,28 +152,31 @@ export class SimstanceManager implements Runnable {
         return injections;
     }
 
-    public getSimProxyHandler(): SimProxy | undefined {
-        return undefined;
-    }
-
     @PostConstruct
     public post(simProxyHandler: SimProxyHandler) {
         this.simProxyHandler = simProxyHandler;
     }
 
-
-    public proxy<T>(target: T, type?: ConstructorType<any>): T {
+    public proxy<T>(target: T): T {
         // if ((type ? target instanceof type : true) && (!('isProxy' in target))) {
-        //     for (const key in target) {
-        //         // console.log('target->', target, key)
-        //         target[key] = this.proxy(target[key], type);
-        //     }
-        //     const protoTypeName = ObjectUtils.getProtoTypeName(target);
-        //     protoTypeName.forEach(it => {
-        //         (target as any)[it] = new Proxy((target as any)[it], this.simProxyHandler!);
-        //     });
-        //     target = new Proxy(target, this.simProxyHandler!);
-        // }
+        if ((typeof target === 'object') && (!('isProxy' in target))) {
+            for (const key in target) {
+                // console.log('target->', target, key)
+                target[key] = this.proxy(target[key]);
+            }
+            const protoTypeName = ObjectUtils.getProtoTypeName(target);
+            protoTypeName.filter(it => typeof (target as any)[it] === 'object').forEach(it => {
+                (target as any)[it] = new Proxy((target as any)[it], this.simProxyHandler!);
+            });
+
+            if (this.simProxyHandler) {
+                target = new Proxy(target, this.simProxyHandler);
+            }
+        }
+
+        if (this.option.proxy) {
+            target = this.option.proxy.onProxy(target);
+        }
         return target;
     }
 

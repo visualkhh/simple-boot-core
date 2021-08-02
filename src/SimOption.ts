@@ -1,9 +1,7 @@
-import {ConstructorType} from "./types/Types";
-import {SimProxy} from "./proxy/SimProxy";
+import {ConstructorType} from './types/Types';
 
 export class SimOption {
-
-    constructor(public advice: ConstructorType<any>[] = [], public simProxy?: SimProxy) {
+    constructor(public advice: ConstructorType<any>[] = [], public proxy?: {onProxy: <T>(it: T) => T}) {
     }
 
     addAdvicce(advice: ConstructorType<any>) {

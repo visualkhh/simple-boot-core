@@ -5,21 +5,17 @@ import {Sim} from '../decorators/SimDecorator';
 import {getTargetAndIncludeNullAndSortExceptionHandlers} from '../decorators/exception/ExceptionDecorator';
 import {getProtoAfters, getProtoBefores} from '../decorators/aop/AOPDecorator';
 import {ObjectUtils} from '../utils/object/ObjectUtils';
-import {SimProxy} from './SimProxy';
-import {SimOption} from "../SimOption";
+import {SimOption} from '../SimOption';
 
 @Sim()
-export class SimProxyHandler extends SimProxy {
+export class SimProxyHandler implements ProxyHandler<any> {
     private simstanceManager?: SimstanceManager;
 
     constructor(private simOption: SimOption) {
-        super()
         this.simstanceManager = SimGlobal().application?.simstanceManager;
     }
 
     public get(target: any, name: string): any {
-        // this.aopBefore(AOPAction.get, target, name, target[name]);
-        // setTimeout(() => this.aopAfter(AOPAction.get, target, name, target[name]), 1)
         return target[name]
     }
 
@@ -28,12 +24,7 @@ export class SimProxyHandler extends SimProxy {
         value = this.simstanceManager?.proxy(value, Object)
         // this.aopBefore(AOPAction.set, obj, prop, value);
         obj[prop] = value
-
-        if (this.simOption.simProxy) {
-            return this.simOption.simProxy.set(obj, prop, value, receiver);
-        } else {
-            return true
-        }
+        return true
     }
 
     apply(target: Function, thisArg: any, argumentsList?: any): any {
@@ -93,5 +84,12 @@ export class SimProxyHandler extends SimProxy {
                 })
             }
         }
+    }
+
+    has(target: any, key: PropertyKey): boolean {
+        if (key === 'isProxy') {
+            return true
+        }
+        return key in target
     }
 }
