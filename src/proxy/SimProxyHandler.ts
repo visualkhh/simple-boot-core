@@ -21,7 +21,7 @@ export class SimProxyHandler implements ProxyHandler<any> {
 
     public set(obj: any, prop: string, value: any, receiver: any): boolean {
         // console.log('proxy set-->')
-        value = this.simstanceManager?.proxy(value, Object)
+        value = this.simstanceManager?.proxy(value)
         // this.aopBefore(AOPAction.set, obj, prop, value);
         obj[prop] = value
         return true

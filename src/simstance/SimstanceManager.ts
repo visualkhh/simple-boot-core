@@ -157,9 +157,10 @@ export class SimstanceManager implements Runnable {
         this.simProxyHandler = simProxyHandler;
     }
 
-    public proxy<T>(target: T): T {
+    public proxy<T = any>(target: T): T {
         // if ((type ? target instanceof type : true) && (!('isProxy' in target))) {
-        if ((typeof target === 'object') && (!('isProxy' in target))) {
+        // @ts-ignore
+        if ((typeof target === 'object') && (target !== this.option) && (!('isProxy' in target))) {
             for (const key in target) {
                 // console.log('target->', target, key)
                 target[key] = this.proxy(target[key]);
