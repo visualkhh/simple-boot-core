@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import {ConstructorType} from '../types/Types'
 import {SimNoSuch} from '../throwable/SimNoSuch'
-import { getPostConstruct, PostConstruct } from '../decorators/SimDecorator';
+import { getPostConstruct, getSim, PostConstruct } from '../decorators/SimDecorator';
 import {Runnable} from '../run/Runnable';
 import {SimGlobal} from '../global/SimGlobal';
 import {ObjectUtils} from '../utils/object/ObjectUtils';
@@ -11,6 +11,8 @@ import {FunctionUtils} from '../utils/function/FunctionUtils';
 import {getInject} from '../decorators/inject/Inject';
 import {SimOption} from '../SimOption';
 import {SimProxyHandler} from '../proxy/SimProxyHandler';
+import { IntentManager } from '../intent/IntentManager';
+import { RouterManager } from '../route/RouterManager';
 
 export class SimstanceManager implements Runnable {
     private _storage = new Map<ConstructorType<any>, any>()
@@ -158,17 +160,15 @@ export class SimstanceManager implements Runnable {
     }
 
     public proxy<T = any>(target: T): T {
-        // if ((type ? target instanceof type : true) && (!('isProxy' in target))) {
-        // @ts-ignore
-        if ((typeof target === 'object') && (target !== this.option) && (!('isProxy' in target))) {
+        if (getSim(target) && (typeof target === 'object') && (!('isProxy' in target))) {
             for (const key in target) {
                 // console.log('target->', target, key)
                 target[key] = this.proxy(target[key]);
             }
-            const protoTypeName = ObjectUtils.getProtoTypeName(target);
-            protoTypeName.filter(it => typeof (target as any)[it] === 'object').forEach(it => {
-                (target as any)[it] = new Proxy((target as any)[it], this.simProxyHandler!);
-            });
+            // const protoTypeName = ObjectUtils.getProtoTypeName(target);
+            // protoTypeName.filter(it => typeof (target as any)[it] === 'object').forEach(it => {
+            //     (target as any)[it] = new Proxy((target as any)[it], this.simProxyHandler!);
+            // });
 
             if (this.simProxyHandler) {
                 target = new Proxy(target, this.simProxyHandler);

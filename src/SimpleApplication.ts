@@ -7,6 +7,7 @@ import {RouterManager} from './route/RouterManager';
 import {Intent} from './intent/Intent';
 import {ConstructorType} from './types/Types';
 import {RouterModule} from './route/RouterModule';
+import { SimAtomic } from 'simstance/SimAtomic';
 
 export class SimpleApplication implements Runnable {
     public simstanceManager: SimstanceManager;
@@ -15,7 +16,7 @@ export class SimpleApplication implements Runnable {
     constructor(public rootRouter: ConstructorType<Object>, public option = new SimOption()) {
         this.simstanceManager = new SimstanceManager(option)
         this.intentManager = new IntentManager(this.simstanceManager);
-        this.routerManager = new RouterManager(this.rootRouter, this.simstanceManager);
+        this.routerManager = new RouterManager(this.rootRouter);
         this.simstanceManager.storage.set(SimstanceManager, this.simstanceManager);
         this.simstanceManager.storage.set(IntentManager, this.intentManager);
         this.simstanceManager.storage.set(RouterManager, this.routerManager);
@@ -30,8 +31,8 @@ export class SimpleApplication implements Runnable {
         return this.intentManager.publish(i);
     }
 
-    public async routing<R = any, M = any>(i: Intent) {
+    public async routing<R = SimAtomic, M = any>(i: Intent) {
         const promise = await this.routerManager.routing(i);
-        return promise as RouterModule<R, M>;
+        return promise as RouterModule<R, M> | undefined;
     }
 }

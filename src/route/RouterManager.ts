@@ -9,7 +9,7 @@ import { SimAtomic } from '../simstance/SimAtomic';
 export class RouterManager {
     public activeRouterModule?:RouterModule;
     // public subject = new Subject<Intent>()
-    constructor(private rootRouter: ConstructorType<any>, private simstanceManager: SimstanceManager) {
+    constructor(private rootRouter: ConstructorType<any>) {
     }
 
     public async routing(intent: Intent): Promise<RouterModule | undefined> {
@@ -22,7 +22,7 @@ export class RouterManager {
         const routerAtomic = new SimAtomic(this.rootRouter);
         const rootRouterData = routerAtomic.getConfig<RouterConfig>(RouterMetadataKey)!;
         const rootRouter = routerAtomic.value!;
-        const executeModule = this.getExecuteModule(rootRouter, intent, routers);
+        const executeModule = this.getExecuteModule(routerAtomic, intent, routers);
         // console.log('rootRouter->', this.rootRouter, rootRouter, executeModule)
         if (!executeModule) {
             // notfound find
@@ -43,9 +43,9 @@ export class RouterManager {
 
         if (executeModule.router) {
             executeModule.routerChains = routers;
-            if (executeModule.router.canActivat) {
-                executeModule.module = (await executeModule.router.canActivate(intent, executeModule)) ?? executeModule.module;
-            }
+            // if (executeModule.router.canActivat) {
+            //     executeModule.module = (await executeModule.router.canActivate(intent, executeModule)) ?? executeModule.module;
+            // }
             // eslint-disable-next-line no-return-assign
             return this.activeRouterModule = executeModule;
         } else {
@@ -53,10 +53,10 @@ export class RouterManager {
         }
     }
 
-    private getExecuteModule(router: object, intent: Intent, parentRouters: object[]): RouterModule | undefined {
+    private getExecuteModule(router: SimAtomic, intent: Intent, parentRouters: SimAtomic[]): RouterModule | undefined {
         const path = intent.pathname;
-        const routerStrings = parentRouters.slice(1).map(it => getRouter(it)?.path || '');
-        const routerConfig = getRouter(router)!
+        const routerConfig = router.getConfig<RouterConfig>(RouterMetadataKey)!;
+        const routerStrings = parentRouters.slice(1).map(it => it.getConfig<RouterConfig>(RouterMetadataKey)?.path || '');
         const isRoot = this.isRootUrl(routerConfig.path, routerStrings, path)
         if (isRoot) {
             parentRouters.push(router);
@@ -67,10 +67,10 @@ export class RouterManager {
                 for (const child of routerConfig.childRouters) {
                     const routerAtomic = new SimAtomic(child);
                     const rootRouterData = routerAtomic.getConfig<RouterConfig>(RouterMetadataKey)!;
-                    const rootRouter = routerAtomic.value!;
+                    const router = routerAtomic.value!;
                     // console.log('---------------', rootRouter)
-                    const executeModule = this.getExecuteModule(rootRouter, intent, parentRouters)
-                    if (rootRouter && executeModule) {
+                    const executeModule = this.getExecuteModule(routerAtomic, intent, parentRouters)
+                    if (router && executeModule) {
                         return executeModule
                     }
                 }
@@ -82,7 +82,7 @@ export class RouterManager {
         return url.startsWith(parentRoots.join('') + (path || ''))
     }
 
-    private findRouting(router: object, routerData: RouterConfig, parentRoots: string[], intent: Intent): RouterModule | undefined {
+    private findRouting(router: SimAtomic, routerData: RouterConfig, parentRoots: string[], intent: Intent): RouterModule | undefined {
         const urlRoot = parentRoots.join('') + routerData.path
         const regex = new RegExp('^' + urlRoot, 'i')
         // path = path.replace(regex, '')
