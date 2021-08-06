@@ -26,7 +26,7 @@ export class Intent<T = any, E = any> {
 
     get query() {
         const paths = this.fullPath.split('?');
-        return paths[1]??'';
+        return paths[1] ?? '';
     }
 
     get queryParams() {
@@ -41,7 +41,7 @@ export class Intent<T = any, E = any> {
     getPathnameData(urlExpression: string) {
         const urls = this.pathname.split('/');
         const urlExpressions = urlExpression.split('/');
-        if (urls.length != urlExpressions.length) {
+        if (urls.length !== urlExpressions.length) {
             return;
         }
         const data: {[name: string]: string } = {}

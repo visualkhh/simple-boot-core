@@ -6,26 +6,31 @@ export class IntentManager {
     constructor(public simstanceManager: SimstanceManager) {
     }
 
-    public publish(it: Intent) {
-        this.simstanceManager.getSimConfig(it.scheme).forEach((data) => {
+    public publish(it: Intent | string, data?: any) {
+        if (typeof it === 'string') {
+            it = new Intent(it, data);
+        }
+        const intent = it as Intent;
+
+        this.simstanceManager.getSimConfig(intent.scheme).forEach((data) => {
             let orNewSim = this.simstanceManager?.getOrNewSim(data.type) as any;
             if (orNewSim) {
                 // console.log('-->', orNewSim, it.paths)
-                if (it.paths.length > 0) {
+                if (intent.paths.length > 0) {
                     let callthis = orNewSim;
                     let lastProp = '';
-                    it.paths.filter(i => i).forEach(i => {
+                    intent.paths.filter(i => i).forEach(i => {
                         callthis = orNewSim;
                         orNewSim = orNewSim?.[i]
                         lastProp = i;
                     });
                     if (orNewSim && typeof orNewSim === 'function') {
-                        orNewSim.call(callthis, it);
+                        orNewSim.call(callthis, intent);
                     } else if (orNewSim) {
-                        callthis[lastProp] = it.data;
+                        callthis[lastProp] = intent.data;
                     }
                 } else {
-                    orNewSim?.subscribe?.(it);
+                    orNewSim?.subscribe?.(intent);
                 }
             }
         })

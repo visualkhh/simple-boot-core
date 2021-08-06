@@ -7,12 +7,8 @@ import {getProtoAfters, getProtoBefores} from '../decorators/aop/AOPDecorator';
 import {ObjectUtils} from '../utils/object/ObjectUtils';
 import {SimOption} from '../SimOption';
 
-@Sim()
 export class SimProxyHandler implements ProxyHandler<any> {
-    private simstanceManager?: SimstanceManager;
-
-    constructor(private simOption: SimOption) {
-        this.simstanceManager = SimGlobal().application?.simstanceManager;
+    constructor(private simstanceManager: SimstanceManager, private simOption: SimOption) {
     }
 
     public get(target: any, name: string): any {

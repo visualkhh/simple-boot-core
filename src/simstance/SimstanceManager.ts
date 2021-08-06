@@ -16,12 +16,13 @@ import { RouterManager } from '../route/RouterManager';
 
 export class SimstanceManager implements Runnable {
     private _storage = new Map<ConstructorType<any>, any>()
-    private simProxyHandler: SimProxyHandler | undefined;
+    private simProxyHandler: SimProxyHandler;
 
     constructor(private option: SimOption) {
         this._storage.set(SimstanceManager, this);
         this._storage.set((option as any).constructor, option);
         this._storage.set(SimOption, option);
+        this.simProxyHandler = new SimProxyHandler(this, option);
     }
 
     get storage(): Map<ConstructorType<any>, any> {
@@ -154,21 +155,18 @@ export class SimstanceManager implements Runnable {
         return injections;
     }
 
-    @PostConstruct
-    public post(simProxyHandler: SimProxyHandler) {
-        this.simProxyHandler = simProxyHandler;
-    }
-
     public proxy<T = any>(target: T): T {
         if (getSim(target) && (typeof target === 'object') && (!('isProxy' in target))) {
             for (const key in target) {
                 // console.log('target->', target, key)
                 target[key] = this.proxy(target[key]);
             }
-            // const protoTypeName = ObjectUtils.getProtoTypeName(target);
-            // protoTypeName.filter(it => typeof (target as any)[it] === 'object').forEach(it => {
-            //     (target as any)[it] = new Proxy((target as any)[it], this.simProxyHandler!);
-            // });
+
+            // function apply proxy
+            const protoTypeName = ObjectUtils.getProtoTypeName(target);
+            protoTypeName.filter(it => typeof (target as any)[it] === 'function').forEach(it => {
+                (target as any)[it] = new Proxy((target as any)[it], this.simProxyHandler!);
+            });
 
             if (this.simProxyHandler) {
                 target = new Proxy(target, this.simProxyHandler);
