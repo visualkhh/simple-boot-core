@@ -4,13 +4,14 @@ import {CustomSimOption} from "./CustomSimOption";
 import {AppRouter} from "./AppRouter";
 import {Intent} from "simple-boot-core/intent/Intent";
 import { User } from 'src/users/User';
+import { SimAtomic } from 'simple-boot-core/simstance/SimAtomic';
 
 const option = new CustomSimOption([GlobalAdvice]);
 const simpleApplication = new SimpleApplication(AppRouter, option);
 simpleApplication.run();
 const url = '/users/d51515dd';
 // const url = '/b/asdf/vv';
-simpleApplication.routing(new Intent(url)).then(it => {
+simpleApplication.routing<SimAtomic<any>, any>(new Intent(url)).then(it => {
     // it.router;
     // const m = it.module
     console.log('--->', it.pathData);

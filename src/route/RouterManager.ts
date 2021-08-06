@@ -1,5 +1,4 @@
 import 'reflect-metadata'
-import {SimstanceManager} from '../simstance/SimstanceManager';
 import {Intent} from '../intent/Intent';
 import {ConstructorType} from '../types/Types';
 import {RouterModule} from './RouterModule';
@@ -12,7 +11,7 @@ export class RouterManager {
     constructor(private rootRouter: ConstructorType<any>) {
     }
 
-    public async routing(intent: Intent): Promise<RouterModule | undefined> {
+    public async routing(intent: Intent) {
         // const metadata = Reflect.getMetadata('design:type', this.rootRouter);
         // const metadata = Reflect.getMetadataKeys( this.rootRouter);
         // console.log('-->', metadata)

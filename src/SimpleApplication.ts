@@ -1,18 +1,19 @@
-import {SimGlobal} from './global/SimGlobal';
-import {Runnable} from './run/Runnable';
-import {SimstanceManager} from './simstance/SimstanceManager';
-import {SimOption} from './SimOption';
-import {IntentManager} from './intent/IntentManager';
-import {RouterManager} from './route/RouterManager';
-import {Intent} from './intent/Intent';
-import {ConstructorType} from './types/Types';
-import {RouterModule} from './route/RouterModule';
-import { SimAtomic } from 'simstance/SimAtomic';
+import { SimGlobal } from './global/SimGlobal';
+import { Runnable } from './run/Runnable';
+import { SimstanceManager } from './simstance/SimstanceManager';
+import { SimOption } from './SimOption';
+import { IntentManager } from './intent/IntentManager';
+import { RouterManager } from './route/RouterManager';
+import { Intent } from './intent/Intent';
+import { ConstructorType } from './types/Types';
+import { RouterModule } from './route/RouterModule';
+import { SimAtomic } from './simstance/SimAtomic';
 
 export class SimpleApplication implements Runnable {
     public simstanceManager: SimstanceManager;
     private intentManager: IntentManager;
     private routerManager: RouterManager;
+
     constructor(public rootRouter: ConstructorType<Object>, public option = new SimOption()) {
         this.simstanceManager = new SimstanceManager(option)
         this.intentManager = new IntentManager(this.simstanceManager);
