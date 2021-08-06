@@ -121,11 +121,11 @@ export class SimstanceManager implements Runnable {
 
     public newSim<T>(target: ConstructorType<T>, simCreateAfter?: (data: T) => void): T {
         const r = new target(...this.getParameterSim(target))
-        this.callBindPostConstruct(r);
         // this.settingEventListener(r);
         const p = this.proxy(r);
         // 순환참조 막기위한 콜백 처리
         simCreateAfter?.(p);
+        this.callBindPostConstruct(p);
         // object in module proxy
         // if (p instanceof Module) {
         //     this.moduleObjectPropProxy(p);
