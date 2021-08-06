@@ -1,8 +1,7 @@
 import {ReflectUtils} from '../../utils/reflect/ReflectUtils';
-import {FromEventTarget} from 'rxjs/internal/observable/fromEvent';
 
 export interface EventListenerOption {
-    target: string|any|FromEventTarget<any>;
+    target: string|any;
     name: string;
 }
 const EventListenerMetadataKey = Symbol('EventListener');
