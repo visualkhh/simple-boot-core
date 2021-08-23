@@ -4,7 +4,7 @@ import { ConstructorType } from 'types/Types';
 
 export interface RouterAction {
 
-    canActivate(url: Intent, module: ConstructorType<object>): void;
+    canActivate(url: Intent, module: any): void;
     // notFound(url: Intent): ConstructorType<Object>;
 
         // public async canActivate(url: Intent, module: RouterModule): Promise<ConstructorType<Object> | undefined> {

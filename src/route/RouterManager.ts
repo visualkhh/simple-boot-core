@@ -54,23 +54,25 @@ export class RouterManager {
 
     private getExecuteModule(router: SimAtomic, intent: Intent, parentRouters: SimAtomic[]): RouterModule | undefined {
         const path = intent.pathname;
-        const routerConfig = router.getConfig<RouterConfig>(RouterMetadataKey)!;
-        const routerStrings = parentRouters.slice(1).map(it => it.getConfig<RouterConfig>(RouterMetadataKey)?.path || '');
-        const isRoot = this.isRootUrl(routerConfig.path, routerStrings, path)
-        if (isRoot) {
-            parentRouters.push(router);
-            const module = this.findRouting(router, routerConfig, routerStrings, intent)
-            if (module?.module) {
-                return module;
-            } else if (routerConfig.childRouters && routerConfig.childRouters.length > 0) {
-                for (const child of routerConfig.childRouters) {
-                    const routerAtomic = new SimAtomic(child);
-                    const rootRouterData = routerAtomic.getConfig<RouterConfig>(RouterMetadataKey)!;
-                    const router = routerAtomic.value!;
-                    // console.log('---------------', rootRouter)
-                    const executeModule = this.getExecuteModule(routerAtomic, intent, parentRouters)
-                    if (router && executeModule) {
-                        return executeModule
+        const routerConfig = router.getConfig<RouterConfig>(RouterMetadataKey);
+        if (routerConfig) {
+            const routerStrings = parentRouters.slice(1).map(it => it.getConfig<RouterConfig>(RouterMetadataKey)?.path || '');
+            const isRoot = this.isRootUrl(routerConfig.path, routerStrings, path)
+            if (isRoot) {
+                parentRouters.push(router);
+                const module = this.findRouting(router, routerConfig, routerStrings, intent)
+                if (module?.module) {
+                    return module;
+                } else if (routerConfig.childRouters && routerConfig.childRouters.length > 0) {
+                    for (const child of routerConfig.childRouters) {
+                        const routerAtomic = new SimAtomic(child);
+                        const rootRouterData = routerAtomic.getConfig<RouterConfig>(RouterMetadataKey)!;
+                        const router = routerAtomic.value!;
+                        // console.log('---------------', rootRouter)
+                        const executeModule = this.getExecuteModule(routerAtomic, intent, parentRouters)
+                        if (router && executeModule) {
+                            return executeModule
+                        }
                     }
                 }
             }
