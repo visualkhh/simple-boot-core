@@ -6,7 +6,9 @@ export class IntentManager {
     constructor(public simstanceManager: SimstanceManager) {
     }
 
-    public publish(it: Intent | string, data?: any) {
+    public publish(it: string, data?: any): void;
+    public publish(it: Intent, data?: any): void;
+    public publish(it: Intent | string, data?: any): void {
         if (typeof it === 'string') {
             it = new Intent(it, data);
         }
