@@ -6,6 +6,7 @@ declare let window: any;
 const g = new class {
     _application?: SimpleApplication;
     storage = new Set<ConstructorType<any>>();
+    data: any = {};
     // storage = new Map<ConstructorType<any>, { config?: SimConfig, object?: any }>();
 
     set application(application: SimpleApplication | undefined) {

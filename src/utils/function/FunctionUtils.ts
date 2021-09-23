@@ -5,7 +5,7 @@ export class FunctionUtils {
         }
         // @ts-ignore https://stackoverflow.com/questions/1007981/how-to-get-function-parameter-names-values-dynamicallyㄱ
         return new RegExp('(?:' + func.name + '\\s*|^)\\s*\\((.*?)\\)')
-            .exec(func.toString().replace(/\n/g, ''))[1]
+            .exec(func.toString().replace(/\n/g, ''))?.[1]
             .replace(/\/\*.*?\*\//g, '')
             .replace(/ /g, '')
             .split(',') ?? [];
