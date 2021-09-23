@@ -1,0 +1,24 @@
+- typescript
+    - decorator
+        - https://blog.logrocket.com/a-practical-guide-to-typescript-decorators/
+        - https://haeguri.github.io/2019/08/25/typescript-decorator/
+        - https://www.typescriptlang.org/docs/handbook/decorators.html
+        - https://typescript-kr.github.io/pages/decorators.html
+    - reflection
+        - Reflect: https://rbuckton.github.io/reflect-metadata/
+        - http://blog.wolksoftware.com/decorators-metadata-reflection-in-typescript-from-novice-to-expert-part-4
+        - metadata
+            - https://typescript-kr.github.io/pages/decorators.html
+        - 전반적인
+            - https://nehalist.io/dependency-injection-in-typescript/#theinjector
+
+    - TypeScript로 DI 구현해보기
+        - https://blog.shovelman.dev/964
+        - https://github.com/nehalist/di-ts
+    - lib
+        - di,ioc: https://www.npmjs.com/package/typescript-ioc
+    - plugin
+        - https://github.com/Microsoft/TypeScript/wiki/Using-the-Compiler-API
+        - https://github.com/Microsoft/TypeScript/wiki/Using-the-Language-Service-API
+        - https://github.com/microsoft/TypeScript/wiki/Using-the-Language-Service-API#reference-resolution-in-the-language-service
+        - ht
