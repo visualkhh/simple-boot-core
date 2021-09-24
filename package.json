@@ -1,6 +1,6 @@
 {
   "name": "simple-boot-core",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "main": "SimpleApplication.js",
   "license": "MIT",
   "description": "front end SPA frameworks",
