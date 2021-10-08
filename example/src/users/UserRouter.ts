@@ -6,7 +6,7 @@ import { B } from 'src/B';
 
 @Sim()
 @Router({
-    childs: {
+    route: {
         '': User,
         '/': User,
         '/:no': User,

@@ -63,8 +63,8 @@ export class RouterManager {
                 const module = this.findRouting(router, routerConfig, routerStrings, intent)
                 if (module?.module) {
                     return module;
-                } else if (routerConfig.childRouters && routerConfig.childRouters.length > 0) {
-                    for (const child of routerConfig.childRouters) {
+                } else if (routerConfig.routers && routerConfig.routers.length > 0) {
+                    for (const child of routerConfig.routers) {
                         const routerAtomic = new SimAtomic(child);
                         const rootRouterData = routerAtomic.getConfig<RouterConfig>(RouterMetadataKey)!;
                         const router = routerAtomic.value!;
@@ -87,10 +87,10 @@ export class RouterManager {
         const urlRoot = parentRoots.join('') + routerData.path
         const regex = new RegExp('^' + urlRoot, 'i')
         // path = path.replace(regex, '')
-        for (const it of Object.keys(routerData.childs).filter(it => !it.startsWith('_'))) {
+        for (const it of Object.keys(routerData.route).filter(it => !it.startsWith('_'))) {
             const pathnameData = intent.getPathnameData(urlRoot + it);
             if (pathnameData) {
-                const rm = new RouterModule(router, routerData.childs[it]);
+                const rm = new RouterModule(router, routerData.route[it]);
                 rm.pathData = pathnameData;
                 return rm;
             }

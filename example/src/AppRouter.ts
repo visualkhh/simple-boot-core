@@ -7,14 +7,14 @@ import { UserRouter } from './users/UserRouter';
 
 @Sim()
 @Router({
-    childs: {
+    route: {
         '': A,
         '/': A,
         '/b': B,
         '/b/:aa/vv': B
     },
     path: '',
-    childRouters: [UserRouter]
+    routers: [UserRouter]
 })
 export class AppRouter {
 

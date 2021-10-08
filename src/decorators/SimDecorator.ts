@@ -7,8 +7,8 @@ export interface SimConfig {
 }
 export interface RouterConfig {
     path: string;
-    childs: {[name: string]: ConstructorType<Object>}
-    childRouters?: ConstructorType<Object>[];
+    route: {[name: string]: ConstructorType<Object>}
+    routers?: ConstructorType<Object>[];
 
     // constructor(childs: { [p: string]: ConstructorType<Object> } = {}, path = '', childRouters: ConstructorType<Object>[] = []) {
     //     this.path = path;
