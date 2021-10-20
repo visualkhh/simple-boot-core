@@ -5,9 +5,11 @@ import {ReflectUtils} from '../utils/reflect/ReflectUtils';
 export interface SimConfig {
     scheme?: string;
 }
+export type RouteProperty = ConstructorType<Object> | [ConstructorType<Object>, any] | string;
+export type Route = {[name: string]: RouteProperty};
 export interface RouterConfig {
     path: string;
-    route: {[name: string]: ConstructorType<Object>}
+    route: Route;
     routers?: ConstructorType<Object>[];
 }
 

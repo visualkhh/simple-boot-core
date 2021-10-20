@@ -1,30 +1,29 @@
 import { A } from './A';
 import { B } from './B';
-import { Router, RouterConfig, Sim, SimConfig } from 'simple-boot-core/decorators/SimDecorator';
+import { Router, Sim } from 'simple-boot-core/decorators/SimDecorator';
 import { Intent } from 'simple-boot-core/intent/Intent';
-import { ConstructorType } from 'simple-boot-core/types/Types';
 import { UserRouter } from './users/UserRouter';
+import { RouterAction } from 'simple-boot-core/route/RouterAction';
 
 @Sim()
 @Router({
     route: {
-        '': A,
-        '/': A,
+        '': '/',
+        '/': [A, {a: 123}],
         '/b': B,
-        '/b/:aa/vv': B
+        '/b/:aa/vv': [B, {b: 'zzzzz'}]
     },
     path: '',
     routers: [UserRouter]
 })
-export class AppRouter {
+export class AppRouter implements RouterAction {
 
 
     constructor() {
     }
 
-    notFound(url: Intent): ConstructorType<Object> | undefined {
-        console.log('notfound--->');
-        return undefined
-        // return super.notFound(url);
+
+    canActivate(url: Intent, module: any): void {
+        console.log('AppRouter canActivate->>>>>', url, module)
     }
 }

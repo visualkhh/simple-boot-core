@@ -1,18 +1,14 @@
 import {Sim} from "simple-boot-core/decorators/SimDecorator";
 import {A} from "./A";
 import {UserNotFound} from "./exceptions/UserNotFound";
-import {Intent} from "simple-boot-core/intent/Intent";
-import {CustomSimOption} from "./CustomSimOption";
-import {CustomModule} from "./CustomModule";
 import {RouterManager} from "simple-boot-core/route/RouterManager";
 import {SimstanceManager} from "simple-boot-core/simstance/SimstanceManager";
 
 @Sim()
-export class B extends CustomModule {
+export class B {
 
 
-    constructor(private a: A, private option: CustomSimOption, private routerManager: RouterManager, private simstanceManager: SimstanceManager) {
-        super();
+    constructor(private a: A, private routerManager: RouterManager, private simstanceManager: SimstanceManager) {
     }
 
     print() {

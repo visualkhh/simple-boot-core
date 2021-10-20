@@ -4,7 +4,7 @@ import { SimAtomic } from '../simstance/SimAtomic';
 
 export class RouterModule<R = SimAtomic, M = any> {
     public pathData?: { [name: string]: string };
-
+    public data?: any;
     constructor(public router?: R, public module?: ConstructorType<M>, public routerChains: R[] = []) {
     }
 

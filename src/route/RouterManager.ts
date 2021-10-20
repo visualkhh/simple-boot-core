@@ -2,7 +2,7 @@ import 'reflect-metadata'
 import {Intent} from '../intent/Intent';
 import {ConstructorType} from '../types/Types';
 import {RouterModule} from './RouterModule';
-import { getRouter, getSim, RouterConfig, RouterMetadataKey } from '../decorators/SimDecorator';
+import { getRouter, getSim, Route, RouteProperty, RouterConfig, RouterMetadataKey } from '../decorators/SimDecorator';
 import { SimAtomic } from '../simstance/SimAtomic';
 
 export class RouterManager {
@@ -17,29 +17,51 @@ export class RouterManager {
         const rootRouterData = routerAtomic.getConfig<RouterConfig>(RouterMetadataKey)!;
         const rootRouter = routerAtomic.value!;
         const executeModule = this.getExecuteModule(routerAtomic, intent, routers);
-        if (!executeModule) {
-            // notfound find
-            let notFound;
-            for (const route of routers.slice().reverse()) {
-                if (route !== rootRouter && route.notFound) {
-                    const nf = route.notFound(intent);
-                    if (nf) {
-                        notFound = nf;
-                        break;
-                    }
-                }
-            }
-            // notFound = notFound ?? rootRouter?.notFound(intent);
-            // eslint-disable-next-line no-return-assign
-            return this.activeRouterModule = new RouterModule(rootRouter, notFound, routers);
-        }
+        // if (!executeModule) {
+        //     // notfound find
+        //     let notFound;
+        //     for (const route of routers.slice().reverse()) {
+        //         if (route !== rootRouter && route.notFound) {
+        //             const nf = route.notFound(intent);
+        //             if (nf) {
+        //                 notFound = nf;
+        //                 break;
+        //             }
+        //         }
+        //     }
+        //     // notFound = notFound ?? rootRouter?.notFound(intent);
+        //     // eslint-disable-next-line no-return-assign
+        //     return this.activeRouterModule = new RouterModule(rootRouter, notFound, routers);
+        // }
 
-        if (executeModule.router) {
+        if (executeModule?.router) {
             executeModule.routerChains = routers;
-            // eslint-disable-next-line no-return-assign
-            return this.activeRouterModule = executeModule;
+            if (executeModule.routerChains?.length && executeModule.routerChains?.length > 0) {
+                executeModule.routerChains?.reduce?.((a, b) => {
+                    const value = a.value! as any;
+                    value?.canActivate?.(intent, b.value);
+                    return b;
+                });
+            }
+            (executeModule.router?.value! as any)?.canActivate?.(intent, executeModule.getModuleInstance());
+            // 페이지 찾지못했을시.
+            if (!executeModule?.module) {
+                const routerChain = executeModule.routerChains[executeModule.routerChains.length - 1] as any;
+                routerChain?.value?.canActivate?.(intent, executeModule.getModuleInstance());
+            } else { // 페이지 찾았을시
+                (executeModule.router?.value! as any)?.canActivate?.(intent, executeModule.getModuleInstance());
+            }
+           return this.activeRouterModule = executeModule;
         } else {
-            return undefined;
+            if (routers.length && routers.length > 0) {
+                const lastRouter = routers.reduce?.((a, b) => {
+                    const value = a.value! as any;
+                    value?.canActivate?.(intent, b.value);
+                    return b;
+                });
+                lastRouter.value?.canActivate?.(intent, null)
+            }
+            return this.activeRouterModule = new RouterModule(rootRouter, undefined, routers);
         }
     }
 
@@ -81,10 +103,31 @@ export class RouterManager {
         for (const it of Object.keys(routerData.route).filter(it => !it.startsWith('_'))) {
             const pathnameData = intent.getPathnameData(urlRoot + it);
             if (pathnameData) {
-                const rm = new RouterModule(router, routerData.route[it]);
+                // const routeElement = routerData.route[it];
+                const {child, data} = this.findRouteProperty(routerData.route, it);
+                const rm = new RouterModule(router, child);
+                rm.data = data;
                 rm.pathData = pathnameData;
                 return rm;
             }
+        }
+    }
+
+    private findRouteProperty(route: Route, propertyName: string): {child?: ConstructorType<any>, data?: any} {
+        let child: ConstructorType<any>;
+        let data: any;
+        const routeElement = route[propertyName];
+        if (typeof routeElement === 'function') {
+            child = routeElement;
+        } else if (typeof routeElement === 'string') {
+            return this.findRouteProperty(route, routeElement)
+        } else {
+            child = routeElement[0];
+            data = routeElement[1];
+        }
+        return {
+            child,
+            data
         }
     }
 }

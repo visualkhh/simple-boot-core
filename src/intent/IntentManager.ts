@@ -32,7 +32,7 @@ export class IntentManager {
                         callthis[lastProp] = intent.data;
                     }
                 } else {
-                    orNewSim?.subscribe?.(intent);
+                    orNewSim?.intentSubscribe?.(intent);
                 }
             }
         })

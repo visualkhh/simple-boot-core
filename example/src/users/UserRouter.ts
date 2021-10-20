@@ -1,8 +1,8 @@
 import {User} from './User';
 import {UserDetaile} from 'src/users/UserDetaile';
 import { Router, RouterConfig, Sim } from 'simple-boot-core/decorators/SimDecorator';
-import { A } from 'src/A';
-import { B } from 'src/B';
+import { RouterAction } from 'simple-boot-core/route/RouterAction';
+import { Intent } from 'simple-boot-core/intent/Intent';
 
 @Sim()
 @Router({
@@ -10,10 +10,13 @@ import { B } from 'src/B';
         '': User,
         '/': User,
         '/:no': User,
-        '/:no/detaile': UserDetaile,
+        '/:no/detaile': [UserDetaile, {name: 'zz'}],
     },
     path: '/users'
 })
-export class UserRouter{
+export class UserRouter {
+    // canActivate(url: Intent, module: any): void {
+    //     console.log('UserRouter canActivate', url, module)
+    // }
 
 }

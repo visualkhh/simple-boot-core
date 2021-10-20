@@ -2,69 +2,56 @@ SIMPLE-BOOT-CORE
 ===
 
 ## Sim LifeCycle
-* onCreate: Object create 
+OnSimCreate
+* onSimCreate: Object create 
 
 ```typescript
-const option = new CustomSimOption([GlobalAdvice]);
+const option = new SimOption([GlobalAdvice]);
 const simpleApplication = new SimpleApplication(AppRouter, option);
 simpleApplication.run();
-const url = '/users/d51515dd';
-simpleApplication.routing<SimAtomic<any>, any>(new Intent(url)).then(it => {
-    console.log('--->', it.pathData);
+const intent = new Intent('/b/asd/vv');
+simpleApplication.routing<SimAtomic<any>, any>(intent).then(it => {
+    console.log('--->', it.pathData, it.routerChains);
     let moduleInstance = it.getModuleInstance<User>();
-    moduleInstance.print();
     console.log('-22->', moduleInstance);
+    moduleInstance?.print();
+    console.log('------->' , simpleApplication.routerManager.activeRouterModule)
 });
-
 ```
 
 
 ```typescript
-
-import { A } from './A';
-import { B } from './B';
-import { Router, RouterConfig, Sim, SimConfig } from 'simple-boot-core/decorators/SimDecorator';
-import { Intent } from 'simple-boot-core/intent/Intent';
-import { ConstructorType } from 'simple-boot-core/types/Types';
-import { UserRouter } from './users/UserRouter';
-
 @Sim()
 @Router({
     route: {
-        '': A,
-        '/': A,
+        '': '/',
+        '/': [A, {a: 123}],
         '/b': B,
-        '/b/:aa/vv': B
+        '/b/:aa/vv': [B, {b:'zzzzz'}]
     },
     path: '',
     routers: [UserRouter]
 })
-export class AppRouter {
+export class AppRouter implements RouterAction {
 
 
     constructor() {
     }
 
-    notFound(url: Intent): ConstructorType<Object> | undefined {
-        console.log('notfound--->');
-        return undefined
+
+    canActivate(url: Intent, module: any): void {
+        console.log('AppRouter canActivate->>>>>', url, module)
     }
 }
-
-
-
 ```
+# router
+- RouterAction
+  - canActivate(url: Intent, module: any): void
 
 ```typescript
-import {Sim} from "simple-boot-core/decorators/SimDecorator";
-import {Intent} from "simple-boot-core/intent/Intent";
-import {CustomModule} from "./CustomModule";
-
 @Sim({scheme: 'A'})
-export class A extends CustomModule {
-
+export class A {
     constructor() {
-        super();
         console.log('--->aA')
     }
 
@@ -75,26 +62,18 @@ export class A extends CustomModule {
     gogo(intent: Intent) {
         console.log('gogogo', intent);
     }
-
 }
-import {Sim} from "simple-boot-core/decorators/SimDecorator";
-import {A} from "./A";
-import {UserNotFound} from "./exceptions/UserNotFound";
-import {Intent} from "simple-boot-core/intent/Intent";
-import {CustomSimOption} from "./CustomSimOption";
-import {CustomModule} from "./CustomModule";
-import {RouterManager} from "simple-boot-core/route/RouterManager";
-import {SimstanceManager} from "simple-boot-core/simstance/SimstanceManager";
+
 
 ```
 
+# intent subscribe
+- IntentSubscribe
+  - intentSubscribe(intent: Intent): void;
 ```typescript
 @Sim()
-export class B extends CustomModule {
-
-
-    constructor(private a: A, private option: CustomSimOption, private routerManager: RouterManager, private simstanceManager: SimstanceManager) {
-        super();
+export class B {
+    constructor(private a: A, private routerManager: RouterManager, private simstanceManager: SimstanceManager) {
     }
 
     print() {
@@ -102,12 +81,13 @@ export class B extends CustomModule {
         console.log('bbb print', this.routerManager.activeRouterModule.pathData.aa)
     }
 
+    intentSubscribe(intent: Intent) {
+        //receive    
+    }
+    
     err() {
-        // this.publish(new Intent('A://gogo?a=55', 'ddddddddddd'));
-        // this.publish(new Intent('A://gogo?bb=44&ff=44', '444'));
-        // this.publish(new Intent('A://gogo?gg=55&sadfsdf=444', '55'));
         throw new UserNotFound('good');
     }
-
 }
+
 ```

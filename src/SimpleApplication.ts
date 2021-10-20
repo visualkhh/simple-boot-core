@@ -11,8 +11,8 @@ import { SimAtomic } from './simstance/SimAtomic';
 
 export class SimpleApplication implements Runnable {
     public simstanceManager: SimstanceManager;
-    private intentManager: IntentManager;
-    private routerManager: RouterManager;
+    public intentManager: IntentManager;
+    public routerManager: RouterManager;
 
     constructor(public rootRouter: ConstructorType<Object>, public option = new SimOption()) {
         this.simstanceManager = new SimstanceManager(option)

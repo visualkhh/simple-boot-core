@@ -1,12 +1,9 @@
 import {Sim} from "simple-boot-core/decorators/SimDecorator";
 import {Intent} from "simple-boot-core/intent/Intent";
-import {CustomModule} from "./CustomModule";
 
 @Sim({scheme: 'A'})
-export class A extends CustomModule {
-
+export class A {
     constructor() {
-        super();
         console.log('--->aA')
     }
 
@@ -17,5 +14,4 @@ export class A extends CustomModule {
     gogo(intent: Intent) {
         console.log('gogogo', intent);
     }
-
 }

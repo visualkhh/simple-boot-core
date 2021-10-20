@@ -1,8 +1,7 @@
-import {CustomModule} from "../CustomModule";
 import {Sim} from "simple-boot-core/decorators/SimDecorator";
 
 @Sim()
-export class User extends CustomModule{
+export class User {
     public print() {
         console.log('user print')
     }
