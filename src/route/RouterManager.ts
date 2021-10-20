@@ -12,17 +12,11 @@ export class RouterManager {
     }
 
     public async routing(intent: Intent) {
-        // const metadata = Reflect.getMetadata('design:type', this.rootRouter);
-        // const metadata = Reflect.getMetadataKeys( this.rootRouter);
-        // console.log('-->', metadata)
-        // console.log(getSim(this.rootRouter), getSim2(this.rootRouter));
-        // const routers: RouterConfig[] = [];
         const routers: any[] = [];
         const routerAtomic = new SimAtomic(this.rootRouter);
         const rootRouterData = routerAtomic.getConfig<RouterConfig>(RouterMetadataKey)!;
         const rootRouter = routerAtomic.value!;
         const executeModule = this.getExecuteModule(routerAtomic, intent, routers);
-        // console.log('rootRouter->', this.rootRouter, rootRouter, executeModule)
         if (!executeModule) {
             // notfound find
             let notFound;
@@ -42,9 +36,6 @@ export class RouterManager {
 
         if (executeModule.router) {
             executeModule.routerChains = routers;
-            // if (executeModule.router.canActivat) {
-            //     executeModule.module = (await executeModule.router.canActivate(intent, executeModule)) ?? executeModule.module;
-            // }
             // eslint-disable-next-line no-return-assign
             return this.activeRouterModule = executeModule;
         } else {

@@ -9,12 +9,6 @@ export interface RouterConfig {
     path: string;
     route: {[name: string]: ConstructorType<Object>}
     routers?: ConstructorType<Object>[];
-
-    // constructor(childs: { [p: string]: ConstructorType<Object> } = {}, path = '', childRouters: ConstructorType<Object>[] = []) {
-    //     this.path = path;
-    //     this.childs = childs;
-    //     this.childRouters = childRouters;
-    // }
 }
 
 export const SimMetadataKey = Symbol('Sim');
