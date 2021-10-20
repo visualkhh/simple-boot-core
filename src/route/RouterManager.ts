@@ -17,23 +17,7 @@ export class RouterManager {
         const rootRouterData = routerAtomic.getConfig<RouterConfig>(RouterMetadataKey)!;
         const rootRouter = routerAtomic.value!;
         const executeModule = this.getExecuteModule(routerAtomic, intent, routers);
-        // if (!executeModule) {
-        //     // notfound find
-        //     let notFound;
-        //     for (const route of routers.slice().reverse()) {
-        //         if (route !== rootRouter && route.notFound) {
-        //             const nf = route.notFound(intent);
-        //             if (nf) {
-        //                 notFound = nf;
-        //                 break;
-        //             }
-        //         }
-        //     }
-        //     // notFound = notFound ?? rootRouter?.notFound(intent);
-        //     // eslint-disable-next-line no-return-assign
-        //     return this.activeRouterModule = new RouterModule(rootRouter, notFound, routers);
-        // }
-
+        const date = new Date().getTime();
         if (executeModule?.router) {
             executeModule.routerChains = routers;
             if (executeModule.routerChains?.length && executeModule.routerChains?.length > 0) {
@@ -43,7 +27,6 @@ export class RouterManager {
                     return b;
                 });
             }
-            (executeModule.router?.value! as any)?.canActivate?.(intent, executeModule.getModuleInstance());
             // 페이지 찾지못했을시.
             if (!executeModule?.module) {
                 const routerChain = executeModule.routerChains[executeModule.routerChains.length - 1] as any;
