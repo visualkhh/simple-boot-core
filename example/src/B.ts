@@ -3,6 +3,7 @@ import {A} from "./A";
 import {UserNotFound} from "./exceptions/UserNotFound";
 import {RouterManager} from "simple-boot-core/route/RouterManager";
 import {SimstanceManager} from "simple-boot-core/simstance/SimstanceManager";
+import { After, Before } from 'simple-boot-core/decorators/aop/AOPDecorator';
 
 @Sim()
 export class B {
@@ -23,13 +24,13 @@ export class B {
         throw new UserNotFound('good');
     }
 
-    // @Before({property: 'print'})
-    // before() {
-    //     console.log('-------')
-    // }
-    //
-    // @After({property: 'print'})
-    // after() {
-    //     console.log('---end----')
-    // }
+    @Before({property: 'print'})
+    before() {
+        console.log('-------')
+    }
+
+    @After({property: 'print'})
+    after() {
+        console.log('---end----')
+    }
 }
