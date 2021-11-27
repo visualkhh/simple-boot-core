@@ -54,6 +54,10 @@ export class SimstanceManager implements Runnable {
         return newVar;
     }
 
+    findFirstSim(scheme?: string, type?: ConstructorType<any>): SimAtomic<any> | undefined {
+        return this.getSimAtomics().filter(it => (scheme ? scheme === it.getConfig()?.scheme : true) && (type ? it.value instanceof type : true))[0]
+    }
+
     // getOrNewSimSet<T>(k: ConstructorType<T>): T {
     //
     // }
@@ -145,10 +149,20 @@ export class SimstanceManager implements Runnable {
     public getParameterSim(target: Object, targetKey?: string | symbol): any[] {
         const paramTypes = ReflectUtils.getParameterTypes(target, targetKey);
         const paramNames = FunctionUtils.getParameterNames(target, targetKey);
+        // console.log('--------', target, paramTypes)
+        // console.log('--------', target, (target as any).name, paramTypes, paramNames)
         const injections = paramTypes.map((token: ConstructorType<any>, idx: number) => {
             target = targetKey ? (target as any)[targetKey] : target;
-            const inject = getInject(target, paramNames[idx]);
-            return this.resolve<any>(inject ?? token)
+            const inject = getInject(target, String(idx));
+            // console.log('inject-????->', target, paramNames[idx])
+            if (inject) {
+                // this.getSimAtomics().forEach(it => console.log(it.getConfig()?.scheme))
+                // console.log(this.getSimConfig(inject.scheme));
+                // console.log('inject-->', inject, this.findFirstSim(inject.scheme, inject.type), this.getSimAtomics())
+                return this.resolve<any>(this.findFirstSim(inject.scheme, inject.type)?.type ?? token);
+            } else {
+                return this.resolve<any>(token);
+            }
         })
         return injections;
     }

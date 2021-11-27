@@ -1,9 +1,12 @@
 import {ConstructorType, GenericClassDecorator, MethodParameter} from '../../types/Types'
 import {ReflectUtils} from '../../utils/reflect/ReflectUtils';
 import {FunctionUtils} from "../../utils/function/FunctionUtils";
-
+export interface InjectConfig {
+    scheme?: string;
+    type?: ConstructorType<any>;
+}
 const InjectMetadataKey = Symbol('Inject');
-export const Inject = (type?: ConstructorType<any>): MethodParameter => {
+export const Inject = (config: InjectConfig = {}): MethodParameter => {
     return (target: Object, propertyKey: string | symbol | undefined, parameterIndex: number) => {
         // const existingInjectdParameters: number[] = Reflect.getOwnMetadata(InjectMetadataKey, target, propertyKey) || [];
         // existingInjectdParameters.push(parameterIndex);
@@ -14,12 +17,13 @@ export const Inject = (type?: ConstructorType<any>): MethodParameter => {
             target = (target as any)[propertyKey];
             propertyKey = FunctionUtils.getParameterNames(target as Function)[parameterIndex];
         }
-        ReflectUtils.defineMetadata(InjectMetadataKey, type, target, propertyKey);
+        ReflectUtils.defineMetadata(InjectMetadataKey, config, target, String(parameterIndex));
+        // ReflectUtils.defineMetadata(InjectMetadataKey, config, target, propertyKey);
         // Reflect.defineMetadata( requiredMetadataKey, existingRequiredParameters, target, propertyKey);
     }
 }
 
-export const getInject = (target: ConstructorType<any> | Function | any, propertyKey: string): ConstructorType<any> | undefined => {
+export const getInject = (target: ConstructorType<any> | Function | any, propertyKey: string): InjectConfig | undefined => {
     // console.log('000>>', target, typeof target)
     // const constructor = target.constructor;
 

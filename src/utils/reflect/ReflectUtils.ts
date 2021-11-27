@@ -1,3 +1,4 @@
+import "reflect-metadata"
 export class ReflectUtils {
     static getParameterTypes(target: any, propertyKey?: string | symbol): any[] {
         if (propertyKey) {
