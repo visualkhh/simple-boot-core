@@ -28,7 +28,7 @@ export class SimpleApplication implements Runnable {
         this.simstanceManager.run();
     }
 
-    public publishIntent(i: Intent) {
+    public publishIntent(i: Intent):any[] {
         return this.intentManager.publish(i);
     }
 

@@ -6,14 +6,14 @@ export class IntentManager {
     constructor(public simstanceManager: SimstanceManager) {
     }
 
-    public publish(it: string, data?: any): void;
-    public publish(it: Intent, data?: any): void;
-    public publish(it: Intent | string, data?: any): void {
+    public publish(it: string, data?: any): any[];
+    public publish(it: Intent, data?: any): any[];
+    public publish(it: Intent | string, data?: any): any[] {
         if (typeof it === 'string') {
             it = new Intent(it, data);
         }
         const intent = it as Intent;
-
+        const r: any[] = [];
         this.simstanceManager.getSimConfig(intent.scheme).forEach((data) => {
             let orNewSim = this.simstanceManager?.getOrNewSim(data.type) as any;
             if (orNewSim) {
@@ -27,15 +27,17 @@ export class IntentManager {
                         lastProp = i;
                     });
                     if (orNewSim && typeof orNewSim === 'function') {
-                        orNewSim.call(callthis, intent);
+                        r.push(orNewSim.call(callthis, intent));
                     } else if (orNewSim) {
                         callthis[lastProp] = intent.data;
+                        r.push(callthis[lastProp]);
                     }
                 } else {
-                    orNewSim?.intentSubscribe?.(intent);
+                    r.push(orNewSim?.intentSubscribe?.(intent));
                 }
             }
         })
+        return r;
     }
 }
 
