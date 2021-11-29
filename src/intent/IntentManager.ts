@@ -27,13 +27,13 @@ export class IntentManager {
                         lastProp = i;
                     });
                     if (orNewSim && typeof orNewSim === 'function') {
-                        r.push(orNewSim.call(callthis, intent));
+                        r.push(orNewSim.call(callthis, intent.publishData));
                     } else if (orNewSim) {
                         callthis[lastProp] = intent.data;
                         r.push(callthis[lastProp]);
                     }
                 } else {
-                    r.push(orNewSim?.intentSubscribe?.(intent));
+                    r.push(orNewSim?.intentSubscribe?.(intent.publishData));
                 }
             }
         })
