@@ -11,8 +11,6 @@ import {FunctionUtils} from '../utils/function/FunctionUtils';
 import {getInject} from '../decorators/inject/Inject';
 import {SimOption} from '../SimOption';
 import {SimProxyHandler} from '../proxy/SimProxyHandler';
-import { IntentManager } from '../intent/IntentManager';
-import { RouterManager } from '../route/RouterManager';
 
 export class SimstanceManager implements Runnable {
     private _storage = new Map<ConstructorType<any>, any>()
@@ -159,7 +157,11 @@ export class SimstanceManager implements Runnable {
                 // this.getSimAtomics().forEach(it => console.log(it.getConfig()?.scheme))
                 // console.log(this.getSimConfig(inject.scheme));
                 // console.log('inject-->', inject, this.findFirstSim(inject.scheme, inject.type), this.getSimAtomics())
-                return this.resolve<any>(this.findFirstSim(inject.scheme, inject.type)?.type ?? token);
+                let obj = this.resolve<any>(this.findFirstSim(inject.scheme, inject.type)?.type ?? token);
+                if (inject.applyProxy) {
+                    obj = new Proxy(obj, new inject.applyProxy.type(inject.applyProxy.param));
+                }
+                return obj;
             } else {
                 return this.resolve<any>(token);
             }

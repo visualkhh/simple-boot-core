@@ -23,6 +23,7 @@ export class RouterManager {
             if (executeModule.routerChains?.length && executeModule.routerChains?.length > 0) {
                 executeModule.routerChains?.reduce?.((a, b) => {
                     const value = a.value! as any;
+                    // console.log('routing-->', b, b.value)
                     value?.canActivate?.(intent, b.value);
                     return b;
                 });
@@ -39,6 +40,7 @@ export class RouterManager {
             if (routers.length && routers.length > 0) {
                 const lastRouter = routers.reduce?.((a, b) => {
                     const value = a.value! as any;
+                    // console.log('routing-null->', b, b.value)
                     value?.canActivate?.(intent, b.value);
                     return b;
                 });

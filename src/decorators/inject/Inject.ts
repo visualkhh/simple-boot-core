@@ -4,6 +4,7 @@ import {FunctionUtils} from "../../utils/function/FunctionUtils";
 export interface InjectConfig {
     scheme?: string;
     type?: ConstructorType<any>;
+    applyProxy?: {type: ConstructorType<ProxyHandler<any>>, param?: any[]};
 }
 const InjectMetadataKey = Symbol('Inject');
 export const Inject = (config: InjectConfig = {}): MethodParameter => {
