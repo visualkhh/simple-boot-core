@@ -1,15 +1,19 @@
+export enum PublishType {
+    DATA_PARAMETERS = 'DATA_PARAMETERS',
+    INLINE_DATA_PARAMETERS = 'INLINE_DATA_PARAMETERS',
+}
 export class Intent<T = any, E = any> {
     // uri example: mymodule://asd/asd/b?a=545&aa=33&wow=wow
     // uri example: ://asd/asd/b?a=545&aa=33&wow=wow
     // uri example: /asd/asd/b?a=545&aa=33&wow=wow
     // <스킴>://<사용자이름>:<비밀번호>@<호스트>:<포트>/<경로>?<질의>#<프레그먼트>
-    public publishOnlyData = false;
+    public publishType?: PublishType;
     constructor(public uri: string, public data?: T, public event?: E) {
     }
 
-    get publishData(): T | undefined | this {
-        return this.publishOnlyData ? this.data : this;
-    }
+    // get publishData(): T | undefined | this {
+    //     return this.publishOnlyData ? this.data : this;
+    // }
 
     get scheme() {
         return this.uri.split('://')[0];

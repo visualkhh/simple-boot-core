@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import {Intent} from './Intent';
+import { Intent, PublishType } from './Intent';
 import {SimstanceManager} from '../simstance/SimstanceManager';
 
 export class IntentManager {
@@ -7,13 +7,10 @@ export class IntentManager {
     }
 
     public publish(it: string, data?: any): any[];
-    public publish(it: Intent, otherParameter?: any): any[];
+    public publish(it: Intent): any[];
     public publish(it: Intent | string, data?: any): any[] {
-        let otherParameter: any;
         if (typeof it === 'string') {
             it = new Intent(it, data);
-        } else {
-            otherParameter = data;
         }
         const intent = it as Intent;
         const r: any[] = [];
@@ -30,13 +27,25 @@ export class IntentManager {
                         lastProp = i;
                     });
                     if (orNewSim && typeof orNewSim === 'function') {
-                        r.push(orNewSim.call(callthis, intent.publishData, otherParameter));
+                        if (PublishType.DATA_PARAMETERS === intent.publishType) {
+                            r.push(orNewSim.call(callthis, intent.data));
+                        } else if (PublishType.INLINE_DATA_PARAMETERS === intent.publishType) {
+                            r.push(orNewSim.call(callthis, ...intent.data));
+                        } else {
+                            r.push(orNewSim.call(callthis, intent));
+                        }
                     } else if (orNewSim) {
                         callthis[lastProp] = intent.data;
                         r.push(callthis[lastProp]);
                     }
                 } else {
-                    r.push(orNewSim?.intentSubscribe?.(intent.publishData, otherParameter));
+                    if (PublishType.DATA_PARAMETERS === intent.publishType) {
+                        r.push(orNewSim?.intentSubscribe?.(intent.data));
+                    } else if (PublishType.INLINE_DATA_PARAMETERS === intent.publishType) {
+                        r.push(orNewSim?.intentSubscribe?.(...intent.data));
+                    } else {
+                        r.push(orNewSim?.intentSubscribe?.(intent));
+                    }
                 }
             }
         })

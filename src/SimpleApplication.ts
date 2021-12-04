@@ -28,8 +28,8 @@ export class SimpleApplication implements Runnable {
         this.simstanceManager.run();
     }
 
-    public publishIntent(i: Intent, otherparam?: any):any[] {
-        return this.intentManager.publish(i, otherparam);
+    public publishIntent(i: Intent):any[] {
+        return this.intentManager.publish(i);
     }
 
     public routing<R = SimAtomic, M = any>(i: Intent) {
