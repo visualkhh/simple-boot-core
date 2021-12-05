@@ -105,6 +105,10 @@ export class SimstanceManager implements Runnable {
         }
     }
 
+    set(target: ConstructorType<any>, obj: any): void {
+        this._storage.set(target, obj)
+    }
+
     resolve<T>(target: ConstructorType<any>): T {
         const registed = this._storage.get(target)
         if (registed) {
