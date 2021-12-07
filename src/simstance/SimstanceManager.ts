@@ -1,4 +1,3 @@
-import 'reflect-metadata'
 import {ConstructorType} from '../types/Types'
 import {SimNoSuch} from '../throwable/SimNoSuch'
 import { getPostConstruct, getSim, PostConstruct } from '../decorators/SimDecorator';

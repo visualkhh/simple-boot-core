@@ -1,4 +1,3 @@
-import 'reflect-metadata'
 import {Intent} from '../intent/Intent';
 import {ConstructorType} from '../types/Types';
 import {RouterModule} from './RouterModule';

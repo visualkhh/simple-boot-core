@@ -1,4 +1,3 @@
-import 'reflect-metadata'
 import { Intent, PublishType } from './Intent';
 import {SimstanceManager} from '../simstance/SimstanceManager';
 
