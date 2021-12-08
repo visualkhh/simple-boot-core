@@ -1,3 +1,4 @@
+import "reflect-metadata"
 import {ConstructorType, GenericClassDecorator} from '../types/Types'
 import {SimGlobal} from '../global/SimGlobal';
 import {ReflectUtils} from '../utils/reflect/ReflectUtils';

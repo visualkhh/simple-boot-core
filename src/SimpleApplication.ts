@@ -8,7 +8,7 @@ import { Intent } from './intent/Intent';
 import { ConstructorType } from './types/Types';
 import { RouterModule } from './route/RouterModule';
 import { SimAtomic } from './simstance/SimAtomic';
-
+import "reflect-metadata"
 export class SimpleApplication implements Runnable {
     public simstanceManager: SimstanceManager;
     public intentManager: IntentManager;

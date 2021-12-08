@@ -1,3 +1,4 @@
+import "reflect-metadata"
 import {ConstructorType, GenericClassDecorator, MethodParameter} from '../../types/Types'
 import {ReflectUtils} from '../../utils/reflect/ReflectUtils';
 import {FunctionUtils} from "../../utils/function/FunctionUtils";

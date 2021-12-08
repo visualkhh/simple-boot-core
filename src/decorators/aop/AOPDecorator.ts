@@ -1,3 +1,4 @@
+import "reflect-metadata"
 import {ReflectUtils} from '../../utils/reflect/ReflectUtils';
 import {MetaDataPropertyAtomic} from '../MetaDataAtomic';
 import {ObjectUtils} from '../../utils/object/ObjectUtils';

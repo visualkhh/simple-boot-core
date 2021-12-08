@@ -1,3 +1,4 @@
+import "reflect-metadata"
 export class MetaDataAtomic<T = any, M = any> {
     constructor(public target: T, public metaData: M) {
     }
