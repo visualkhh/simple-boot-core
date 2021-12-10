@@ -27,6 +27,7 @@ export class RouterManager {
                     return b;
                 });
             }
+            this.activeRouterModule = executeModule
             // 페이지 찾지못했을시.
             if (!executeModule?.module) {
                 const routerChain = executeModule.routerChains[executeModule.routerChains.length - 1] as any;
@@ -34,6 +35,7 @@ export class RouterManager {
             } else { // 페이지 찾았을시
                 (executeModule.router?.value! as any)?.canActivate?.(intent, executeModule.getModuleInstance());
             }
+            // console.log('activeRouterModule--->', executeModule)
            return this.activeRouterModule = executeModule;
         } else {
             if (routers.length && routers.length > 0) {
