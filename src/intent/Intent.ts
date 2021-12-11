@@ -38,7 +38,7 @@ export class Intent<T = any, E = any> {
         return paths[1] ?? '';
     }
 
-    get queryParams() {
+    get queryParams(): { [key:string]: string } {
         const param = {} as { [key:string]: string };
         this.query.split('&')?.forEach(it => {
             const a = it.split('=')
@@ -46,6 +46,17 @@ export class Intent<T = any, E = any> {
         })
         return param;
     }
+
+    get queryParamsAfterDecodeURI(): { [key:string]: string } {
+        const params = this.queryParams;
+        for (const key in params) {
+            if (params.hasOwnProperty(key)) {
+                params[key] = decodeURIComponent(params[key]);
+            }
+        }
+        return params;
+    }
+
 
     getPathnameData(urlExpression: string) {
         const urls = this.pathname.split('/');

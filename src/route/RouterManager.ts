@@ -1,13 +1,19 @@
-import {Intent} from '../intent/Intent';
-import {ConstructorType} from '../types/Types';
-import {RouterModule} from './RouterModule';
-import { getRouter, getSim, Route, RouteProperty, RouterConfig, RouterMetadataKey } from '../decorators/SimDecorator';
+import { Intent } from '../intent/Intent';
+import { ConstructorType } from '../types/Types';
+import { RouterModule } from './RouterModule';
+import { Route, RouterConfig, RouterMetadataKey } from '../decorators/SimDecorator';
 import { SimAtomic } from '../simstance/SimAtomic';
+import { OnActiveRoute } from '../route/OnActiveRoute';
 
 export class RouterManager {
-    public activeRouterModule?:RouterModule;
-    // public subject = new Subject<Intent>()
+    public activeRouterModule?: RouterModule;
+    public subject = new Set<OnActiveRoute>();
+
     constructor(private rootRouter: ConstructorType<any>) {
+    }
+
+    public addActiveRouterCallBack(callBackObj: OnActiveRoute) {
+        this.subject.add(callBackObj);
     }
 
     public async routing(intent: Intent) {
@@ -36,7 +42,9 @@ export class RouterManager {
                 (executeModule.router?.value! as any)?.canActivate?.(intent, executeModule.getModuleInstance());
             }
             // console.log('activeRouterModule--->', executeModule)
-           return this.activeRouterModule = executeModule;
+            this.activeRouterModule = executeModule;
+            this.subject.forEach(it => it.onActiveRoute(this.activeRouterModule!))
+            return this.activeRouterModule;
         } else {
             if (routers.length && routers.length > 0) {
                 const lastRouter = routers.reduce?.((a, b) => {
@@ -61,6 +69,7 @@ export class RouterManager {
                 parentRouters.push(router);
                 const module = this.findRouting(router, routerConfig, routerStrings, intent)
                 if (module?.module) {
+                    module.intent = intent;
                     return module;
                 } else if (routerConfig.routers && routerConfig.routers.length > 0) {
                     for (const child of routerConfig.routers) {
@@ -99,7 +108,7 @@ export class RouterManager {
         }
     }
 
-    private findRouteProperty(route: Route, propertyName: string): {child?: ConstructorType<any>, data?: any} {
+    private findRouteProperty(route: Route, propertyName: string): { child?: ConstructorType<any>, data?: any } {
         let child: ConstructorType<any>;
         let data: any;
         const routeElement = route[propertyName];
