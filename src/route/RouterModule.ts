@@ -18,6 +18,14 @@ export class RouterModule<R = SimAtomic, M = any> {
         return this.routerChains[this.routerChains.length - 1];
     }
 
+    get lastRouteChainValue() {
+        return (this.lastRouteChain as unknown as SimAtomic<any>).value;
+    }
+
+    hasActivateInLastRoute(obj: any) {
+        return this.lastRouteChainValue?.hasActivate(obj) === true;
+    }
+
     get queryParams(): { [key:string]: string } | undefined{
         if (this.intent) {
             return this.intent.queryParams;
