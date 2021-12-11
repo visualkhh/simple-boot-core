@@ -14,6 +14,10 @@ export class RouterModule<R = SimAtomic, M = any> {
         return SimGlobal().application.simstanceManager.getOrNewSim(this.module);
     }
 
+    get lastRouteChain() {
+        return this.routerChains[this.routerChains.length - 1];
+    }
+
     get queryParams(): { [key:string]: string } | undefined{
         if (this.intent) {
             return this.intent.queryParams;
