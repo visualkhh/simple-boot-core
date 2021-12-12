@@ -1,3 +1,5 @@
+import { URLSearchParams } from "url";
+
 export enum PublishType {
     DATA_PARAMETERS = 'DATA_PARAMETERS',
     INLINE_DATA_PARAMETERS = 'INLINE_DATA_PARAMETERS',
@@ -36,6 +38,10 @@ export class Intent<T = any, E = any> {
     get query() {
         const paths = this.fullPath.split('?');
         return paths[1] ?? '';
+    }
+
+    get urlQueryParams(): URLSearchParams {
+        return new URLSearchParams(this.query.split('&')[1] ?? '');
     }
 
     get queryParams(): { [key:string]: string } {
