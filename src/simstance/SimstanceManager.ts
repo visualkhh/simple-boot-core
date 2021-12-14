@@ -120,7 +120,7 @@ export class SimstanceManager implements Runnable {
             newSim?.onSimCreate?.();
             return newSim
         }
-        throw new SimNoSuch('no simple instance ' + target)
+        throw new SimNoSuch('no simple instance ' + 'name:' + target?.prototype?.constructor?.name + ',' + target )
     }
 
     public newSim<T>(target: ConstructorType<T>, simCreateAfter?: (data: T) => void): T {
