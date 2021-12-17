@@ -53,7 +53,12 @@ export class SimstanceManager implements Runnable {
     }
 
     findFirstSim(scheme?: string, type?: ConstructorType<any>): SimAtomic<any> | undefined {
-        return this.getSimAtomics().filter(it => (scheme ? scheme === it.getConfig()?.scheme : true) && (type ? it.value instanceof type : true))[0]
+        if (scheme || type) {
+            return this.getSimAtomics().filter(it => {
+                const b = (scheme ? scheme === it.getConfig()?.scheme : true) && (type ? it.value instanceof type : true);
+                return b
+            })[0]
+        }
     }
 
     // getOrNewSimSet<T>(k: ConstructorType<T>): T {
@@ -161,7 +166,8 @@ export class SimstanceManager implements Runnable {
                 // this.getSimAtomics().forEach(it => console.log(it.getConfig()?.scheme))
                 // console.log(this.getSimConfig(inject.scheme));
                 // console.log('inject-->', inject, this.findFirstSim(inject.scheme, inject.type), this.getSimAtomics())
-                let obj = this.resolve<any>(this.findFirstSim(inject.scheme, inject.type)?.type ?? token);
+                const findFirstSim1 = this.findFirstSim(inject.scheme, inject.type);
+                let obj = findFirstSim1 ? this.resolve<any>(findFirstSim1?.type ?? token) : undefined;
                 if (inject.applyProxy) {
                     obj = new Proxy(obj, new inject.applyProxy.type(inject.applyProxy.param));
                 }
