@@ -26,20 +26,28 @@ export class RouterManager {
         if (executeModule?.router) {
             executeModule.routerChains = routers;
             if (executeModule.routerChains?.length && executeModule.routerChains?.length > 0) {
-                executeModule.routerChains?.reduce?.((a, b) => {
-                    const value = a.value! as any;
-                    // console.log('routing-->', b, b.value)
-                    value?.canActivate?.(intent, b.value);
-                    return b;
-                });
+                for (let i = 0; i < executeModule.routerChains.length; i++) {
+                    const current = executeModule.routerChains[i];
+                    const next = executeModule.routerChains[i+1];
+                    const value = current.value! as any;
+                    if (next) {
+                        await value?.canActivate?.(intent, next?.value ?? null);
+                    }
+                }
+                // executeModule.routerChains?.reduce?.((a, b) => {
+                //     const value = a.value! as any;
+                //     // console.log('routing-->', b, b.value)
+                //     value?.canActivate?.(intent, b.value);
+                //     return b;
+                // });
             }
             this.activeRouterModule = executeModule
             // 페이지 찾지못했을시.
             if (!executeModule?.module) {
                 const routerChain = executeModule.routerChains[executeModule.routerChains.length - 1] as any;
-                routerChain?.value?.canActivate?.(intent, executeModule.getModuleInstance());
+                await routerChain?.value?.canActivate?.(intent, executeModule.getModuleInstance());
             } else { // 페이지 찾았을시
-                (executeModule.router?.value! as any)?.canActivate?.(intent, executeModule.getModuleInstance());
+                await (executeModule.router?.value! as any)?.canActivate?.(intent, executeModule.getModuleInstance());
             }
             // console.log('activeRouterModule--->', executeModule)
             this.activeRouterModule = executeModule;
@@ -47,13 +55,22 @@ export class RouterManager {
             return this.activeRouterModule;
         } else {
             if (routers.length && routers.length > 0) {
-                const lastRouter = routers.reduce?.((a, b) => {
-                    const value = a.value! as any;
-                    // console.log('routing-null->', b, b.value)
-                    value?.canActivate?.(intent, b.value);
-                    return b;
-                });
-                lastRouter.value?.canActivate?.(intent, null)
+                for (let i = 0; i < routers.length; i++) {
+                    const current = routers[i];
+                    const next = routers[i+1];
+                    const value = current.value! as any;
+                    if (next) {
+                        await value?.canActivate?.(intent, next?.value ?? null);
+                    }
+                }
+
+                // const lastRouter = routers.reduce?.((a, b) => {
+                //     const value = a.value! as any;
+                //     // console.log('routing-null->', b, b.value)
+                //     value?.canActivate?.(intent, b.value);
+                //     return b;
+                // });
+                // lastRouter.value?.canActivate?.(intent, null)
             }
             return this.activeRouterModule = new RouterModule(rootRouter, undefined, routers);
         }
