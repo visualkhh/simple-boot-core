@@ -53,6 +53,7 @@ export class RouterManager {
             // console.log('activeRouterModule--->', executeModule)
             this.activeRouterModule = executeModule;
             this.subject.forEach(it => it.onActiveRoute(this.activeRouterModule!))
+            // console.log('routermanager--> return', '1')
             return this.activeRouterModule;
         } else {
             if (routers.length && routers.length > 0) {
@@ -73,6 +74,7 @@ export class RouterManager {
                 // });
                 // lastRouter.value?.canActivate?.(intent, null)
             }
+            // console.log('routermanager--> return', '2')
             return this.activeRouterModule = new RouterModule(this.simstanceManager, rootRouter, undefined, routers);
         }
     }
