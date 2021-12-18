@@ -59,9 +59,9 @@ export class RouterManager {
                     const current = routers[i];
                     const next = routers[i+1];
                     const value = current.value! as any;
-                    if (next) {
+                    // if (next) {
                         await value?.canActivate?.(intent, next?.value ?? null);
-                    }
+                    // }
                 }
 
                 // const lastRouter = routers.reduce?.((a, b) => {
