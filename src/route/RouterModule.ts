@@ -1,17 +1,17 @@
 import { ConstructorType } from '../types/Types';
-import { SimGlobal } from '../global/SimGlobal';
 import { SimAtomic } from '../simstance/SimAtomic';
 import { Intent } from '../intent/Intent';
+import { SimstanceManager } from '../simstance/SimstanceManager';
 
 export class RouterModule<R = SimAtomic, M = any> {
     public pathData?: { [name: string]: string };
     public data?: any;
     public intent?: Intent;
-    constructor(public router?: R, public module?: ConstructorType<M>, public routerChains: R[] = []) {
+    constructor(private simstanceManager: SimstanceManager, public router?: R, public module?: ConstructorType<M>, public routerChains: R[] = []) {
     }
 
-    getModuleInstance<T = M>(): T {
-        return SimGlobal().application.simstanceManager.getOrNewSim(this.module);
+    getModuleInstance<T = M>(): T | undefined {
+        return this.simstanceManager.getOrNewSim<T>(this.module as any);
     }
 
     get lastRouteChain() {

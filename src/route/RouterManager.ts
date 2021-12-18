@@ -4,12 +4,13 @@ import { RouterModule } from './RouterModule';
 import { Route, RouterConfig, RouterMetadataKey } from '../decorators/SimDecorator';
 import { SimAtomic } from '../simstance/SimAtomic';
 import { OnActiveRoute } from '../route/OnActiveRoute';
+import { SimstanceManager } from '../simstance/SimstanceManager';
 
 export class RouterManager {
     public activeRouterModule?: RouterModule;
     public subject = new Set<OnActiveRoute>();
 
-    constructor(private rootRouter: ConstructorType<any>) {
+    constructor(private simstanceManager: SimstanceManager, private rootRouter: ConstructorType<any>) {
     }
 
     public addActiveRouterCallBack(callBackObj: OnActiveRoute) {
@@ -18,7 +19,7 @@ export class RouterManager {
 
     public async routing(intent: Intent) {
         const routers: any[] = [];
-        const routerAtomic = new SimAtomic(this.rootRouter);
+        const routerAtomic = new SimAtomic(this.rootRouter, this.simstanceManager);
         const rootRouterData = routerAtomic.getConfig<RouterConfig>(RouterMetadataKey)!;
         const rootRouter = routerAtomic.value!;
         const executeModule = this.getExecuteModule(routerAtomic, intent, routers);
@@ -72,7 +73,7 @@ export class RouterManager {
                 // });
                 // lastRouter.value?.canActivate?.(intent, null)
             }
-            return this.activeRouterModule = new RouterModule(rootRouter, undefined, routers);
+            return this.activeRouterModule = new RouterModule(this.simstanceManager, rootRouter, undefined, routers);
         }
     }
 
@@ -90,7 +91,7 @@ export class RouterManager {
                     return module;
                 } else if (routerConfig.routers && routerConfig.routers.length > 0) {
                     for (const child of routerConfig.routers) {
-                        const routerAtomic = new SimAtomic(child);
+                        const routerAtomic = new SimAtomic(child, this.simstanceManager);
                         const rootRouterData = routerAtomic.getConfig<RouterConfig>(RouterMetadataKey)!;
                         const router = routerAtomic.value!;
                         // console.log('---------------', rootRouter)
@@ -117,7 +118,7 @@ export class RouterManager {
             if (pathnameData) {
                 // const routeElement = routerData.route[it];
                 const {child, data} = this.findRouteProperty(routerData.route, it);
-                const rm = new RouterModule(router, child);
+                const rm = new RouterModule(this.simstanceManager, router, child);
                 rm.data = data;
                 rm.pathData = pathnameData;
                 return rm;

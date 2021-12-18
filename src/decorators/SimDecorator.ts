@@ -1,8 +1,9 @@
 import "reflect-metadata"
 import {ConstructorType, GenericClassDecorator} from '../types/Types'
-import {SimGlobal} from '../global/SimGlobal';
+// import {SimGlobal} from '../global/SimGlobal';
 import {ReflectUtils} from '../utils/reflect/ReflectUtils';
 
+export const sims = new Set<ConstructorType<any>>();
 export interface SimConfig {
     scheme?: string;
 }
@@ -19,7 +20,8 @@ export const Sim = (config: SimConfig = {}): GenericClassDecorator<ConstructorTy
     return (target: ConstructorType<any>) => {
         // console.log('sim add-->', target, config, SimGlobal().storage)
         ReflectUtils.defineMetadata(SimMetadataKey, config, target);
-        SimGlobal().storage.add(target);
+        sims.add(target)
+        // SimGlobal().storage.add(target);
     }
 }
 

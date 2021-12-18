@@ -1,9 +1,8 @@
 import "reflect-metadata"
 import {ConstructorType} from '../types/Types'
 import {SimNoSuch} from '../throwable/SimNoSuch'
-import { getPostConstruct, getSim, PostConstruct } from '../decorators/SimDecorator';
+import { getPostConstruct, getSim, PostConstruct, sims } from '../decorators/SimDecorator';
 import {Runnable} from '../run/Runnable';
-import {SimGlobal} from '../global/SimGlobal';
 import {ObjectUtils} from '../utils/object/ObjectUtils';
 import {SimAtomic} from './SimAtomic';
 import {ReflectUtils} from '../utils/reflect/ReflectUtils';
@@ -44,7 +43,7 @@ export class SimstanceManager implements Runnable {
     // }
 
     getSimAtomics(): SimAtomic[] {
-        return Array.from(this._storage.keys()).map(it => new SimAtomic(it));
+        return Array.from(this._storage.keys()).map(it => new SimAtomic(it, this));
     }
 
     getSimConfig(scheme: string | undefined): SimAtomic<any>[] {
@@ -225,7 +224,7 @@ export class SimstanceManager implements Runnable {
     // }
 
     run() {
-        SimGlobal().storage.forEach((data: any) => {
+        sims.forEach((data: any) => {
             this.register(data);
         })
         this.callBindPostConstruct(this);

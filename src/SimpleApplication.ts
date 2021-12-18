@@ -1,4 +1,3 @@
-import { SimGlobal } from './global/SimGlobal';
 import { Runnable } from './run/Runnable';
 import { SimstanceManager } from './simstance/SimstanceManager';
 import { SimOption } from './SimOption';
@@ -16,12 +15,12 @@ export class SimpleApplication implements Runnable {
 
     constructor(public rootRouter: ConstructorType<Object>, public option = new SimOption()) {
         this.simstanceManager = new SimstanceManager(option)
+        this.simstanceManager.storage.set(SimpleApplication, this);
         this.intentManager = new IntentManager(this.simstanceManager);
-        this.routerManager = new RouterManager(this.rootRouter);
+        this.routerManager = new RouterManager(this.simstanceManager, this.rootRouter);
         this.simstanceManager.storage.set(SimstanceManager, this.simstanceManager);
         this.simstanceManager.storage.set(IntentManager, this.intentManager);
         this.simstanceManager.storage.set(RouterManager, this.routerManager);
-        SimGlobal().application = this;
     }
 
     public run() {
