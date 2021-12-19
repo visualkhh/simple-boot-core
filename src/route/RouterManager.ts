@@ -52,7 +52,9 @@ export class RouterManager {
             }
             // console.log('activeRouterModule--->', executeModule)
             this.activeRouterModule = executeModule;
-            this.subject.forEach(it => it.onActiveRoute(this.activeRouterModule!))
+            for (const it of Array.from(this.subject)) {
+                await it.onActiveRoute(this.activeRouterModule!);
+            }
             // console.log('routermanager--> return', '1')
             return this.activeRouterModule;
         } else {
