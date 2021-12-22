@@ -155,27 +155,26 @@ export class SimstanceManager implements Runnable {
         })
     }
 
-    public getParameterSim(target: Object, targetKey?: string | symbol): any[] {
+    public getParameterSim(target: Object, targetKey?: string | symbol, otherStorage?: Map<ConstructorType<any>, any>): any[] {
         const paramTypes = ReflectUtils.getParameterTypes(target, targetKey);
         const paramNames = FunctionUtils.getParameterNames(target, targetKey);
-        // console.log('--------', target, paramTypes , targetKey)
-        // console.log('--------', target, (target as any).name, paramTypes, paramNames)
         const injections = paramTypes.map((token: ConstructorType<any>, idx: number) => {
             target = targetKey ? (target as any)[targetKey] : target;
             const inject = getInject(target, String(idx));
-            // console.log('inject-????->', target, paramNames[idx])
             if (inject) {
-                // this.getSimAtomics().forEach(it => console.log(it.getConfig()?.scheme))
-                // console.log(this.getSimConfig(inject.scheme));
-                // console.log('inject-->', inject, this.findFirstSim(inject.scheme, inject.type), this.getSimAtomics())
-                const findFirstSim1 = this.findFirstSim(inject.scheme, inject.type);
-                let obj = findFirstSim1 ? this.resolve<any>(findFirstSim1?.type ?? token) : undefined;
+                let obj = otherStorage?.get(token);
+                if (!obj) {
+                    const findFirstSim1 = this.findFirstSim(inject.scheme, inject.type);
+                    obj = findFirstSim1 ? this.resolve<any>(findFirstSim1?.type ?? token) : undefined;
+                }
+
                 if (inject.applyProxy) {
                     obj = new Proxy(obj, new inject.applyProxy.type(inject.applyProxy.param));
                 }
                 return obj;
             } else if (token) {
-                return this.resolve<any>(token);
+                return otherStorage?.get(token) ?? this.resolve<any>(token);
+
             }
         })
         return injections;

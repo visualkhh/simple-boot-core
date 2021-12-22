@@ -52,6 +52,10 @@ export class RouterManager {
                 await (executeModule.router?.value! as any)?.canActivate?.(intent, executeModule.getModuleInstance());
             }
             this.activeRouterModule = executeModule;
+
+            const otherStorage = new Map<ConstructorType<any>, any>();
+            otherStorage.set(Intent, intent);
+            otherStorage.set(RouterModule, executeModule);
             for (let [key, value] of Array.from(onRoutes)) {
                 const sim = this.simstanceManager.getOrNewSim<any>(key);
                 if(sim) {
