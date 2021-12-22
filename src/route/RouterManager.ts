@@ -160,10 +160,16 @@ export class RouterManager {
         if (typeof routeElement === 'function') {
             child = routeElement;
         } else if (typeof routeElement === 'string') {
+            // console.log('-----', routeElement)
+            // if (routeElement.startsWith('redirect:')) {
+            //     this.simstanceManager.getOrNewSim(Navigation)?.go(routeElement)
+            //     return this.findRouteProperty(route, routeElement)
+            // } else {
+            // }
             return this.findRouteProperty(route, routeElement)
         } else {
-            child = routeElement[0];
-            data = routeElement[1];
+            child = routeElement?.[0];
+            data = routeElement?.[1];
         }
         return {
             child,
