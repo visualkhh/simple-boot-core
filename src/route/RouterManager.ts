@@ -3,20 +3,20 @@ import { ConstructorType } from '../types/Types';
 import { RouterModule } from './RouterModule';
 import { Route, RouterConfig, RouterMetadataKey } from '../decorators/SimDecorator';
 import { SimAtomic } from '../simstance/SimAtomic';
-import { OnActiveRoute } from '../route/OnActiveRoute';
+// import { OnActiveRoute } from '../route/OnActiveRoute';
 import { SimstanceManager } from '../simstance/SimstanceManager';
-import {OnRoute, onRoutes} from '../decorators/route/OnRoute';
+import {getOnRoute, OnRoute, onRoutes} from '../decorators/route/OnRoute';
 
 export class RouterManager {
     public activeRouterModule?: RouterModule;
-    public subject = new Set<OnActiveRoute>();
+    // public subject = new Set<OnActiveRoute>();
 
     constructor(private simstanceManager: SimstanceManager, private rootRouter: ConstructorType<any>) {
     }
 
-    public addActiveRouterCallBack(callBackObj: OnActiveRoute) {
-        this.subject.add(callBackObj);
-    }
+    // public addActiveRouterCallBack(callBackObj: OnActiveRoute) {
+    //     this.subject.add(callBackObj);
+    // }
 
     public async routing(intent: Intent) {
         const routers: any[] = [];
@@ -51,25 +51,29 @@ export class RouterManager {
             } else { // 페이지 찾았을시
                 await (executeModule.router?.value! as any)?.canActivate?.(intent, executeModule.getModuleInstance());
             }
-            // console.log('activeRouterModule--->', onRoutes)
             this.activeRouterModule = executeModule;
-            onRoutes.forEach((value, key, map) => {
-                // console.log('-----onRouters-->', key, key.constructor)
-                // console.log('-----onRouters--1>', this.simstanceManager.storage)
-                // this.simstanceManager.storage.forEach((svalue, skey, map) => {
-                    // console.log('-----onRouters--2>', (svalue as any)?.name, skey, key.constructor, '--', skey === key.constructor,  svalue);
-                // })
-                const sim = this.simstanceManager.getOrNewSim<any>(key.constructor);
+            for (let [key, value] of Array.from(onRoutes)) {
+                const sim = this.simstanceManager.getOrNewSim<any>(key);
                 if(sim) {
-                    value.forEach((v) => {
-                        sim[v]?.(...this.simstanceManager.getParameterSim(sim, v));
-                    })
+                    for (const v of value) {
+                        const onRouteConfig = getOnRoute(key, v) ?? {};
+                        let r = undefined;
+                        if (!onRouteConfig.hasActivate) {
+                            r = sim[v]?.(...this.simstanceManager.getParameterSim(sim, v));
+                        } else if (this.activeRouterModule?.routerChains?.some((it: SimAtomic) => (it.value as any)?.hasActivate?.(sim))) {
+                            r = sim[v]?.(...this.simstanceManager.getParameterSim(sim, v));
+                        }
+                        if (r instanceof Promise) {
+                            const a = await r;
+                        }
+                    }
                 }
-            })
-
-            for (const it of Array.from(this.subject)) {
-                await it.onActiveRoute(this.activeRouterModule!);
             }
+
+
+            // for (const it of Array.from(this.subject)) {
+            //     await it.onActiveRoute(this.activeRouterModule!);
+            // }
             // console.log('routermanager--> return', '1')
             return this.activeRouterModule;
         } else {
