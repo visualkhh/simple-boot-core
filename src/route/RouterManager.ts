@@ -5,6 +5,7 @@ import { Route, RouterConfig, RouterMetadataKey } from '../decorators/SimDecorat
 import { SimAtomic } from '../simstance/SimAtomic';
 import { OnActiveRoute } from '../route/OnActiveRoute';
 import { SimstanceManager } from '../simstance/SimstanceManager';
+import {OnRoute, onRoutes} from '../decorators/route/OnRoute';
 
 export class RouterManager {
     public activeRouterModule?: RouterModule;
@@ -50,8 +51,22 @@ export class RouterManager {
             } else { // 페이지 찾았을시
                 await (executeModule.router?.value! as any)?.canActivate?.(intent, executeModule.getModuleInstance());
             }
-            // console.log('activeRouterModule--->', executeModule)
+            // console.log('activeRouterModule--->', onRoutes)
             this.activeRouterModule = executeModule;
+            onRoutes.forEach((value, key, map) => {
+                // console.log('-----onRouters-->', key, key.constructor)
+                // console.log('-----onRouters--1>', this.simstanceManager.storage)
+                // this.simstanceManager.storage.forEach((svalue, skey, map) => {
+                    // console.log('-----onRouters--2>', (svalue as any)?.name, skey, key.constructor, '--', skey === key.constructor,  svalue);
+                // })
+                const sim = this.simstanceManager.getOrNewSim<any>(key.constructor);
+                if(sim) {
+                    value.forEach((v) => {
+                        sim[v]?.(...this.simstanceManager.getParameterSim(sim, v));
+                    })
+                }
+            })
+
             for (const it of Array.from(this.subject)) {
                 await it.onActiveRoute(this.activeRouterModule!);
             }

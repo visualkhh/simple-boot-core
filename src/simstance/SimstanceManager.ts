@@ -128,6 +128,7 @@ export class SimstanceManager implements Runnable {
     }
 
     public newSim<T>(target: ConstructorType<T>, simCreateAfter?: (data: T) => void): T {
+        // console.log('======newSim-->', target, simCreateAfter)
         const r = new target(...this.getParameterSim(target))
         // this.settingEventListener(r);
         const p = this.proxy(r);
@@ -155,7 +156,7 @@ export class SimstanceManager implements Runnable {
     public getParameterSim(target: Object, targetKey?: string | symbol): any[] {
         const paramTypes = ReflectUtils.getParameterTypes(target, targetKey);
         const paramNames = FunctionUtils.getParameterNames(target, targetKey);
-        // console.log('--------', target, paramTypes)
+        // console.log('--------', target, paramTypes , targetKey)
         // console.log('--------', target, (target as any).name, paramTypes, paramNames)
         const injections = paramTypes.map((token: ConstructorType<any>, idx: number) => {
             target = targetKey ? (target as any)[targetKey] : target;
@@ -171,7 +172,7 @@ export class SimstanceManager implements Runnable {
                     obj = new Proxy(obj, new inject.applyProxy.type(inject.applyProxy.param));
                 }
                 return obj;
-            } else {
+            } else if (token) {
                 return this.resolve<any>(token);
             }
         })

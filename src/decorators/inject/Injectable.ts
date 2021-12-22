@@ -18,7 +18,7 @@ export const Injectable = (config?: InjectableConfig): GenericClassDecorator<Con
 }
 
 export const getInjectable = (target: ConstructorType<any> | Function | any): InjectableConfig | undefined => {
-    if (typeof target === 'object') {
+    if (null != target && undefined != target && typeof target === 'object') {
         target = target.constructor;
     }
     try {

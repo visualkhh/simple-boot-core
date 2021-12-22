@@ -29,7 +29,7 @@ export const getInject = (target: ConstructorType<any> | Function | any, propert
     // console.log('000>>', target, typeof target)
     // const constructor = target.constructor;
 
-    if (typeof target === 'object') {
+    if (null != target && undefined != target && typeof target === 'object') {
         target = target.constructor;
     }
     try {
