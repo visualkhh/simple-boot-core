@@ -1,7 +1,7 @@
 import {ReflectUtils} from '../../utils/reflect/ReflectUtils';
 import {ReflectMethod, ConstructorType} from '../../types/Types';
 
-type OnRouteOption = { hasActivate?: boolean }
+type OnRouteOption = { isActivateMe?: boolean }
 
 export const onRoutes = new Map<ConstructorType<any>, string[]>();
 
