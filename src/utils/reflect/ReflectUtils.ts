@@ -8,6 +8,15 @@ export class ReflectUtils {
         }
     }
 
+    // @Reflect.metadata("design:type", Point)
+    static getType(target: any, propertyKey?: string | symbol): any {
+        if (propertyKey) {
+            return Reflect.getMetadata('design:type', target, propertyKey);
+        } else {
+            return Reflect.getMetadata('design:type', target);
+        }
+    }
+
     static getMetadata(metadataKey: any, target: any, propertyKey?: string | symbol) {
         if (propertyKey) {
             return Reflect.getMetadata(metadataKey, target, propertyKey);
@@ -18,6 +27,14 @@ export class ReflectUtils {
 
     static getMetadataKeys(target: any) {
         return Reflect.getMetadataKeys(target);
+    }
+
+    static getOwnMetadata(metadataKey: any, target: any, propertyKey?: string): number[] {
+        if (propertyKey) {
+            return Reflect.getOwnMetadata(metadataKey, target, propertyKey);
+        } else {
+            return Reflect.getOwnMetadata(metadataKey, target);
+        }
     }
 
     static getMetadatas(target: any) {

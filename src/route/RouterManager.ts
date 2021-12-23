@@ -57,20 +57,24 @@ export class RouterManager {
             otherStorage.set(Intent, intent);
             otherStorage.set(RouterModule, executeModule);
             for (let [key, value] of Array.from(onRoutes)) {
-                const sim = this.simstanceManager.getOrNewSim<any>(key);
-                if(sim) {
-                    for (const v of value) {
-                        const onRouteConfig = getOnRoute(key, v);
-                        let r = undefined;
-                        if (!onRouteConfig?.hasActivate) {
-                            r = sim[v]?.(...this.simstanceManager.getParameterSim({target: sim, targetKey:v}, otherStorage));
-                        } else if (this.activeRouterModule?.routerChains?.some((it: SimAtomic) => (it.value as any)?.hasActivate?.(sim))) {
-                            r = sim[v]?.(...this.simstanceManager.getParameterSim({target: sim, targetKey:v}, otherStorage));
-                        }
-                        if (r instanceof Promise) {
-                            const a = await r;
+                try {
+                    const sim = this.simstanceManager.getOrNewSim<any>(key);
+                    if(sim) {
+                        for (const v of value) {
+                            const onRouteConfig = getOnRoute(key, v);
+                            let r = undefined;
+                            if (!onRouteConfig?.hasActivate) {
+                                r = sim[v]?.(...this.simstanceManager.getParameterSim({target: sim, targetKey:v}, otherStorage));
+                            } else if (this.activeRouterModule?.routerChains?.some((it: SimAtomic) => (it.value as any)?.hasActivate?.(sim))) {
+                                r = sim[v]?.(...this.simstanceManager.getParameterSim({target: sim, targetKey:v}, otherStorage));
+                            }
+                            if (r instanceof Promise) {
+                                const a = await r;
+                            }
                         }
                     }
+                } catch (error) {
+
                 }
             }
 

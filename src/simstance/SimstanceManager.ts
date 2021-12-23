@@ -124,7 +124,7 @@ export class SimstanceManager implements Runnable {
             newSim?.onSimCreate?.();
             return newSim
         }
-        const simNoSuch = new SimNoSuch('no simple instance ' + 'name:' + target?.prototype?.constructor?.name + ',' + target );
+        const simNoSuch = new SimNoSuch('SimNoSuch: no simple instance ' + 'name:' + target?.prototype?.constructor?.name + ',' + target );
         console.error(simNoSuch);
         throw simNoSuch
     }

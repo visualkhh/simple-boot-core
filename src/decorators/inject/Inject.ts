@@ -8,6 +8,7 @@ export interface InjectConfig {
     applyProxy?: {type: ConstructorType<ProxyHandler<any>>, param?: any[]};
 }
 const InjectMetadataKey = Symbol('Inject');
+// Reflect.getOwnMetadata 써서 처리할수도 있을듯한데..
 export const Inject = (config: InjectConfig = {}): MethodParameter => {
     return (target: Object, propertyKey: string | symbol | undefined, parameterIndex: number) => {
         // const existingInjectdParameters: number[] = Reflect.getOwnMetadata(InjectMetadataKey, target, propertyKey) || [];
