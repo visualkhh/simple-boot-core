@@ -223,7 +223,10 @@ export class SimstanceManager implements Runnable {
     //     return target;
     // }
 
-    run() {
+    run(otherInstanceSim?: Map<ConstructorType<any>, any>) {
+        otherInstanceSim?.forEach((value, key) => {
+            this.set(key, value);
+        })
         sims.forEach((data: any) => {
             this.register(data);
         })

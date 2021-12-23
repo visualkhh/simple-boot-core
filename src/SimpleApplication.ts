@@ -23,8 +23,8 @@ export class SimpleApplication implements Runnable {
         this.simstanceManager.storage.set(RouterManager, this.routerManager);
     }
 
-    public run() {
-        this.simstanceManager.run();
+    public run(otherInstanceSim?: Map<ConstructorType<any>, any>) {
+        this.simstanceManager.run(otherInstanceSim);
     }
 
     public publishIntent(i: Intent):any[] {
