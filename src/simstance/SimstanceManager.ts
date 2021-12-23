@@ -158,23 +158,32 @@ export class SimstanceManager implements Runnable {
     public getParameterSim({target, targetKey}: {target: Object, targetKey?: string | symbol}, otherStorage?: Map<ConstructorType<any>, any>): any[] {
         const paramTypes = ReflectUtils.getParameterTypes(target, targetKey);
         const paramNames = FunctionUtils.getParameterNames(target, targetKey);
-        const injections = paramTypes.map((token: ConstructorType<any>, idx: number) => {
-            const metHodTarget = targetKey ? (target as any)[targetKey] : target;
-            const inject = getInject(metHodTarget, String(idx));
-            if (inject) {
+        let injections = [];
+
+
+        const injects = getInject(target, targetKey);
+        injections = paramTypes.map((token: ConstructorType<any>, idx: number) => {
+            const saveInject = injects?.find(it => it.index === idx);
+            if (saveInject) {
+                const inject = saveInject.config;
                 let obj = otherStorage?.get(token);
                 if (!obj) {
-                    const findFirstSim1 = this.findFirstSim(inject.scheme, inject.type);
-                    obj = findFirstSim1 ? this.resolve<any>(findFirstSim1?.type ?? token) : undefined;
+                    const findFirstSim = this.findFirstSim(inject.scheme, inject.type);
+                    obj = findFirstSim ? this.resolve<any>(findFirstSim?.type ?? token) : this.resolve<any>(token);
                 }
                 if (inject.applyProxy) {
-                    obj = new Proxy(obj, new inject.applyProxy.type(inject.applyProxy.param));
+                    // console.log('inject.applyProxy--------->', inject.applyProxy.type, token, obj);
+                    if (inject.applyProxy.param){
+                        obj = new Proxy(obj, new inject.applyProxy.type(...inject.applyProxy.param));
+                    } else {
+                        obj = new Proxy(obj, new inject.applyProxy.type());
+                    }
                 }
                 return obj;
             } else if (token) {
                 return otherStorage?.get(token) ?? this.resolve<any>(token);
             }
-        })
+        });
         return injections;
     }
 
