@@ -58,18 +58,22 @@ export class RouterManager {
             otherStorage.set(RouterModule, executeModule);
             for (let [key, value] of Array.from(onRoutes)) {
                 try {
-                    const sim = this.simstanceManager.getOrNewSim<any>(key);
-                    if(sim) {
+                    // const sim = this.simstanceManager.getOrNewSim<any>(key);
+                    const sim = this.simstanceManager.findFirstSim({type: key});
+                    const simValue = sim?.value
+                    if(simValue) {
                         for (const v of value) {
                             const onRouteConfig = getOnRoute(key, v);
                             let r = undefined;
                             if (!onRouteConfig?.isActivateMe) {
-                                r = sim[v]?.(...this.simstanceManager.getParameterSim({target: sim, targetKey:v}, otherStorage));
-                            } else if (this.activeRouterModule?.routerChains?.some((it: SimAtomic) => (it.value as any)?.hasActivate?.(sim))) {
-                                r = sim[v]?.(...this.simstanceManager.getParameterSim({target: sim, targetKey:v}, otherStorage));
+                                r = simValue[v]?.(...this.simstanceManager.getParameterSim({target: simValue, targetKey:v}, otherStorage));
+                            } else if (this.activeRouterModule?.routerChains?.some((it: SimAtomic) => (it.value as any)?.hasActivate?.(simValue))) {
+                                r = simValue[v]?.(...this.simstanceManager.getParameterSim({target: simValue, targetKey:v}, otherStorage));
                             }
                             if (r instanceof Promise) {
-                                const a = await r;
+                                this.activeRouterModule.onRouteDatas.push({simAtomic: sim, onRouteData: await r});
+                            } else {
+                                this.activeRouterModule.onRouteDatas.push({simAtomic: sim, onRouteData: r});
                             }
                         }
                     }

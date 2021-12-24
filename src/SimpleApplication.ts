@@ -31,7 +31,7 @@ export class SimpleApplication implements Runnable {
         return this.intentManager.publish(i);
     }
 
-    public routing<R = SimAtomic, M = any>(i: Intent) {
+    public routing<R = SimAtomic, M = any>(i: Intent): Promise<RouterModule> {
         return this.routerManager.routing(i);
     }
 }
