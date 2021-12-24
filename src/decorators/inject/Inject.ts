@@ -16,17 +16,11 @@ export type InjectConfig = {
 const InjectMetadataKey = Symbol('Inject');
 export const Inject = (config: InjectConfig = {}): MethodParameter => {
     return (target: Object, propertyKey: string | symbol | undefined, parameterIndex: number) => {
-        //target type (function: constructor,  object: method)
-        // console.group('Inject');
-        // console.log('Inject!!', target, propertyKey, parameterIndex, typeof target);
         if (propertyKey && typeof target === 'object') { // <-- object: method
             target = target.constructor;
-            // console.group('Inject sub');
             const existingInjectdParameters = (Reflect.getOwnMetadata(InjectMetadataKey, target, propertyKey) || []) as SaveInjectConfig[];
             existingInjectdParameters.push({index: parameterIndex, config, propertyKey});
             ReflectUtils.defineMetadata(InjectMetadataKey, existingInjectdParameters, target, propertyKey);
-            // console.log('Inject-', existingInjectdParameters);
-            // console.groupEnd();
         } else if (!propertyKey || typeof target === 'function') { // <-- function: constructor
             const existingInjectdParameters = (ReflectUtils.getMetadata(InjectMetadataKey, target) || []) as SaveInjectConfig[]
             existingInjectdParameters.push({index: parameterIndex, config});

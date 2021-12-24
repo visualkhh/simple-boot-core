@@ -63,7 +63,7 @@ export class RouterManager {
                         for (const v of value) {
                             const onRouteConfig = getOnRoute(key, v);
                             let r = undefined;
-                            if (!onRouteConfig?.hasActivate) {
+                            if (!onRouteConfig?.isActivateMe) {
                                 r = sim[v]?.(...this.simstanceManager.getParameterSim({target: sim, targetKey:v}, otherStorage));
                             } else if (this.activeRouterModule?.routerChains?.some((it: SimAtomic) => (it.value as any)?.hasActivate?.(sim))) {
                                 r = sim[v]?.(...this.simstanceManager.getParameterSim({target: sim, targetKey:v}, otherStorage));
