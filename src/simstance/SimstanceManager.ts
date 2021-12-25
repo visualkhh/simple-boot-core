@@ -7,9 +7,10 @@ import {ObjectUtils} from '../utils/object/ObjectUtils';
 import {SimAtomic} from './SimAtomic';
 import {ReflectUtils} from '../utils/reflect/ReflectUtils';
 import {FunctionUtils} from '../utils/function/FunctionUtils';
-import {getInject} from '../decorators/inject/Inject';
+import { getInject, SaveInjectConfig } from '../decorators/inject/Inject';
 import {SimOption} from '../SimOption';
 import {SimProxyHandler} from '../proxy/SimProxyHandler';
+export type FirstCheckMaker = (token: ConstructorType<any>, idx: number, saveInjectConfig?: SaveInjectConfig) => any | undefined;
 
 export class SimstanceManager implements Runnable {
     private _storage = new Map<ConstructorType<any>, any>()
@@ -155,15 +156,23 @@ export class SimstanceManager implements Runnable {
         })
     }
 
-    public getParameterSim({target, targetKey}: {target: Object, targetKey?: string | symbol}, otherStorage?: Map<ConstructorType<any>, any>): any[] {
+    public getParameterSim({target, targetKey, firstCheckMaker}: {target: Object, targetKey?: string | symbol, firstCheckMaker?:FirstCheckMaker[] },
+                           otherStorage?: Map<ConstructorType<any>, any>): any[] {
         const paramTypes = ReflectUtils.getParameterTypes(target, targetKey);
         const paramNames = FunctionUtils.getParameterNames(target, targetKey);
         let injections = [];
 
-
         const injects = getInject(target, targetKey);
+        // console.log('--->', target, targetKey, paramTypes, injects)
         injections = paramTypes.map((token: ConstructorType<any>, idx: number) => {
             const saveInject = injects?.find(it => it.index === idx);
+
+            for(const f of firstCheckMaker??[]) {
+                const firstCheckObj = f(token, idx, saveInject);
+                if (firstCheckObj) {
+                    return firstCheckObj;
+                }
+            }
             if (saveInject) {
                 const inject = saveInject.config;
                 let obj = otherStorage?.get(token);

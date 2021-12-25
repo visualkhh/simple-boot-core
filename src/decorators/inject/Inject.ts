@@ -11,6 +11,7 @@ export type SaveInjectConfig ={
 export type InjectConfig = {
     scheme?: string;
     type?: ConstructorType<any>;
+    situationType?: string;
     applyProxy?: {type: ConstructorType<ProxyHandler<any>>, param?: any[]};
 }
 const InjectMetadataKey = Symbol('Inject');
