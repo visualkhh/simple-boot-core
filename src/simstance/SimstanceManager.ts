@@ -10,7 +10,7 @@ import {FunctionUtils} from '../utils/function/FunctionUtils';
 import { getInject, SaveInjectConfig } from '../decorators/inject/Inject';
 import {SimOption} from '../SimOption';
 import {SimProxyHandler} from '../proxy/SimProxyHandler';
-export type FirstCheckMaker = (token: ConstructorType<any>, idx: number, saveInjectConfig?: SaveInjectConfig) => any | undefined;
+export type FirstCheckMaker = (obj: {target: Object, targetKey?: string | symbol}, token: ConstructorType<any>, idx: number, saveInjectConfig?: SaveInjectConfig) => any | undefined;
 
 export class SimstanceManager implements Runnable {
     private _storage = new Map<ConstructorType<any>, any>()
@@ -163,13 +163,12 @@ export class SimstanceManager implements Runnable {
         let injections = [];
 
         const injects = getInject(target, targetKey);
-        // console.log('--->', target, targetKey, paramTypes, injects)
         injections = paramTypes.map((token: ConstructorType<any>, idx: number) => {
             const saveInject = injects?.find(it => it.index === idx);
 
             for(const f of firstCheckMaker??[]) {
-                const firstCheckObj = f(token, idx, saveInject);
-                if (firstCheckObj) {
+                const firstCheckObj = f({target, targetKey}, token, idx, saveInject);
+                if (undefined !== firstCheckObj) {
                     return firstCheckObj;
                 }
             }
