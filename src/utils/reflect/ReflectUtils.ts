@@ -8,6 +8,11 @@ export class ReflectUtils {
         }
     }
 
+
+    static getReturnType(target: any, propertyKey: string | symbol): any {
+        return Reflect.getMetadata("design:returntype", target, propertyKey);
+    }
+
     // @Reflect.metadata("design:type", Point)
     static getType(target: any, propertyKey?: string | symbol): any {
         if (propertyKey) {

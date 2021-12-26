@@ -9,7 +9,13 @@ export class SimProxyHandler implements ProxyHandler<any> {
     }
 
     public get(target: any, name: string): any {
-        return target[name]
+        if (name === '_SimpleBoot_simstanceManager') {
+            return this.simstanceManager;
+        } else if (name === '_SimpleBoot_simOption') {
+            return this.simOption;
+        } else {
+            return target[name]
+        }
     }
 
     public set(obj: any, prop: string, value: any, receiver: any): boolean {

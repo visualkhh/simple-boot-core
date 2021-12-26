@@ -7,5 +7,5 @@ export interface ConstructorType<T> {
  */
 export type GenericClassDecorator<T> = (target: T) => void;
 
-export type ReflectMethod = (target: any, propertyKey: string, descriptor: PropertyDescriptor) => any;
+export type ReflectMethod = (target: any| ConstructorType<any>, propertyKey: string, descriptor: PropertyDescriptor) => any;
 export type MethodParameter = (target: Object, propertyKey: string | symbol, parameterIndex: number) => void;

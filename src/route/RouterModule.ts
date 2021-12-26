@@ -7,7 +7,7 @@ export class RouterModule<R = SimAtomic, M = any> {
     public pathData?: { [name: string]: string };
     public data?: any;
     public intent?: Intent;
-    public onRouteDatas: {simAtomic: SimAtomic, onRouteData: any}[] = []
+    // public onRouteDatas: {simAtomic: SimAtomic, onRouteData: any}[] = []
     constructor(private simstanceManager: SimstanceManager, public router?: R, public module?: ConstructorType<M>, public routerChains: R[] = []) {
     }
 

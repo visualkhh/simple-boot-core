@@ -71,10 +71,13 @@ export class RouterManager {
                                 r = simValue[v]?.(...this.simstanceManager.getParameterSim({target: simValue, targetKey:v}, otherStorage));
                             }
                             if (r instanceof Promise) {
-                                this.activeRouterModule.onRouteDatas.push({simAtomic: sim, onRouteData: await r});
-                            } else {
-                                this.activeRouterModule.onRouteDatas.push({simAtomic: sim, onRouteData: r});
+                                await r
                             }
+                            // if (r instanceof Promise) {
+                            //     this.activeRouterModule.onRouteDatas.push({simAtomic: sim, onRouteData: await r});
+                            // } else {
+                            //     this.activeRouterModule.onRouteDatas.push({simAtomic: sim, onRouteData: r});
+                            // }
                         }
                     }
                 } catch (error) {
