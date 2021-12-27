@@ -64,7 +64,7 @@ export const Around = (config: AroundOption):  ReflectMethod => {
 
         const method = descriptor.value;
         descriptor.value = function (...args: any[]) {
-            console.log('check method')
+            // console.log('check method')
 
             let before = undefined;
             let r = undefined;
