@@ -130,9 +130,9 @@ export class SimstanceManager implements Runnable {
         throw simNoSuch
     }
 
-    public newSim<T>(target: ConstructorType<T>, simCreateAfter?: (data: T) => void): T {
+    public newSim<T>(target: ConstructorType<T>, simCreateAfter?: (data: T) => void, otherStorage?: Map<ConstructorType<any>, any>): T {
         // console.log('======newSim-->', target, simCreateAfter)
-        const r = new target(...this.getParameterSim({target}))
+        const r = new target(...this.getParameterSim({target}, otherStorage))
         // this.settingEventListener(r);
         const p = this.proxy(r);
         // 순환참조 막기위한 콜백 처리
