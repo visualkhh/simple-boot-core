@@ -55,10 +55,12 @@ export class SimstanceManager implements Runnable {
 
     findFirstSim({scheme, type}: {scheme?: string, type?: ConstructorType<any>}): SimAtomic<any> | undefined {
         if (scheme || type) {
-            return this.getSimAtomics().filter(it => {
-                const b = (scheme ? scheme === it.getConfig()?.scheme : true) && (type ? it.value instanceof type : true);
+            const find = this.getSimAtomics().find(it => {
+                // const b = (scheme ? scheme === it.getConfig()?.scheme : true) && (type ? it.value instanceof type : true);
+                const b = (scheme ? scheme === it.getConfig()?.scheme : true) && (type ? it.type === type : true);
                 return b
-            })[0]
+            });
+            return find
         }
     }
 
@@ -155,6 +157,16 @@ export class SimstanceManager implements Runnable {
                 (obj as any)[it](...this.getParameterSim({target: obj, targetKey: it}))
             }
         })
+    }
+
+    public executeBindParameterSim({target, targetKey, firstCheckMaker}: {target: Object, targetKey?: string | symbol, firstCheckMaker?:FirstCheckMaker[] },
+                                otherStorage?: Map<ConstructorType<any>, any>) {
+        const binds = this.getParameterSim({target, targetKey, firstCheckMaker}, otherStorage);
+        if (typeof target === 'object' && targetKey) {
+            return (target as any)[targetKey]?.(...binds);
+        } else if (typeof target === 'function' && !targetKey) {
+            return new (target as  ConstructorType<any>)(...binds);
+        }
     }
 
     public getParameterSim({target, targetKey, firstCheckMaker}: {target: Object, targetKey?: string | symbol, firstCheckMaker?:FirstCheckMaker[] },
