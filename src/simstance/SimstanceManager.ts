@@ -15,6 +15,7 @@ export type FirstCheckMaker = (obj: {target: Object, targetKey?: string | symbol
 export class SimstanceManager implements Runnable {
     private _storage = new Map<ConstructorType<any>, any>()
     private simProxyHandler: SimProxyHandler;
+    private otherInstanceSim?: Map<ConstructorType<any>, any>;
 
     constructor(private option: SimOption) {
         this._storage.set(SimstanceManager, this);
@@ -241,7 +242,8 @@ export class SimstanceManager implements Runnable {
     // }
 
     run(otherInstanceSim?: Map<ConstructorType<any>, any>) {
-        otherInstanceSim?.forEach((value, key) => {
+        this.otherInstanceSim = otherInstanceSim;
+        this.otherInstanceSim?.forEach((value, key) => {
             this.set(key, value);
         })
         sims.forEach((data: any) => {
