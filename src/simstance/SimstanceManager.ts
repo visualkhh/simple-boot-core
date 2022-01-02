@@ -55,7 +55,8 @@ export class SimstanceManager implements Runnable {
 
     findFirstSim({scheme, type}: {scheme?: string, type?: ConstructorType<any>}): SimAtomic<any> | undefined {
         if (scheme || type) {
-            const find = this.getSimAtomics().find(it => {
+            const simAtomics = this.getSimAtomics();
+            const find = simAtomics.find(it => {
                 // const b = (scheme ? scheme === it.getConfig()?.scheme : true) && (type ? it.value instanceof type : true);
                 const b = (scheme ? scheme === it.getConfig()?.scheme : true) && (type ? it.type === type : true);
                 return b

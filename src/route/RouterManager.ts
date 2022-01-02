@@ -60,28 +60,24 @@ export class RouterManager {
                 try {
                     // const sim = this.simstanceManager.getOrNewSim<any>(key);
                     const sim = this.simstanceManager.findFirstSim({type: key});
-                    const simValue = sim?.value
-                    if(simValue) {
-                        for (const v of value) {
-                            const onRouteConfig = getOnRoute(key, v);
-                            let r = undefined;
-                            if (!onRouteConfig?.isActivateMe) {
-                                r = simValue[v]?.(...this.simstanceManager.getParameterSim({target: simValue, targetKey:v}, otherStorage));
-                            } else if (this.activeRouterModule?.routerChains?.some((it: SimAtomic) => (it.value as any)?.hasActivate?.(simValue))) {
-                                r = simValue[v]?.(...this.simstanceManager.getParameterSim({target: simValue, targetKey:v}, otherStorage));
-                            }
-                            if (r instanceof Promise) {
-                                await r
-                            }
-                            // if (r instanceof Promise) {
-                            //     this.activeRouterModule.onRouteDatas.push({simAtomic: sim, onRouteData: await r});
-                            // } else {
-                            //     this.activeRouterModule.onRouteDatas.push({simAtomic: sim, onRouteData: r});
-                            // }
+                    for (const v of value) {
+                        const onRouteConfig = getOnRoute(key, v);
+                        let r = undefined;
+                        if (!onRouteConfig?.isActivateMe) {
+                            r = sim?.value[v]?.(...this.simstanceManager.getParameterSim({target: sim?.value, targetKey:v}, otherStorage));
+                        } else if (this.activeRouterModule?.routerChains?.some((it: SimAtomic) => (it.value as any)?.hasActivate?.(sim?.value))) {
+                            r = sim?.value[v]?.(...this.simstanceManager.getParameterSim({target: sim?.value, targetKey:v}, otherStorage));
                         }
+                        if (r instanceof Promise) {
+                            await r
+                        }
+                        // if (r instanceof Promise) {
+                        //     this.activeRouterModule.onRouteDatas.push({simAtomic: sim, onRouteData: await r});
+                        // } else {
+                        //     this.activeRouterModule.onRouteDatas.push({simAtomic: sim, onRouteData: r});
+                        // }
                     }
                 } catch (error) {
-
                 }
             }
 
