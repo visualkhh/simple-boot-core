@@ -175,7 +175,7 @@ export class SimstanceManager implements Runnable {
         const paramTypes = ReflectUtils.getParameterTypes(target, targetKey);
         const paramNames = FunctionUtils.getParameterNames(target, targetKey);
         let injections = [];
-        console.log('getParameterSim-->', target, targetKey, paramTypes, paramNames, firstCheckMaker)
+        // console.log('getParameterSim-->', target, targetKey, paramTypes, paramNames, firstCheckMaker)
         const injects = getInject(target, targetKey);
         injections = paramTypes.map((token: ConstructorType<any>, idx: number) => {
             const saveInject = injects?.find(it => it.index === idx);
