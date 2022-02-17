@@ -1,8 +1,9 @@
 import {SimstanceManager} from '../simstance/SimstanceManager'
-import {getTargetAndIncludeNullAndSortExceptionHandlers} from '../decorators/exception/ExceptionDecorator';
 import {getProtoAfters, getProtoBefores} from '../decorators/aop/AOPDecorator';
 import {ObjectUtils} from '../utils/object/ObjectUtils';
 import {SimOption} from '../SimOption';
+import {targetExceptionHandler} from '../decorators/exception/ExceptionDecorator';
+import {ConstructorType} from '../types/Types';
 
 export class SimProxyHandler implements ProxyHandler<any> {
     constructor(private simstanceManager: SimstanceManager, private simOption: SimOption) {
@@ -33,15 +34,27 @@ export class SimProxyHandler implements ProxyHandler<any> {
             r = target.apply(thisArg, argumentsList);
             this.aopAfter(thisArg, target);
         } catch (e: Error | any) {
-            const inHandler = getTargetAndIncludeNullAndSortExceptionHandlers(thisArg, e)
-            if (inHandler.length > 0) {
-                inHandler[inHandler.length - 1].call(e, thisArg, target, argumentsList);
+            const otherStorage = new Map<ConstructorType<any>, any>();
+            otherStorage.set(e.constructor, e);
+            (argumentsList as Array<any>)?.forEach(it => {
+                otherStorage.set(e.constructor, e);
+            });
+
+            const inHandler = targetExceptionHandler(thisArg, e)
+            if (inHandler) {
+                let data = this.simstanceManager.executeBindParameterSim({
+                    target: thisArg,
+                    targetKey: inHandler.propertyKey
+                }, otherStorage);
             } else {
                 for (let i = 0; i < this.simOption.advice.length; i++) {
                     const sim = this.simstanceManager?.getOrNewSim(this.simOption.advice[i]);
-                    const inHandler = getTargetAndIncludeNullAndSortExceptionHandlers(sim, e)
-                    if (inHandler.length > 0) {
-                        inHandler[inHandler.length - 1].call(e, thisArg, target, argumentsList);
+                    const inHandler = targetExceptionHandler(sim, e)
+                    if (inHandler) {
+                        let data = this.simstanceManager.executeBindParameterSim({
+                            target: sim,
+                            targetKey: inHandler.propertyKey
+                        }, otherStorage);
                         break;
                     }
                 }

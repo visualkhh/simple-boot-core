@@ -40,12 +40,35 @@ export class ObjectUtils {
     //     return this.getAllProtoType(target).includes(start);
     // }
 
+    /*
+    Object.prototype.isPrototypeOf()
+    isPrototypeOf() 메소드는 해당 객체가 다른 객체의 프로토타입 체인에 속한 객체인지 확인하기 위해 사용됩니다.
+     */
     static isPrototypeOfTarget(start: ConstructorType<any> | null | undefined, target: any | null | undefined): boolean {
         if (start && target) {
             return Object.prototype.isPrototypeOf.call(start.prototype, target);
         } else {
             return false;
         }
+    }
+    static getPrototypeOfDepth(target: any, dest: ConstructorType<any> | null | undefined): object[] {
+
+        let object = target;
+        const r = [];
+        // if (includeMe) {
+        //     r.push(Object.getPrototypeOf(object));
+        // }
+        if (dest) {
+            do {
+              object = Object.getPrototypeOf(object);
+              if (object?.constructor === dest) {
+                  break;
+              }
+              r.push(object);
+              // console.log(object);
+            } while (object);
+        }
+        return r;
     }
 
     static getAllProtoType(start: ConstructorType<any> | null | undefined): ConstructorType<any>[] {
