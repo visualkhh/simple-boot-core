@@ -45,7 +45,6 @@ export const targetExceptionHandlers = (target: any, error: any): SaveExceptionH
 
 export const targetExceptionHandler = (target: any, error: any): SaveExceptionHandlerConfig | undefined => {
     let exceptionHandlers = targetExceptionHandlers(target, error);
-    console.log('-------------', exceptionHandlers)
     if (exceptionHandlers && exceptionHandlers.length > 0) {
         return exceptionHandlers[0];
     } else {
