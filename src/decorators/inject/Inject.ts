@@ -1,9 +1,10 @@
 import "reflect-metadata"
 import {ConstructorType, MethodParameter} from '../../types/Types'
 import {ReflectUtils} from '../../utils/reflect/ReflectUtils';
-export enum SituationType {
-    ExceptionHandlerErrorObject = 'ExceptionHandlerErrorObject'
-}
+import {ExceptionHandlerSituationType} from '../exception/ExceptionDecorator';
+
+export type SituationType = string | ExceptionHandlerSituationType;
+
 export class SiturationTypeContainer {
     constructor(public situationType: SituationType, public data: any) {
     }
@@ -16,7 +17,7 @@ export type SaveInjectConfig = {
 export type InjectConfig = {
     scheme?: string;
     type?: ConstructorType<any>;
-    situationType?: string | SituationType;
+    situationType?: SituationType;
     applyProxy?: {type: ConstructorType<ProxyHandler<any>>, param?: any[]};
 }
 const InjectMetadataKey = Symbol('Inject');

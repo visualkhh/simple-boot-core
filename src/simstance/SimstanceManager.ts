@@ -160,6 +160,15 @@ export class SimstanceManager implements Runnable {
         })
     }
 
+    public async executeBindParameterSimPromise({target, targetKey, firstCheckMaker}: {target: Object, targetKey?: string | symbol, firstCheckMaker?:FirstCheckMaker[] },
+                                otherStorage?: Map<ConstructorType<any>, any>) {
+        let value = this.executeBindParameterSim({target, targetKey, firstCheckMaker}, otherStorage);
+        if (value instanceof Promise) {
+            value = await value;
+        }
+        return value;
+    }
+
     public executeBindParameterSim({target, targetKey, firstCheckMaker}: {target: Object, targetKey?: string | symbol, firstCheckMaker?:FirstCheckMaker[] },
                                 otherStorage?: Map<ConstructorType<any>, any>) {
         const binds = this.getParameterSim({target, targetKey, firstCheckMaker}, otherStorage);

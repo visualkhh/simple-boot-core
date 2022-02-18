@@ -3,6 +3,9 @@ import {ConstructorType, ReflectMethod} from '../../types/Types';
 import {ReflectUtils} from '../../utils/reflect/ReflectUtils';
 import {ObjectUtils} from '../../utils/object/ObjectUtils';
 
+export enum ExceptionHandlerSituationType {
+    ERROR_OBJECT = 'SIMPLE_BOOT_CORE://ExceptionHandler/ERROR_OBJECT',
+}
 export type ExceptionHandlerConfig = { type?: ConstructorType<any>; }
 export type SaveExceptionHandlerConfig = { propertyKey?: string | symbol; config: ExceptionHandlerConfig; }
 
