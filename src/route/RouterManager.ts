@@ -18,13 +18,29 @@ export class RouterManager {
     //     this.subject.add(callBackObj);
     // }
 
+    public routingMap(prefix: string = '', router = this.rootRouter): {[key: string]: string | any} {
+        const map = {} as {[key: string]: string | any};
+        const routerAtomic = new SimAtomic(router, this.simstanceManager);
+        const routerData = routerAtomic.getConfig<RouterConfig>(RouterMetadataKey);
+        if (routerData) {
+            let currentPrefix = prefix + routerData.path;
+            Object.entries(routerData.route).forEach(([key, value]) => {
+                map[currentPrefix + key] = value;
+            });
+
+            routerData.routers?.forEach(it => {
+                Object.assign(map, this.routingMap(currentPrefix, it));
+            })
+        }
+        return map;
+    }
+
     public async routing(intent: Intent) {
         const routers: any[] = [];
         const routerAtomic = new SimAtomic(this.rootRouter, this.simstanceManager);
         const rootRouterData = routerAtomic.getConfig<RouterConfig>(RouterMetadataKey)!;
         const rootRouter = routerAtomic.value!;
         const executeModule = this.getExecuteModule(routerAtomic, intent, routers);
-        const date = new Date().getTime();
         if (executeModule?.router) {
             executeModule.routerChains = routers;
             if (executeModule.routerChains?.length && executeModule.routerChains?.length > 0) {
