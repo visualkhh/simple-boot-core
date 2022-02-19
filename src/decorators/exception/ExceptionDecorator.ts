@@ -1,4 +1,4 @@
-import "reflect-metadata"
+import 'reflect-metadata'
 import {ConstructorType, ReflectMethod} from '../../types/Types';
 import {ReflectUtils} from '../../utils/reflect/ReflectUtils';
 import {ObjectUtils} from '../../utils/object/ObjectUtils';

@@ -1,18 +1,22 @@
-import "reflect-metadata"
+import 'reflect-metadata'
 import {ConstructorType, MethodParameter} from '../../types/Types'
 import {ReflectUtils} from '../../utils/reflect/ReflectUtils';
 import {ExceptionHandlerSituationType} from '../exception/ExceptionDecorator';
 
-export type SituationType = string | ExceptionHandlerSituationType;
+export enum InjectSituationType {
+    INDEX = 'SIMPLE_BOOT_CORE://Inject/INDEX',
+}
+export type SituationType = string | InjectSituationType | ExceptionHandlerSituationType;
 
 export class SiturationTypeContainer {
-    constructor(public situationType: SituationType, public data: any) {
+    public situationType: SituationType;
+    public data: any;
+    public index?: number;
+    constructor({situationType, data, index}: {situationType: SituationType, data: any, index?: number}) {
+        this.situationType = situationType;
+        this.data = data;
+        this.index = index;
     }
-}
-export type SaveInjectConfig = {
-    index: number;
-    propertyKey?: string | symbol;
-    config: InjectConfig;
 }
 export type InjectConfig = {
     scheme?: string;
@@ -20,6 +24,13 @@ export type InjectConfig = {
     situationType?: SituationType;
     applyProxy?: {type: ConstructorType<ProxyHandler<any>>, param?: any[]};
 }
+
+export type SaveInjectConfig = {
+    index: number;
+    propertyKey?: string | symbol;
+    config: InjectConfig;
+}
+
 const InjectMetadataKey = Symbol('Inject');
 export const Inject = (config: InjectConfig = {}): MethodParameter => {
     return (target: Object, propertyKey: string | symbol | undefined, parameterIndex: number) => {
