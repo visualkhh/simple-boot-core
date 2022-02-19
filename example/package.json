@@ -42,6 +42,6 @@
     "typescript": "^4.2.3"
   },
   "dependencies": {
-    "simple-boot-core": "1.0.16"
+    "simple-boot-core": "file:../dist"
   }
 }

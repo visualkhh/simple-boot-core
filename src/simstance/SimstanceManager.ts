@@ -7,7 +7,7 @@ import {ObjectUtils} from '../utils/object/ObjectUtils';
 import {SimAtomic} from './SimAtomic';
 import {ReflectUtils} from '../utils/reflect/ReflectUtils';
 import {FunctionUtils} from '../utils/function/FunctionUtils';
-import {getInject, SaveInjectConfig, SiturationTypeContainer} from '../decorators/inject/Inject';
+import {getInject, SaveInjectConfig, SituationTypeContainer} from '../decorators/inject/Inject';
 import {SimOption} from '../SimOption';
 import {SimProxyHandler} from '../proxy/SimProxyHandler';
 export type FirstCheckMaker = (obj: {target: Object, targetKey?: string | symbol}, token: ConstructorType<any>, idx: number, saveInjectConfig?: SaveInjectConfig) => any | undefined;
@@ -201,7 +201,7 @@ export class SimstanceManager implements Runnable {
 
                 //situational
                 if (inject.situationType && otherStorage) {
-                    let situration = otherStorage.get(SiturationTypeContainer) as SiturationTypeContainer;
+                    let situration = otherStorage.get(SituationTypeContainer) as SituationTypeContainer;
                     if (inject.situationType === situration?.situationType){
                         obj = situration.data;
                     }

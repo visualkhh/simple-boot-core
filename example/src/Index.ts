@@ -11,10 +11,10 @@ const simpleApplication = new SimpleApplication(AppRouter, option);
 simpleApplication.run();
 const intent = new Intent('/b/asd/vv');
 simpleApplication.routing<SimAtomic<any>, any>(intent).then(it => {
-    console.log('--->', it.pathData, it.routerChains);
+    // console.log('--->', it.pathData, it.routerChains);
     let moduleInstance = it.getModuleInstance<User>();
-    console.log('-22->', moduleInstance);
+    // console.log('-22->', moduleInstance);
     moduleInstance?.print();
-    console.log('------->' , simpleApplication.routerManager.activeRouterModule)
+    // console.log('------->' , simpleApplication.routerManager.activeRouterModule)
 });
 

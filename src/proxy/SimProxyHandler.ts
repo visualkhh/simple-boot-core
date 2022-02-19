@@ -2,8 +2,9 @@ import {SimstanceManager} from '../simstance/SimstanceManager'
 import {getProtoAfters, getProtoBefores} from '../decorators/aop/AOPDecorator';
 import {ObjectUtils} from '../utils/object/ObjectUtils';
 import {SimOption} from '../SimOption';
-import {targetExceptionHandler} from '../decorators/exception/ExceptionDecorator';
+import {ExceptionHandlerSituationType, targetExceptionHandler} from '../decorators/exception/ExceptionDecorator';
 import {ConstructorType} from '../types/Types';
+import {SituationTypeContainer} from '../decorators/inject/Inject';
 
 export class SimProxyHandler implements ProxyHandler<any> {
     constructor(private simstanceManager: SimstanceManager, private simOption: SimOption) {
@@ -36,11 +37,13 @@ export class SimProxyHandler implements ProxyHandler<any> {
         } catch (e: Error | any) {
             const otherStorage = new Map<ConstructorType<any>, any>();
             otherStorage.set(e.constructor, e);
+            let siturationTypeContainer = new SituationTypeContainer({situationType: ExceptionHandlerSituationType.ERROR_OBJECT, data: e});
+            otherStorage.set(SituationTypeContainer, siturationTypeContainer);
             (argumentsList as Array<any>)?.forEach(it => {
                 otherStorage.set(e.constructor, e);
             });
 
-            const inHandler = targetExceptionHandler(thisArg, e)
+            const inHandler = targetExceptionHandler(thisArg, e, [target])
             if (inHandler) {
                 let data = this.simstanceManager.executeBindParameterSim({
                     target: thisArg,

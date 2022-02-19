@@ -23,7 +23,11 @@ export class AppRouter implements RouterAction {
     }
 
 
-    canActivate(url: Intent, module: any): void {
-        console.log('AppRouter canActivate->>>>>', url, module)
+    async canActivate(url: Intent, module: any){
+        // console.log('AppRouter canActivate->>>>>', url, module)
+    }
+
+    hasActivate(checkObj: any): boolean {
+        return true;
     }
 }

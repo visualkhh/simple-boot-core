@@ -8,7 +8,7 @@ export enum InjectSituationType {
 }
 export type SituationType = string | InjectSituationType | ExceptionHandlerSituationType;
 
-export class SiturationTypeContainer {
+export class SituationTypeContainer {
     public situationType: SituationType;
     public data: any;
     public index?: number;

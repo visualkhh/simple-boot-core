@@ -7,14 +7,15 @@ export enum ExceptionHandlerSituationType {
     ERROR_OBJECT = 'SIMPLE_BOOT_CORE://ExceptionHandler/ERROR_OBJECT',
 }
 export type ExceptionHandlerConfig = { type?: ConstructorType<any>; }
-export type SaveExceptionHandlerConfig = { propertyKey?: string | symbol; config: ExceptionHandlerConfig; }
+export type SaveExceptionHandlerConfig = { propertyKey?: string | symbol; method: Function; config: ExceptionHandlerConfig; }
 
 const ExceptionHandlerMetadataKey = Symbol('ExceptionHandler');
 
 export const ExceptionHandler = (config: ExceptionHandlerConfig = {}): ReflectMethod => {
     return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
         const saveMappingConfigs = (ReflectUtils.getMetadata(ExceptionHandlerMetadataKey, target.constructor) ?? []) as SaveExceptionHandlerConfig[];
-        saveMappingConfigs.push({propertyKey, config});
+        const method = target[propertyKey];
+        saveMappingConfigs.push({propertyKey, method, config});
         ReflectUtils.defineMetadata(ExceptionHandlerMetadataKey, saveMappingConfigs, target.constructor);
         ReflectUtils.defineMetadata(ExceptionHandlerMetadataKey, config, target, propertyKey);
     }
@@ -46,8 +47,9 @@ export const targetExceptionHandlers = (target: any, error: any): SaveExceptionH
     return (targetSorts??[]).concat(...emptyTargets??[]);
 }
 
-export const targetExceptionHandler = (target: any, error: any): SaveExceptionHandlerConfig | undefined => {
+export const targetExceptionHandler = (target: any, error: any, excludeMethods: Function[] = []): SaveExceptionHandlerConfig | undefined => {
     let exceptionHandlers = targetExceptionHandlers(target, error);
+    exceptionHandlers = exceptionHandlers?.filter(it => !excludeMethods.includes(it.method));
     if (exceptionHandlers && exceptionHandlers.length > 0) {
         return exceptionHandlers[0];
     } else {
