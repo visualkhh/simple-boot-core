@@ -18,6 +18,22 @@ export class SituationTypeContainer {
         this.index = index;
     }
 }
+
+export class SituationTypeContainers {
+    public containers: SituationTypeContainer[] = [];
+    public push(...item: SituationTypeContainer[]) {
+        this.containers.push(...item)
+    }
+
+    get length() {
+        return this.containers.length;
+    }
+
+    find(predicate: (value: SituationTypeContainer, index: number, obj: SituationTypeContainer[]) => unknown, thisArg?: any): SituationTypeContainer | undefined{
+        return this.containers.find(predicate);
+    }
+}
+
 export type InjectConfig = {
     scheme?: string;
     type?: ConstructorType<any>;

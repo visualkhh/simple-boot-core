@@ -37,15 +37,15 @@ export class SimProxyHandler implements ProxyHandler<any> {
         } catch (e: Error | any) {
             const otherStorage = new Map<ConstructorType<any>, any>();
             otherStorage.set(e.constructor, e);
-            let siturationTypeContainer = new SituationTypeContainer({situationType: ExceptionHandlerSituationType.ERROR_OBJECT, data: e});
-            otherStorage.set(SituationTypeContainer, siturationTypeContainer);
+            const situationTypeContainer = new SituationTypeContainer({situationType: ExceptionHandlerSituationType.ERROR_OBJECT, data: e});
+            otherStorage.set(SituationTypeContainer, situationTypeContainer);
             (argumentsList as Array<any>)?.forEach(it => {
                 otherStorage.set(e.constructor, e);
             });
 
             const inHandler = targetExceptionHandler(thisArg, e, [target])
             if (inHandler) {
-                let data = this.simstanceManager.executeBindParameterSim({
+                this.simstanceManager.executeBindParameterSim({
                     target: thisArg,
                     targetKey: inHandler.propertyKey
                 }, otherStorage);
@@ -54,7 +54,7 @@ export class SimProxyHandler implements ProxyHandler<any> {
                     const sim = this.simstanceManager?.getOrNewSim(this.simOption.advice[i]);
                     const inHandler = targetExceptionHandler(sim, e)
                     if (inHandler) {
-                        let data = this.simstanceManager.executeBindParameterSim({
+                        this.simstanceManager.executeBindParameterSim({
                             target: sim,
                             targetKey: inHandler.propertyKey
                         }, otherStorage);

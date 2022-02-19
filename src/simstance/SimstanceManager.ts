@@ -7,7 +7,7 @@ import {ObjectUtils} from '../utils/object/ObjectUtils';
 import {SimAtomic} from './SimAtomic';
 import {ReflectUtils} from '../utils/reflect/ReflectUtils';
 import {FunctionUtils} from '../utils/function/FunctionUtils';
-import {getInject, SaveInjectConfig, SituationTypeContainer} from '../decorators/inject/Inject';
+import {getInject, SaveInjectConfig, SituationTypeContainer, SituationTypeContainers} from '../decorators/inject/Inject';
 import {SimOption} from '../SimOption';
 import {SimProxyHandler} from '../proxy/SimProxyHandler';
 export type FirstCheckMaker = (obj: {target: Object, targetKey?: string | symbol}, token: ConstructorType<any>, idx: number, saveInjectConfig?: SaveInjectConfig) => any | undefined;
@@ -161,7 +161,7 @@ export class SimstanceManager implements Runnable {
     }
 
     public async executeBindParameterSimPromise({target, targetKey, firstCheckMaker}: {target: Object, targetKey?: string | symbol, firstCheckMaker?:FirstCheckMaker[] },
-                                otherStorage?: Map<ConstructorType<any>, any>) {
+        otherStorage?: Map<ConstructorType<any>, any>) {
         let value = this.executeBindParameterSim({target, targetKey, firstCheckMaker}, otherStorage);
         if (value instanceof Promise) {
             value = await value;
@@ -170,17 +170,17 @@ export class SimstanceManager implements Runnable {
     }
 
     public executeBindParameterSim({target, targetKey, firstCheckMaker}: {target: Object, targetKey?: string | symbol, firstCheckMaker?:FirstCheckMaker[] },
-                                otherStorage?: Map<ConstructorType<any>, any>) {
+        otherStorage?: Map<ConstructorType<any>, any>) {
         const binds = this.getParameterSim({target, targetKey, firstCheckMaker}, otherStorage);
         if (typeof target === 'object' && targetKey) {
             return (target as any)[targetKey]?.(...binds);
         } else if (typeof target === 'function' && !targetKey) {
-            return new (target as  ConstructorType<any>)(...binds);
+            return new (target as ConstructorType<any>)(...binds);
         }
     }
 
     public getParameterSim({target, targetKey, firstCheckMaker}: {target: Object, targetKey?: string | symbol, firstCheckMaker?:FirstCheckMaker[] },
-                           otherStorage?: Map<ConstructorType<any>, any>): any[] {
+        otherStorage?: Map<ConstructorType<any>, any>): any[] {
         const paramTypes = ReflectUtils.getParameterTypes(target, targetKey);
         const paramNames = FunctionUtils.getParameterNames(target, targetKey);
         let injections = [];
@@ -189,7 +189,7 @@ export class SimstanceManager implements Runnable {
         injections = paramTypes.map((token: ConstructorType<any>, idx: number) => {
             const saveInject = injects?.find(it => it.index === idx);
 
-            for(const f of firstCheckMaker??[]) {
+            for (const f of firstCheckMaker ?? []) {
                 const firstCheckObj = f({target, targetKey}, token, idx, saveInject);
                 if (undefined !== firstCheckObj) {
                     return firstCheckObj;
@@ -199,16 +199,23 @@ export class SimstanceManager implements Runnable {
                 const inject = saveInject.config;
                 let obj = otherStorage?.get(token);
 
-                //situational
+                // situational
                 if (inject.situationType && otherStorage) {
-                    let situration = otherStorage.get(SituationTypeContainer) as SituationTypeContainer;
-                    if (inject.situationType === situration?.situationType){
-                        obj = situration.data;
+                    const situations = otherStorage.get(SituationTypeContainers) as SituationTypeContainers;
+                    const situation = otherStorage.get(SituationTypeContainer) as SituationTypeContainer;
+                    if (inject.situationType === situation?.situationType) {
+                        obj = situation.data;
+                    } else if (situations && situations.length > 0) {
+                        // console.log('--->', inject.situationType, situations);
+                        const find = situations.find(a => a.situationType === inject.situationType)
+                        if (find) {
+                            obj = find.data;
+                        }
                     }
                 }
 
                 if (!obj) {
-                    const findFirstSim = this.findFirstSim({scheme:inject.scheme, type: inject.type});
+                    const findFirstSim = this.findFirstSim({scheme: inject.scheme, type: inject.type});
                     obj = findFirstSim ? this.resolve<any>(findFirstSim?.type ?? token) : this.resolve<any>(token);
                 }
                 if (inject.applyProxy) {

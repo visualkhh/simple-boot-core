@@ -1,4 +1,4 @@
-import "reflect-metadata"
+import 'reflect-metadata'
 import {ReflectUtils} from '../../utils/reflect/ReflectUtils';
 
 export interface EventListenerOption {

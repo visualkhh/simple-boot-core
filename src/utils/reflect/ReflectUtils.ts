@@ -1,4 +1,4 @@
-import "reflect-metadata"
+import 'reflect-metadata'
 export class ReflectUtils {
     static getParameterTypes(target: any, propertyKey?: string | symbol): any[] {
         if (propertyKey) {
@@ -10,7 +10,7 @@ export class ReflectUtils {
 
 
     static getReturnType(target: any, propertyKey: string | symbol): any {
-        return Reflect.getMetadata("design:returntype", target, propertyKey);
+        return Reflect.getMetadata('design:returntype', target, propertyKey);
     }
 
     // @Reflect.metadata("design:type", Point)
