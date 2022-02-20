@@ -45,10 +45,18 @@ export class SimProxyHandler implements ProxyHandler<any> {
 
             const inHandler = targetExceptionHandler(thisArg, e, [target])
             if (inHandler) {
-                this.simstanceManager.executeBindParameterSim({
-                    target: thisArg,
-                    targetKey: inHandler.propertyKey
-                }, otherStorage);
+                try {
+                    this.simstanceManager.executeBindParameterSim({
+                        target: thisArg,
+                        targetKey: inHandler.propertyKey
+                    }, otherStorage);
+                } catch (se: any) {
+                    // eslint-disable-next-line no-ex-assign
+                    e = se;
+                }
+                if (inHandler.config.throw) {
+                    throw e;
+                }
             } else {
                 for (let i = 0; i < this.simOption.advice.length; i++) {
                     const sim = this.simstanceManager?.getOrNewSim(this.simOption.advice[i]);
@@ -69,7 +77,7 @@ export class SimProxyHandler implements ProxyHandler<any> {
 
     private aopBefore(obj: any, protoType: Function) {
         const propertyName = ObjectUtils.getPrototypeName(obj, protoType);
-        if (propertyName) {
+        if (propertyName && obj) {
             getProtoBefores(obj, propertyName).forEach(it => {
                 it.call(obj, protoType, propertyName)
             })

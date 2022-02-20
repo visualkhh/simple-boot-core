@@ -13,10 +13,16 @@ export class ObjectUtils {
     }
 
     static getOwnPropertyNames(target?: any): string[] {
-        let data: string[] = [];
+        const data: string[] = [];
         if (target) {
-            const proto = Object.getOwnPropertyNames((target.prototype ? target.prototype : Object.getPrototypeOf(target)) ?? target);
-            data = Object.keys(proto) || []
+            if (!target.prototype) {
+                const a = Object.getPrototypeOf(target);
+                data.push(...Object.getOwnPropertyNames(a));
+            } else {
+                data.push(...Object.getOwnPropertyNames(Object.getPrototypeOf(target)));
+            }
+            // const proto = Object.getOwnPropertyNames((target.prototype ? target.prototype : Object.getPrototypeOf(target)) ?? target);
+            // data = Object.keys(proto) || []
         }
         return data.filter(it => it !== 'constructor');
     }
@@ -60,6 +66,7 @@ export class ObjectUtils {
             return false;
         }
     }
+
     static getPrototypeOfDepth(target: any, dest: ConstructorType<any> | null | undefined): object[] {
 
         let object = target;
@@ -69,12 +76,12 @@ export class ObjectUtils {
         // }
         if (dest) {
             do {
-              object = Object.getPrototypeOf(object);
-              if (object?.constructor === dest) {
-                  break;
-              }
-              r.push(object);
-              // console.log(object);
+                object = Object.getPrototypeOf(object);
+                if (object?.constructor === dest) {
+                    break;
+                }
+                r.push(object);
+                // console.log(object);
             } while (object);
         }
         return r;
@@ -98,10 +105,12 @@ export class ObjectUtils {
 
     static getPrototypeKeyMap(target: any): Map<Function, string> {
         const data = new Map<Function, string>();
-        const proto = Object.getPrototypeOf(target);
-        (Object.keys(proto) || []).filter(it => it !== 'constructor').forEach(it => {
-            data.set(proto[it], it)
-        })
+        if (target) {
+            const proto = Object.getPrototypeOf(target);
+            (Object.keys(proto) || []).filter(it => it !== 'constructor').forEach(it => {
+                data.set(proto[it], it)
+            })
+        }
         return data;
     }
 
@@ -133,7 +142,6 @@ export class ObjectUtils {
 
         const c = Object.assign(a, b);
         console.log(a, b, c);
-
 
         const zz = Object.setPrototypeOf(A.prototype, B.prototype);
         console.log(zz)

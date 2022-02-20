@@ -175,7 +175,7 @@ export class SimstanceManager implements Runnable {
         if (typeof target === 'object' && targetKey) {
             console.log('--->', target, targetKey);
             const targetMethod = (target as any)[targetKey];
-            return targetMethod?.(...binds);
+            return targetMethod?.bind(target)?.(...binds);
         } else if (typeof target === 'function' && !targetKey) {
             return new (target as ConstructorType<any>)(...binds);
         }
@@ -244,7 +244,7 @@ export class SimstanceManager implements Runnable {
             }
 
             // function apply proxy
-            const protoTypeName = ObjectUtils.getProtoTypeName(target);
+            const protoTypeName = ObjectUtils.getOwnPropertyNames(target);
             protoTypeName.filter(it => typeof (target as any)[it] === 'function').forEach(it => {
                 (target as any)[it] = new Proxy((target as any)[it], this.simProxyHandler!);
             });

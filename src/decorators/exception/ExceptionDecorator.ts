@@ -6,7 +6,7 @@ import {ObjectUtils} from '../../utils/object/ObjectUtils';
 export enum ExceptionHandlerSituationType {
     ERROR_OBJECT = 'SIMPLE_BOOT_CORE://ExceptionHandler/ERROR_OBJECT',
 }
-export type ExceptionHandlerConfig = { type?: ConstructorType<any>; }
+export type ExceptionHandlerConfig = { type?: ConstructorType<any>; throw?: boolean }
 export type SaveExceptionHandlerConfig = { propertyKey?: string | symbol; method: Function; config: ExceptionHandlerConfig; }
 
 const ExceptionHandlerMetadataKey = Symbol('ExceptionHandler');
@@ -34,17 +34,17 @@ export const getExceptionHandlers = (target: any): SaveExceptionHandlerConfig[] 
 
 export const targetExceptionHandlers = (target: any, error: any): SaveExceptionHandlerConfig[] => {
     // return getExceptionHandlers(target)?.filter(it => ObjectUtils.isPrototypeOfTarget(it.config.type, error))
-    let exceptionHandlers = getExceptionHandlers(target);
-    let emptyTargets = exceptionHandlers?.filter(it => it.config.type === undefined);
+    const exceptionHandlers = getExceptionHandlers(target);
+    const emptyTargets = exceptionHandlers?.filter(it => it.config.type === undefined);
     const targets = exceptionHandlers?.filter(it => ObjectUtils.isPrototypeOfTarget(it.config.type, error));
     const targetSorts = targets?.sort((a, b) => {
-        let aPrototypeOfDepth = ObjectUtils.getPrototypeOfDepth(error, a.config.type);
-        let bPrototypeOfDepth = ObjectUtils.getPrototypeOfDepth(error, b.config.type);
+        const aPrototypeOfDepth = ObjectUtils.getPrototypeOfDepth(error, a.config.type);
+        const bPrototypeOfDepth = ObjectUtils.getPrototypeOfDepth(error, b.config.type);
         // console.log('-', error, a.config.type, b.config.type);
         // console.log('--', aPrototypeOfDepth, bPrototypeOfDepth);
         return aPrototypeOfDepth.length - bPrototypeOfDepth.length
     });
-    return (targetSorts??[]).concat(...emptyTargets??[]);
+    return (targetSorts ?? []).concat(...emptyTargets ?? []);
 }
 
 export const targetExceptionHandler = (target: any, error: any, excludeMethods: Function[] = []): SaveExceptionHandlerConfig | undefined => {
