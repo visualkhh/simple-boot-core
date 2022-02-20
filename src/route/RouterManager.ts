@@ -132,11 +132,9 @@ export class RouterManager {
             const isRoot = this.isRootUrl(routerConfig.path, routerStrings, path)
             if (isRoot) {
                 parentRouters.push(router);
-                const module = this.findRouting(router, routerConfig, routerStrings, intent)
-                if (module?.module) {
-                    module.intent = intent;
-                    return module;
-                } else if (routerConfig.routers && routerConfig.routers.length > 0) {
+
+                // child routers 부터 찾고.
+                if (routerConfig.routers && routerConfig.routers.length > 0) {
                     for (const child of routerConfig.routers) {
                         const routerAtomic = new SimAtomic(child, this.simstanceManager);
                         // const rootRouterData = routerAtomic.getConfig<RouterConfig>(RouterMetadataKey)!;
@@ -147,6 +145,13 @@ export class RouterManager {
                             return executeModule
                         }
                     }
+                }
+
+                // 그다음 내꺼 찾는다.
+                const module = this.findRouting(router, routerConfig, routerStrings, intent)
+                if (module?.module) {
+                    module.intent = intent;
+                    return module;
                 }
             }
         }
@@ -174,9 +179,10 @@ export class RouterManager {
     }
 
     private findRouteProperty(route: Route, propertyName: string): { child?: ConstructorType<any>, data?: any } {
-        let child: ConstructorType<any>;
+        let child: ConstructorType<any>|undefined;
         let data: any;
         const routeElement = route[propertyName];
+        // console.log('-->', Array.isArray(routeElement))
         if (typeof routeElement === 'function') {
             child = routeElement;
         } else if (typeof routeElement === 'string') {
@@ -187,7 +193,7 @@ export class RouterManager {
             // } else {
             // }
             return this.findRouteProperty(route, routeElement)
-        } else {
+        } else if (Array.isArray(routeElement)) {
             child = routeElement?.[0];
             data = routeElement?.[1];
         }

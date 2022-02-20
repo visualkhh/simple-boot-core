@@ -6,13 +6,13 @@ import { Intent } from 'simple-boot-core/intent/Intent';
 
 @Sim()
 @Router({
+    path: '/users',
     route: {
         '': User,
         '/': User,
         '/:no': User,
         '/:no/detaile': [UserDetaile, {name: 'zz'}],
-    },
-    path: '/users'
+    }
 })
 export class UserRouter {
     // canActivate(url: Intent, module: any): void {

@@ -11,7 +11,8 @@ import { RouterAction } from 'simple-boot-core/route/RouterAction';
         '': '/',
         '/': [A, {a: 123}],
         '/b': B,
-        '/b/:aa/vv': [B, {b: 'zzzzz'}]
+        '/:aa/vv': [B, {b: 'zzzzz'}],
+        '/users/vv': [B, {b: 'zz'}]
     },
     path: '',
     routers: [UserRouter]

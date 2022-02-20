@@ -9,7 +9,7 @@ import { SimOption } from 'simple-boot-core/SimOption';
 const option = new SimOption([GlobalAdvice]);
 const simpleApplication = new SimpleApplication(AppRouter, option);
 simpleApplication.run();
-const intent = new Intent('/b/asd/vv');
+const intent = new Intent('/users/vv');
 simpleApplication.routing<SimAtomic<any>, any>(intent).then(it => {
     // console.log('--->', it.pathData, it.routerChains);
     let moduleInstance = it.getModuleInstance<User>();
