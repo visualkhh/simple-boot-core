@@ -3,9 +3,8 @@ import { ConstructorType } from '../types/Types';
 import { RouterModule } from './RouterModule';
 import { Route, RouterConfig, RouterMetadataKey } from '../decorators/SimDecorator';
 import { SimAtomic } from '../simstance/SimAtomic';
-// import { OnActiveRoute } from '../route/OnActiveRoute';
 import { SimstanceManager } from '../simstance/SimstanceManager';
-import {getOnRoute, OnRoute, onRoutes} from '../decorators/route/OnRoute';
+import {getOnRoute, onRoutes} from '../decorators/route/OnRoute';
 
 export class RouterManager {
     public activeRouterModule?: RouterModule;
@@ -23,7 +22,7 @@ export class RouterManager {
         const routerAtomic = new SimAtomic(router, this.simstanceManager);
         const routerData = routerAtomic.getConfig<RouterConfig>(RouterMetadataKey);
         if (routerData) {
-            let currentPrefix = prefix + routerData.path;
+            const currentPrefix = prefix + routerData.path;
             Object.entries(routerData.route).forEach(([key, value]) => {
                 map[currentPrefix + key] = value;
             });
@@ -35,10 +34,10 @@ export class RouterManager {
         return map;
     }
 
-    public async routing(intent: Intent) {
+    public async routing(intent: Intent): Promise<RouterModule|undefined> {
         const routers: any[] = [];
         const routerAtomic = new SimAtomic(this.rootRouter, this.simstanceManager);
-        const rootRouterData = routerAtomic.getConfig<RouterConfig>(RouterMetadataKey)!;
+        // const rootRouterData = routerAtomic.getConfig<RouterConfig>(RouterMetadataKey)!;
         const rootRouter = routerAtomic.value!;
         const executeModule = this.getExecuteModule(routerAtomic, intent, routers);
         if (executeModule?.router) {
@@ -72,17 +71,17 @@ export class RouterManager {
             const otherStorage = new Map<ConstructorType<any>, any>();
             otherStorage.set(Intent, intent);
             otherStorage.set(RouterModule, executeModule);
-            for (let [key, value] of Array.from(onRoutes)) {
+            for (const [key, value] of Array.from(onRoutes)) {
                 try {
                     // const sim = this.simstanceManager.getOrNewSim<any>(key);
                     const sim = this.simstanceManager.findFirstSim({type: key});
                     for (const v of value) {
                         const onRouteConfig = getOnRoute(key, v);
-                        let r = undefined;
+                        let r;
                         if (!onRouteConfig?.isActivateMe) {
-                            r = sim?.value[v]?.(...this.simstanceManager.getParameterSim({target: sim?.value, targetKey:v}, otherStorage));
+                            r = sim?.value[v]?.(...this.simstanceManager.getParameterSim({target: sim?.value, targetKey: v}, otherStorage));
                         } else if (this.activeRouterModule?.routerChains?.some((it: SimAtomic) => (it.value as any)?.hasActivate?.(sim?.value))) {
-                            r = sim?.value[v]?.(...this.simstanceManager.getParameterSim({target: sim?.value, targetKey:v}, otherStorage));
+                            r = sim?.value[v]?.(...this.simstanceManager.getParameterSim({target: sim?.value, targetKey: v}, otherStorage));
                         }
                         if (r instanceof Promise) {
                             await r
@@ -96,8 +95,6 @@ export class RouterManager {
                 } catch (error) {
                 }
             }
-
-
             // for (const it of Array.from(this.subject)) {
             //     await it.onActiveRoute(this.activeRouterModule!);
             // }
@@ -107,11 +104,9 @@ export class RouterManager {
             if (routers.length && routers.length > 0) {
                 for (let i = 0; i < routers.length; i++) {
                     const current = routers[i];
-                    const next = routers[i+1];
+                    const next = routers[i + 1];
                     const value = current.value! as any;
-                    // if (next) {
-                        await value?.canActivate?.(intent, next?.value ?? null);
-                    // }
+                    await value?.canActivate?.(intent, next?.value ?? null);
                 }
 
                 // const lastRouter = routers.reduce?.((a, b) => {
@@ -123,7 +118,9 @@ export class RouterManager {
                 // lastRouter.value?.canActivate?.(intent, null)
             }
             // console.log('routermanager--> return', '2')
-            return this.activeRouterModule = new RouterModule(this.simstanceManager, rootRouter, undefined, routers);
+            const routerModule = new RouterModule(this.simstanceManager, rootRouter, undefined, routers);
+            this.activeRouterModule = routerModule;
+            return rootRouter;
         }
     }
 
@@ -142,7 +139,7 @@ export class RouterManager {
                 } else if (routerConfig.routers && routerConfig.routers.length > 0) {
                     for (const child of routerConfig.routers) {
                         const routerAtomic = new SimAtomic(child, this.simstanceManager);
-                        const rootRouterData = routerAtomic.getConfig<RouterConfig>(RouterMetadataKey)!;
+                        // const rootRouterData = routerAtomic.getConfig<RouterConfig>(RouterMetadataKey)!;
                         const router = routerAtomic.value!;
                         // console.log('---------------', rootRouter)
                         const executeModule = this.getExecuteModule(routerAtomic, intent, parentRouters)
@@ -161,7 +158,7 @@ export class RouterManager {
 
     private findRouting(router: SimAtomic, routerData: RouterConfig, parentRoots: string[], intent: Intent): RouterModule | undefined {
         const urlRoot = parentRoots.join('') + routerData.path
-        const regex = new RegExp('^' + urlRoot, 'i')
+        // const regex = new RegExp('^' + urlRoot, 'i')
         // path = path.replace(regex, '')
         for (const it of Object.keys(routerData.route).filter(it => !it.startsWith('_'))) {
             const pathnameData = intent.getPathnameData(urlRoot + it);
