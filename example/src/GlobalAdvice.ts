@@ -1,5 +1,6 @@
 import {Sim} from "simple-boot-core/decorators/SimDecorator";
-import {ExceptionHandler} from "simple-boot-core/decorators/exception/ExceptionDecorator";
+import {ExceptionHandler, ExceptionHandlerSituationType} from "simple-boot-core/decorators/exception/ExceptionDecorator";
+import {Inject} from 'simple-boot-core/decorators/inject/Inject';
 
 @Sim()
 export class GlobalAdvice {
@@ -8,8 +9,9 @@ export class GlobalAdvice {
     }
 
     @ExceptionHandler()
-    print(error: any){
-        console.log('global advice errorr', error.msg)
+    print(@Inject({situationType: ExceptionHandlerSituationType.ERROR_OBJECT}) error : any) {
+        console.log('global advice errorr', error);
+        console.log('end-->')
     }
 
 }

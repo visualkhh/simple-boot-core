@@ -16,10 +16,10 @@ export class B {
     print() {
         this.a.print();
         console.log('bbb print', this.routerManager.activeRouterModule.pathData.aa)
-        throw Error('------------')
+        throw Error('1')
     }
 
-    @ExceptionHandler()
+    @ExceptionHandler({throw: true})
     err(@Inject({situationType: ExceptionHandlerSituationType.ERROR_OBJECT}) e : any) {
         console.log('errrorrr-->', e)
         throw Error('2-')

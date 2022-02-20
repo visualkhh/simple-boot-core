@@ -15,7 +15,7 @@ import { RouterAction } from 'simple-boot-core/route/RouterAction';
         '/users/vv': [B, {b: 'zz'}]
     },
     path: '',
-    routers: [UserRouter]
+    // routers: [UserRouter]
 })
 export class AppRouter implements RouterAction {
 
