@@ -12,6 +12,15 @@ export class ObjectUtils {
         return data.filter(it => it !== 'constructor');
     }
 
+    static getOwnPropertyNames(target?: any): string[] {
+        let data: string[] = [];
+        if (target) {
+            const proto = Object.getOwnPropertyNames((target.prototype ? target.prototype : Object.getPrototypeOf(target)) ?? target);
+            data = Object.keys(proto) || []
+        }
+        return data.filter(it => it !== 'constructor');
+    }
+
     static getProtoTypeName(target?: any): string[] {
         let data: string[] = [];
         if (target) {

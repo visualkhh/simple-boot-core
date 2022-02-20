@@ -173,7 +173,9 @@ export class SimstanceManager implements Runnable {
         otherStorage?: Map<ConstructorType<any>, any>) {
         const binds = this.getParameterSim({target, targetKey, firstCheckMaker}, otherStorage);
         if (typeof target === 'object' && targetKey) {
-            return (target as any)[targetKey]?.(...binds);
+            console.log('--->', target, targetKey);
+            const targetMethod = (target as any)[targetKey];
+            return targetMethod?.(...binds);
         } else if (typeof target === 'function' && !targetKey) {
             return new (target as ConstructorType<any>)(...binds);
         }
@@ -220,7 +222,7 @@ export class SimstanceManager implements Runnable {
                 }
                 if (inject.applyProxy) {
                     // console.log('inject.applyProxy--------->', inject.applyProxy.type, token, obj);
-                    if (inject.applyProxy.param){
+                    if (inject.applyProxy.param) {
                         obj = new Proxy(obj, new inject.applyProxy.type(...inject.applyProxy.param));
                     } else {
                         obj = new Proxy(obj, new inject.applyProxy.type());
