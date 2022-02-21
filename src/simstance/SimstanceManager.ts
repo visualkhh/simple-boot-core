@@ -173,7 +173,7 @@ export class SimstanceManager implements Runnable {
         otherStorage?: Map<ConstructorType<any>, any>) {
         const binds = this.getParameterSim({target, targetKey, firstCheckMaker}, otherStorage);
         if (typeof target === 'object' && targetKey) {
-            console.log('--->', target, targetKey);
+            // console.log('--->', target, targetKey);
             const targetMethod = (target as any)[targetKey];
             return targetMethod?.bind(target)?.(...binds);
         } else if (typeof target === 'function' && !targetKey) {

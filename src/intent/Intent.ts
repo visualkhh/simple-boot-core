@@ -74,14 +74,42 @@ export class Intent<T = any, E = any> {
         for (let i = 0; i < urlExpressions.length; i++) {
             const it = urlExpressions[i];
             const urlit = urls[i];
-            if (!it.startsWith(':')) {
+            // 예) {serialNo:[0-9]+} 또는 {no} 등등
+            const execResult = /^\{(.+)\}$/g.exec(it);
+            if (!execResult) {
                 if (it !== urlit) {
                     return;
                 }
                 continue;
             }
-            data[it.slice(1)] = urlit;
+
+            //regex check
+            const [name, regex] = execResult[1].split(':'); // group1
+            if (regex && !new RegExp(regex).test(urlit)) {
+                return;
+            }
+            data[name] = urlit;
         }
         return data;
     }
+    // getPathnameData(urlExpression: string) {
+    //     const urls = this.pathname.split('/');
+    //     const urlExpressions = urlExpression.split('/');
+    //     if (urls.length !== urlExpressions.length) {
+    //         return;
+    //     }
+    //     const data: {[name: string]: string } = {}
+    //     for (let i = 0; i < urlExpressions.length; i++) {
+    //         const it = urlExpressions[i];
+    //         const urlit = urls[i];
+    //         if (!it.startsWith(':')) {
+    //             if (it !== urlit) {
+    //                 return;
+    //             }
+    //             continue;
+    //         }
+    //         data[it.slice(1)] = urlit;
+    //     }
+    //     return data;
+    // }
 }

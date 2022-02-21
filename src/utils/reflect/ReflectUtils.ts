@@ -34,7 +34,7 @@ export class ReflectUtils {
         return Reflect.getMetadataKeys(target);
     }
 
-    static getOwnMetadata(metadataKey: any, target: any, propertyKey?: string): number[] {
+    static getOwnMetadata(metadataKey: any, target: any, propertyKey?: string): number[] | any {
         if (propertyKey) {
             return Reflect.getOwnMetadata(metadataKey, target, propertyKey);
         } else {
