@@ -2,7 +2,11 @@ import {SimstanceManager} from '../simstance/SimstanceManager'
 import {getProtoAfters, getProtoBefores} from '../decorators/aop/AOPDecorator';
 import {ObjectUtils} from '../utils/object/ObjectUtils';
 import {SimOption} from '../SimOption';
-import {ExceptionHandlerSituationType, targetExceptionHandler} from '../decorators/exception/ExceptionDecorator';
+import {
+    ExceptionHandlerSituationType,
+    SaveExceptionHandlerConfig,
+    targetExceptionHandler
+} from '../decorators/exception/ExceptionDecorator';
 import {ConstructorType} from '../types/Types';
 import {SituationTypeContainer} from '../decorators/inject/Inject';
 
@@ -35,42 +39,33 @@ export class SimProxyHandler implements ProxyHandler<any> {
             r = target.apply(thisArg, argumentsList);
             this.aopAfter(thisArg, target);
         } catch (e: Error | any) {
-            const otherStorage = new Map<ConstructorType<any>, any>();
-            otherStorage.set(e.constructor, e);
-            const situationTypeContainer = new SituationTypeContainer({situationType: ExceptionHandlerSituationType.ERROR_OBJECT, data: e});
-            otherStorage.set(SituationTypeContainer, situationTypeContainer);
-            (argumentsList as Array<any>)?.forEach(it => {
+            console.error(e);
+            const globals = this.simOption.advice.map(it => this.simstanceManager?.getOrNewSim(it)).filter(it => it).map(it => targetExceptionHandler(it, e))??[];
+            const inHandlers = [targetExceptionHandler(thisArg, e, [target]), ...globals].filter(it => it) as SaveExceptionHandlerConfig[];
+            if (inHandlers.length > 0 && inHandlers[0]) {
+                const inHandler = inHandlers[0];
+                const otherStorage = new Map<ConstructorType<any>, any>();
                 otherStorage.set(e.constructor, e);
-            });
+                const situationTypeContainer = new SituationTypeContainer({situationType: ExceptionHandlerSituationType.ERROR_OBJECT, data: e});
+                otherStorage.set(SituationTypeContainer, situationTypeContainer);
+                (argumentsList as Array<any>)?.forEach(it => {
+                    otherStorage.set(e.constructor, e);
+                });
 
-            const inHandler = targetExceptionHandler(thisArg, e, [target])
-            if (inHandler) {
                 try {
                     this.simstanceManager.executeBindParameterSim({
                         target: thisArg,
                         targetKey: inHandler.propertyKey
                     }, otherStorage);
                 } catch (se: any) {
-                    // eslint-disable-next-line no-ex-assign
                     e = se;
                 }
                 if (inHandler.config.throw) {
                     throw e;
                 }
             } else {
-                for (let i = 0; i < this.simOption.advice.length; i++) {
-                    const sim = this.simstanceManager?.getOrNewSim(this.simOption.advice[i]);
-                    const inHandler = targetExceptionHandler(sim, e)
-                    if (inHandler) {
-                        this.simstanceManager.executeBindParameterSim({
-                            target: sim,
-                            targetKey: inHandler.propertyKey
-                        }, otherStorage);
-                        break;
-                    }
-                }
+                throw e;
             }
-            console.error(e)
         }
         return r
     }
