@@ -27,7 +27,7 @@ simpleApplication.routing<SimAtomic<any>, any>(intent).then(it => {
         '': '/',
         '/': [A, {a: 123}],
         '/b': B,
-        '/b/:aa/vv': [B, {b:'zzzzz'}]
+        '/b/{aa}/vv': [B, {b:'zzzzz'}]
     },
     path: '',
     routers: [UserRouter]

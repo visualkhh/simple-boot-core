@@ -40,34 +40,53 @@ export class SimProxyHandler implements ProxyHandler<any> {
             this.aopAfter(thisArg, target);
         } catch (e: Error | any) {
             console.error(e);
-            const globals = this.simOption.advice.map(it => this.simstanceManager?.getOrNewSim(it)).filter(it => it).map(it => targetExceptionHandler(it, e))??[];
-            const inHandlers = [targetExceptionHandler(thisArg, e, [target]), ...globals].filter(it => it) as SaveExceptionHandlerConfig[];
+            const inHandlers = this.getExceptionHandler(e, thisArg, target);
             if (inHandlers.length > 0 && inHandlers[0]) {
                 const inHandler = inHandlers[0];
-                const otherStorage = new Map<ConstructorType<any>, any>();
-                otherStorage.set(e.constructor, e);
-                const situationTypeContainer = new SituationTypeContainer({situationType: ExceptionHandlerSituationType.ERROR_OBJECT, data: e});
-                otherStorage.set(SituationTypeContainer, situationTypeContainer);
-                (argumentsList as Array<any>)?.forEach(it => {
-                    otherStorage.set(e.constructor, e);
-                });
-
-                try {
-                    this.simstanceManager.executeBindParameterSim({
-                        target: thisArg,
-                        targetKey: inHandler.propertyKey
-                    }, otherStorage);
-                } catch (se: any) {
-                    e = se;
-                }
-                if (inHandler.config.throw) {
-                    throw e;
-                }
+                this.executeExceptionHandler(e, argumentsList, inHandler);
             } else {
                 throw e;
             }
         }
         return r
+    }
+
+    private executeExceptionHandler(e: any, argumentsList: any, inHandler: { thisArg: any; config: SaveExceptionHandlerConfig }) {
+        const otherStorage = new Map<ConstructorType<any>, any>();
+        otherStorage.set(e.constructor, e);
+        const situationTypeContainer = new SituationTypeContainer({
+            situationType: ExceptionHandlerSituationType.ERROR_OBJECT,
+            data: e
+        });
+        otherStorage.set(SituationTypeContainer, situationTypeContainer);
+        (argumentsList as Array<any>)?.forEach(it => {
+            otherStorage.set(e.constructor, e);
+        });
+
+        try {
+            this.simstanceManager.executeBindParameterSim({
+                target: inHandler.thisArg,
+                targetKey: inHandler.config.propertyKey
+            }, otherStorage);
+        } catch (es) {
+            e = es;
+        }
+        if (inHandler.config.config.throw) {
+            let exceptionHandler = this.getExceptionHandler(e, inHandler.thisArg, inHandler.config.method);
+            if ((exceptionHandler?.length??0) > 0) {
+                this.executeExceptionHandler(e, argumentsList, exceptionHandler[0]);
+            }
+            // throw e;
+        }
+    }
+
+    private getExceptionHandler(e: any, thisArg: any, target: Function) {
+        const globalConfigSets = this.simOption.advice.map(it => this.simstanceManager?.getOrNewSim(it)).filter(it => it).map(it => {
+            return {thisArg: it, config: targetExceptionHandler(it, e, [target])}
+        }) ?? [];
+        const thisConfigSet = {thisArg: thisArg, config: targetExceptionHandler(thisArg, e, [target])}
+        const inHandlers = [thisConfigSet, ...globalConfigSets].filter(it => it && it.config) as { thisArg: any, config: SaveExceptionHandlerConfig }[];
+        return inHandlers;
     }
 
     private aopBefore(obj: any, protoType: Function) {

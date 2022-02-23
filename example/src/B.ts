@@ -3,7 +3,10 @@ import {A} from "./A";
 import {RouterManager} from "simple-boot-core/route/RouterManager";
 import {SimstanceManager} from "simple-boot-core/simstance/SimstanceManager";
 import {After, Before} from 'simple-boot-core/decorators/aop/AOPDecorator';
-import {ExceptionHandler, ExceptionHandlerSituationType} from 'simple-boot-core/decorators/exception/ExceptionDecorator';
+import {
+    ExceptionHandler,
+    ExceptionHandlerSituationType
+} from 'simple-boot-core/decorators/exception/ExceptionDecorator';
 import {Inject} from 'simple-boot-core/decorators/inject/Inject';
 
 @Sim()

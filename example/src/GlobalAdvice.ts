@@ -8,10 +8,11 @@ export class GlobalAdvice {
     constructor() {
     }
 
-    @ExceptionHandler()
-    print(@Inject({situationType: ExceptionHandlerSituationType.ERROR_OBJECT}) error : any) {
+    @ExceptionHandler({throw: true})
+    globalAdvicePrint(@Inject({situationType: ExceptionHandlerSituationType.ERROR_OBJECT}) error : any) {
         console.log('global advice errorr', error);
         console.log('end-->')
+
     }
 
 }
