@@ -1,7 +1,7 @@
 import { Intent } from '../intent/Intent';
 import { ConstructorType } from '../types/Types';
 import { RouterModule } from './RouterModule';
-import { Route, RouterConfig, RouterMetadataKey } from '../decorators/SimDecorator';
+import { Route, RouterConfig, RouterMetadataKey } from '../decorators/route/Router';
 import { SimAtomic } from '../simstance/SimAtomic';
 import { SimstanceManager } from '../simstance/SimstanceManager';
 import {getOnRoute, onRoutes} from '../decorators/route/OnRoute';
@@ -23,9 +23,11 @@ export class RouterManager {
         const routerData = routerAtomic.getConfig<RouterConfig>(RouterMetadataKey);
         if (routerData) {
             const currentPrefix = prefix + routerData.path;
-            Object.entries(routerData.route).forEach(([key, value]) => {
-                map[currentPrefix + key] = value;
-            });
+            if (routerData.route) {
+                Object.entries(routerData.route).forEach(([key, value]) => {
+                    map[currentPrefix + key] = value;
+                });
+            }
 
             routerData.routers?.forEach(it => {
                 Object.assign(map, this.routingMap(currentPrefix, it));
@@ -165,22 +167,26 @@ export class RouterManager {
         const urlRoot = parentRoots.join('') + routerData.path
         // const regex = new RegExp('^' + urlRoot, 'i')
         // path = path.replace(regex, '')
-        for (const it of Object.keys(routerData.route).filter(it => !it.startsWith('_'))) {
-            const pathnameData = intent.getPathnameData(urlRoot + it);
-            if (pathnameData) {
-                // const routeElement = routerData.route[it];
-                const {child, data} = this.findRouteProperty(routerData.route, it);
-                const rm = new RouterModule(this.simstanceManager, router, child);
-                rm.data = data;
-                rm.pathData = pathnameData;
-                return rm;
+        if (routerData.route) {
+            for (const it of Object.keys(routerData.route).filter(it => !it.startsWith('_'))) {
+                const pathnameData = intent.getPathnameData(urlRoot + it);
+                if (pathnameData) {
+                    // const routeElement = routerData.route[it];
+                    const {child, data, propertyKey} = this.findRouteProperty(routerData.route, it);
+                    const rm = new RouterModule(this.simstanceManager, router, child);
+                    rm.data = data;
+                    rm.pathData = pathnameData;
+                    rm.propertyKey = propertyKey;
+                    return rm;
+                }
             }
         }
     }
 
-    private findRouteProperty(route: Route, propertyName: string): { child?: ConstructorType<any>, data?: any } {
+    private findRouteProperty(route: Route, propertyName: string): { child?: ConstructorType<any>, data?: any, propertyKey?: string } {
         let child: ConstructorType<any>|undefined;
         let data: any;
+        let propertyKey: undefined | string = undefined;
         const routeElement = route[propertyName];
         // console.log('-->', Array.isArray(routeElement))
         if (typeof routeElement === 'function') {
@@ -196,10 +202,14 @@ export class RouterManager {
         } else if (Array.isArray(routeElement)) {
             child = routeElement?.[0];
             data = routeElement?.[1];
+        } else if (typeof routeElement === 'object' && 'target' in routeElement && 'propertyKey' in routeElement) { // RouteTargetMethod
+            child = routeElement.target;
+            propertyKey = routeElement.propertyKey as string;
         }
         return {
             child,
-            data
+            data,
+            propertyKey
         }
     }
 }

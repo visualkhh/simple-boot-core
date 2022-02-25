@@ -1,9 +1,11 @@
 import { A } from './A';
 import { B } from './B';
-import { Router, Sim } from 'simple-boot-core/decorators/SimDecorator';
+import { Router } from 'simple-boot-core/decorators/route/Router';
 import { Intent } from 'simple-boot-core/intent/Intent';
 import { UserRouter } from './users/UserRouter';
 import { RouterAction } from 'simple-boot-core/route/RouterAction';
+import {Route} from 'simple-boot-core/decorators/route/Router';
+import {Sim} from 'simple-boot-core/decorators/SimDecorator';
 
 @Sim()
 @Router({
@@ -23,6 +25,11 @@ export class AppRouter implements RouterAction {
     constructor() {
     }
 
+    @Route({path: '/goodjob'})
+    test() {
+        console.log('----------->goodjob')
+        return 100;
+    }
 
     async canActivate(url: Intent, module: any){
         // console.log('AppRouter canActivate->>>>>', url, module)

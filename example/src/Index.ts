@@ -9,16 +9,17 @@ import {SimOption} from 'simple-boot-core/SimOption';
 const option = new SimOption([GlobalAdvice]);
 const simpleApplication = new SimpleApplication(AppRouter, option);
 simpleApplication.run();
-const intent = new Intent('/users/vv');
+const intent = new Intent('/goodjob');
 simpleApplication.routing<SimAtomic<any>, any>(intent).then(it => {
+    // console.log('--->', it);
     // console.log('--->', it.pathData, it.routerChains);
-    let moduleInstance = it.getModuleInstance<User>();
-    // console.log('-22->', moduleInstance);
-    try {
-        moduleInstance?.print();
-    } catch (e) {
-
-    }
+    // let moduleInstance = it.getModuleInstance<User>();
+    let moduleInstance = it.executeModuleProperty();
+    console.log('-22->', moduleInstance);
+    // try {
+        // moduleInstance?.print();
+    // } catch (e) {
+    // }
     // console.log('------->' , simpleApplication.routerManager.activeRouterModule)
 });
 

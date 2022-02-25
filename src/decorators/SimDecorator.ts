@@ -1,18 +1,11 @@
 import "reflect-metadata"
-import {ConstructorType, GenericClassDecorator} from '../types/Types'
-// import {SimGlobal} from '../global/SimGlobal';
+import {ConstructorType, GenericClassDecorator, ReflectMethod} from '../types/Types'
 import {ReflectUtils} from '../utils/reflect/ReflectUtils';
+import {ExceptionHandlerConfig, SaveExceptionHandlerConfig} from './exception/ExceptionDecorator';
 
 export const sims = new Set<ConstructorType<any>>();
 export interface SimConfig {
     scheme?: string;
-}
-export type RouteProperty = ConstructorType<Object> | [ConstructorType<Object>, any] | string;
-export type Route = {[name: string]: RouteProperty};
-export interface RouterConfig {
-    path: string;
-    route: Route;
-    routers?: ConstructorType<Object>[];
 }
 
 export const SimMetadataKey = Symbol('Sim');
@@ -32,19 +25,6 @@ export const getSim = (target: ConstructorType<any> | Function | any): SimConfig
     try { return ReflectUtils.getMetadata(SimMetadataKey, target); } catch (e) {}
 }
 
-export const RouterMetadataKey = Symbol('Router');
-export const Router = (config?: RouterConfig): GenericClassDecorator<ConstructorType<any>> => {
-    return (target: ConstructorType<any>) => {
-        ReflectUtils.defineMetadata(RouterMetadataKey, config, target);
-    }
-}
-
-export const getRouter = (target: ConstructorType<any> | Function | any): RouterConfig | undefined => {
-    if (null != target && undefined != target && typeof target === 'object') {
-        target = target.constructor;
-    }
-    try { return ReflectUtils.getMetadata(RouterMetadataKey, target); } catch (e) {}
-}
 
 const PostConstructMetadataKey = Symbol('PostConstruct');
 export const PostConstruct = (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
