@@ -38,7 +38,7 @@ type RouteConfig = { path: string }
 export type SaveRouteConfig = { propertyKey: string | symbol; method: Function; config: RouteConfig; }
 export const RouteMetadataKey = Symbol('RouteMetadataKey');
 export const Route = (config: RouteConfig): ReflectMethod => {
-    return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
+    return (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor) => {
         const saveRouteConfigs = (ReflectUtils.getMetadata(RouteMetadataKey, target.constructor) ?? []) as SaveRouteConfig[];
         const method = target[propertyKey];
         saveRouteConfigs.push({propertyKey, method, config});
@@ -47,7 +47,7 @@ export const Route = (config: RouteConfig): ReflectMethod => {
     };
 }
 
-export const getRoute = (target: any, propertyKey: string): RouteConfig | undefined => {
+export const getRoute = (target: any, propertyKey: string | symbol): RouteConfig | undefined => {
     return ReflectUtils.getMetadata(RouteMetadataKey, target, propertyKey);
 }
 
