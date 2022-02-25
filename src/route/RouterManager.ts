@@ -172,21 +172,21 @@ export class RouterManager {
                 const pathnameData = intent.getPathnameData(urlRoot + it);
                 if (pathnameData) {
                     // const routeElement = routerData.route[it];
-                    const {child, data, propertyKey} = this.findRouteProperty(routerData.route, it);
+                    const {child, data, propertyKeys} = this.findRouteProperty(routerData.route, it);
                     const rm = new RouterModule(this.simstanceManager, router, child);
                     rm.data = data;
                     rm.pathData = pathnameData;
-                    rm.propertyKey = propertyKey;
+                    rm.propertyKeys = propertyKeys;
                     return rm;
                 }
             }
         }
     }
 
-    private findRouteProperty(route: Route, propertyName: string): { child?: ConstructorType<any>, data?: any, propertyKey?: string } {
+    private findRouteProperty(route: Route, propertyName: string): { child?: ConstructorType<any>, data?: any, propertyKeys?: (string|symbol)[] } {
         let child: ConstructorType<any>|undefined;
         let data: any;
-        let propertyKey: undefined | string = undefined;
+        let propertyKeys: undefined | (string|symbol)[];
         const routeElement = route[propertyName];
         // console.log('-->', Array.isArray(routeElement))
         if (typeof routeElement === 'function') {
@@ -202,14 +202,14 @@ export class RouterManager {
         } else if (Array.isArray(routeElement)) {
             child = routeElement?.[0];
             data = routeElement?.[1];
-        } else if (typeof routeElement === 'object' && 'target' in routeElement && 'propertyKey' in routeElement) { // RouteTargetMethod
+        } else if (typeof routeElement === 'object' && 'target' in routeElement && 'propertyKeys' in routeElement) { // RouteTargetMethod
             child = routeElement.target;
-            propertyKey = routeElement.propertyKey as string;
+            propertyKeys = routeElement.propertyKeys as (string|symbol)[];
         }
         return {
             child,
             data,
-            propertyKey
+            propertyKeys
         }
     }
 }

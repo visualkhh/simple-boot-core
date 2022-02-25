@@ -1,7 +1,7 @@
 import {ConstructorType, GenericClassDecorator, ReflectMethod} from '../../types/Types';
 import {ReflectUtils} from '../../utils/reflect/ReflectUtils';
 
-export type RouteTargetMethod = {target: ConstructorType<Object>, propertyKey: string}
+export type RouteTargetMethod = {target: ConstructorType<Object>, propertyKeys: (string|symbol)[]}
 export type RouteProperty = ConstructorType<Object> | [ConstructorType<Object>, any] | RouteTargetMethod | string;
 export type Route = {[name: string]: RouteProperty};
 export interface RouterConfig {
@@ -10,13 +10,17 @@ export interface RouterConfig {
     routers?: ConstructorType<Object>[];
 }
 
-
 export const RouterMetadataKey = Symbol('Router');
 export const Router = (config: RouterConfig): GenericClassDecorator<ConstructorType<any>> => {
     return (target: ConstructorType<any>) => {
-        (getRoutes(target)??[]).forEach(it => {
+        (getRoutes(target) ?? []).forEach(it => {
+            // console.log('route---->', it);
             config.route = (config.route ?? {})
-            config.route[it.config.path] = {target, propertyKey: it.propertyKey} as RouteTargetMethod;
+            if (config.route[it.config.path]) {
+                (config.route[it.config.path] as RouteTargetMethod).propertyKeys.push(it.propertyKey);
+            } else {
+                config.route[it.config.path] = {target, propertyKeys: [it.propertyKey]} as RouteTargetMethod;
+            }
         });
         // console.log('-->', routes);
         ReflectUtils.defineMetadata(RouterMetadataKey, config, target);
@@ -24,7 +28,7 @@ export const Router = (config: RouterConfig): GenericClassDecorator<ConstructorT
 }
 
 export const getRouter = (target: ConstructorType<any> | Function | any): RouterConfig | undefined => {
-    if (null != target && undefined != target && typeof target === 'object') {
+    if (target != null && typeof target === 'object') {
         target = target.constructor;
     }
     try { return ReflectUtils.getMetadata(RouterMetadataKey, target); } catch (e) {}

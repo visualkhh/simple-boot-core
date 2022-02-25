@@ -8,7 +8,7 @@ export class RouterModule<R = SimAtomic, M = any> {
     public pathData?: { [name: string]: string };
     public data?: any;
     public intent?: Intent;
-    public propertyKey?: string;
+    public propertyKeys?: (string|symbol)[];
     // public onRouteDatas: {simAtomic: SimAtomic, onRouteData: any}[] = []
     constructor(private simstanceManager: SimstanceManager, public router?: R, public module?: ConstructorType<M>, public routerChains: R[] = []) {
     }
@@ -27,16 +27,16 @@ export class RouterModule<R = SimAtomic, M = any> {
     //     return await this.simstanceManager.executeBindParameterSimPromise({target, targetKey: this.propertyKey})
     // }
 
-    executeModuleProperty(...param: any[]): any {
+    executeModuleProperty(propertyKey: string | symbol, ...param: any[]): any {
         const target = this.getModuleInstance() as any;
-        if (this.propertyKey) {
-            const config = getInjection(target, this.propertyKey);
+        if (propertyKey) {
+            const config = getInjection(target, propertyKey);
             if (config) {
                 const other = new Map<any, any>();
                 param.forEach(it => other.set(it.constructor, it));
-                return this.simstanceManager.executeBindParameterSim({target, targetKey: this.propertyKey}, other)
+                return this.simstanceManager.executeBindParameterSim({target, targetKey: propertyKey}, other)
             } else {
-                return target[this.propertyKey](...param);
+                return target[propertyKey](...param);
             }
         }
     }
