@@ -6,10 +6,10 @@ export type InjectionConfig = {}
 const InjectionMetadataKey = Symbol('Injection');
 export const Injection = (config?: InjectionConfig): ReflectMethod => {
     return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
-        ReflectUtils.defineMetadata(InjectionMetadataKey, config, target, propertyKey);
+        ReflectUtils.defineMetadata(InjectionMetadataKey, config??{}, target, propertyKey);
     }
 }
 
-export const getInjection = (target: any, propertyKey: string): any => {
+export const getInjection = (target: any, propertyKey: string): InjectionConfig | undefined => {
     return ReflectUtils.getMetadata(InjectionMetadataKey, target, propertyKey);
 }

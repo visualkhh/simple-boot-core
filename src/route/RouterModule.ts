@@ -2,6 +2,7 @@ import { ConstructorType } from '../types/Types';
 import { SimAtomic } from '../simstance/SimAtomic';
 import { Intent } from '../intent/Intent';
 import { SimstanceManager } from '../simstance/SimstanceManager';
+import {getInjection} from '../decorators/inject/Injection';
 
 export class RouterModule<R = SimAtomic, M = any> {
     public pathData?: { [name: string]: string };
@@ -16,20 +17,28 @@ export class RouterModule<R = SimAtomic, M = any> {
         return this.simstanceManager.getOrNewSim<T>(this.module as any);
     }
 
-    executeModulePropertyBindParameter(): any {
-        const target = this.getModuleInstance() as any;
-        return this.simstanceManager.executeBindParameterSim({target, targetKey: this.propertyKey})
-    }
-
-    async executeModulePropertyBindParameterPromise() {
-        const target = this.getModuleInstance() as any;
-        return await this.simstanceManager.executeBindParameterSimPromise({target, targetKey: this.propertyKey})
-    }
+    // executeModulePropertyBindParameter(): any {
+    //     const target = this.getModuleInstance() as any;
+    //     return this.simstanceManager.executeBindParameterSim({target, targetKey: this.propertyKey})
+    // }
+    //
+    // async executeModulePropertyBindParameterPromise() {
+    //     const target = this.getModuleInstance() as any;
+    //     return await this.simstanceManager.executeBindParameterSimPromise({target, targetKey: this.propertyKey})
+    // }
 
     executeModuleProperty(...param: any[]): any {
         const target = this.getModuleInstance() as any;
-        if (this.propertyKey)
-            return target[this.propertyKey](...param);
+        if (this.propertyKey) {
+            const config = getInjection(target, this.propertyKey);
+            if (config) {
+                const other = new Map<any, any>();
+                param.forEach(it => other.set(it.constructor, it));
+                return this.simstanceManager.executeBindParameterSim({target, targetKey: this.propertyKey}, other)
+            } else {
+                return target[this.propertyKey](...param);
+            }
+        }
     }
 
     get lastRouteChain() {
