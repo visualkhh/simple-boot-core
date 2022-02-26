@@ -2,10 +2,6 @@ import "reflect-metadata"
 import {ConstructorType, GenericClassDecorator} from '../../types/Types'
 import {ReflectUtils} from '../../utils/reflect/ReflectUtils';
 
-// export enum SimConfigType {
-//     advice = 'advice'
-// }
-
 export interface InjectableConfig {
     scheme?: string,
 }

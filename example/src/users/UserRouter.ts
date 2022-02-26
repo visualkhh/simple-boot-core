@@ -1,8 +1,9 @@
 import {User} from './User';
 import {UserDetaile} from 'src/users/UserDetaile';
-import { Router, RouterConfig, Sim } from 'simple-boot-core/decorators/SimDecorator';
+import { Router, RouterConfig } from 'simple-boot-core/decorators/route/Router';
 import { RouterAction } from 'simple-boot-core/route/RouterAction';
 import { Intent } from 'simple-boot-core/intent/Intent';
+import {Sim} from 'simple-boot-core/decorators/SimDecorator';
 
 @Sim()
 @Router({

@@ -1,7 +1,6 @@
 import "reflect-metadata"
 import {ConstructorType, GenericClassDecorator, ReflectMethod} from '../types/Types'
 import {ReflectUtils} from '../utils/reflect/ReflectUtils';
-import {ExceptionHandlerConfig, SaveExceptionHandlerConfig} from './exception/ExceptionDecorator';
 
 export const sims = new Set<ConstructorType<any>>();
 export interface SimConfig {
@@ -11,10 +10,8 @@ export interface SimConfig {
 export const SimMetadataKey = Symbol('Sim');
 export const Sim = (config: SimConfig = {}): GenericClassDecorator<ConstructorType<any>> => {
     return (target: ConstructorType<any>) => {
-        // console.log('sim add-->', target, config, SimGlobal().storage)
         ReflectUtils.defineMetadata(SimMetadataKey, config, target);
         sims.add(target)
-        // SimGlobal().storage.add(target);
     }
 }
 

@@ -21,8 +21,6 @@ export class ObjectUtils {
             } else {
                 data.push(...Object.getOwnPropertyNames(Object.getPrototypeOf(target)));
             }
-            // const proto = Object.getOwnPropertyNames((target.prototype ? target.prototype : Object.getPrototypeOf(target)) ?? target);
-            // data = Object.keys(proto) || []
         }
         return data.filter(it => it !== 'constructor');
     }
@@ -51,10 +49,6 @@ export class ObjectUtils {
         return Object.seal(target);
     }
 
-    // static isAssignableFrom(start: ConstructorType<any>, target: ConstructorType<any>) {
-    //     return this.getAllProtoType(target).includes(start);
-    // }
-
     /*
     Object.prototype.isPrototypeOf()
     isPrototypeOf() 메소드는 해당 객체가 다른 객체의 프로토타입 체인에 속한 객체인지 확인하기 위해 사용됩니다.
@@ -71,9 +65,6 @@ export class ObjectUtils {
 
         let object = target;
         const r = [];
-        // if (includeMe) {
-        //     r.push(Object.getPrototypeOf(object));
-        // }
         if (dest) {
             do {
                 object = Object.getPrototypeOf(object);
@@ -81,16 +72,12 @@ export class ObjectUtils {
                     break;
                 }
                 r.push(object);
-                // console.log(object);
             } while (object);
         }
         return r;
     }
 
     static getAllProtoType(start: ConstructorType<any> | null | undefined): ConstructorType<any>[] {
-        // if (typeof start === 'object') {
-        //     start = Object.getPrototypeOf(start);
-        // }
         const protos: ConstructorType<any>[] = []
         while (start) {
             protos.push(start);
@@ -118,33 +105,4 @@ export class ObjectUtils {
         return this.getPrototypeKeyMap(target).get(fnc)
     }
 
-    // static getObjectKeyValue() {
-    //     for(const [key, value] of Object.entries(rtnAttribute)) {
-    //         it.setAttribute(key, value);
-    //     }
-    // }
-
-    /* prototype 상속 처리하기
-        class A {
-            say() {
-                console.log('say')
-            }
-        }
-
-        class B {
-            wow() {
-                console.log('wow')
-            }
-        }
-
-        const a = new A();
-        const b = new B();
-
-        const c = Object.assign(a, b);
-        console.log(a, b, c);
-
-        const zz = Object.setPrototypeOf(A.prototype, B.prototype);
-        console.log(zz)
-        new A().wow();
-    *  */
 }

@@ -1,5 +1,5 @@
 import { ConstructorType } from '../types/Types';
-import { getSim, SimConfig, SimMetadataKey } from '../decorators/SimDecorator';
+import { SimMetadataKey } from '../decorators/SimDecorator';
 import { SimstanceManager } from './SimstanceManager';
 import { ReflectUtils } from '../utils/reflect/ReflectUtils';
 

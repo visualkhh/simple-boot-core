@@ -6,13 +6,15 @@ import {ExceptionHandlerSituationType} from '../exception/ExceptionDecorator';
 export enum InjectSituationType {
     INDEX = 'SIMPLE_BOOT_CORE://Inject/INDEX',
 }
+
 export type SituationType = string | InjectSituationType | ExceptionHandlerSituationType;
 
 export class SituationTypeContainer {
     public situationType: SituationType;
     public data: any;
     public index?: number;
-    constructor({situationType, data, index}: {situationType: SituationType, data: any, index?: number}) {
+
+    constructor({situationType, data, index}: { situationType: SituationType, data: any, index?: number }) {
         this.situationType = situationType;
         this.data = data;
         this.index = index;
@@ -21,6 +23,7 @@ export class SituationTypeContainer {
 
 export class SituationTypeContainers {
     public containers: SituationTypeContainer[] = [];
+
     public push(...item: SituationTypeContainer[]) {
         this.containers.push(...item)
     }
@@ -29,7 +32,7 @@ export class SituationTypeContainers {
         return this.containers.length;
     }
 
-    find(predicate: (value: SituationTypeContainer, index: number, obj: SituationTypeContainer[]) => unknown, thisArg?: any): SituationTypeContainer | undefined{
+    find(predicate: (value: SituationTypeContainer, index: number, obj: SituationTypeContainer[]) => unknown, thisArg?: any): SituationTypeContainer | undefined {
         return this.containers.find(predicate);
     }
 }
@@ -38,7 +41,7 @@ export type InjectConfig = {
     scheme?: string;
     type?: ConstructorType<any>;
     situationType?: SituationType;
-    applyProxy?: {type: ConstructorType<ProxyHandler<any>>, param?: any[]};
+    applyProxy?: { type: ConstructorType<ProxyHandler<any>>, param?: any[] };
 }
 
 export type SaveInjectConfig = {
@@ -57,17 +60,13 @@ export const Inject = (config: InjectConfig = {}): MethodParameter => {
             const saves = (Reflect.getOwnMetadata(InjectMetadataKey, target, propertyKey) || []) as SaveInjectConfig[];
             const type = ReflectUtils.getParameterTypes(otarget, propertyKey)[parameterIndex];
             saves.push({index: parameterIndex, config, propertyKey, type});
-            // console.log('---params--1->', params);
             ReflectUtils.defineMetadata(InjectMetadataKey, saves, target, propertyKey);
-            // params = ReflectUtils.getParameterTypes(otarget, propertyKey)
-            // console.log('---params--2->', params);
         } else if (!propertyKey || typeof target === 'function') { // <-- function: constructor
             const existingInjectdParameters = (ReflectUtils.getMetadata(InjectMetadataKey, target) || []) as SaveInjectConfig[]
             const type = ReflectUtils.getParameterTypes(target)[parameterIndex];
             existingInjectdParameters.push({index: parameterIndex, config, type});
             ReflectUtils.defineMetadata(InjectMetadataKey, existingInjectdParameters, target);
         }
-        // console.groupEnd();
     }
 }
 

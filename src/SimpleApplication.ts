@@ -1,13 +1,14 @@
-import { Runnable } from './run/Runnable';
-import { SimstanceManager } from './simstance/SimstanceManager';
-import { SimOption } from './SimOption';
-import { IntentManager } from './intent/IntentManager';
-import { RouterManager } from './route/RouterManager';
-import { Intent } from './intent/Intent';
-import { ConstructorType } from './types/Types';
-import { RouterModule } from './route/RouterModule';
-import { SimAtomic } from './simstance/SimAtomic';
+import {Runnable} from './run/Runnable';
+import {SimstanceManager} from './simstance/SimstanceManager';
+import {SimOption} from './SimOption';
+import {IntentManager} from './intent/IntentManager';
+import {RouterManager} from './route/RouterManager';
+import {Intent} from './intent/Intent';
+import {ConstructorType} from './types/Types';
+import {RouterModule} from './route/RouterModule';
+import {SimAtomic} from './simstance/SimAtomic';
 import 'reflect-metadata'
+
 export class SimpleApplication implements Runnable {
     public simstanceManager: SimstanceManager;
     public intentManager: IntentManager;
@@ -23,15 +24,28 @@ export class SimpleApplication implements Runnable {
         this.simstanceManager.storage.set(RouterManager, this.routerManager);
     }
 
-    public run(otherInstanceSim?: Map<ConstructorType<any>, any>) {
+    public run(otherInstanceSim?: Map<ConstructorType<any>, any>): SimpleApplication {
         this.simstanceManager.run(otherInstanceSim);
+        return this;
     }
 
-    public publishIntent(i: Intent):any[] {
-        return this.intentManager.publish(i);
+    public publishIntent(i: string, data?: any): any[];
+    public publishIntent(i: Intent): any[];
+    public publishIntent(i: Intent | string, data?: any): any[] {
+        if (i instanceof Intent) {
+            return this.intentManager.publish(i);
+        } else {
+            return this.intentManager.publish(i, data);
+        }
     }
 
-    public routing<R = SimAtomic, M = any>(i: Intent): Promise<RouterModule|undefined> {
-        return this.routerManager.routing(i);
+    public routing<R = SimAtomic, M = any>(i: string, data?: any): Promise<RouterModule>;
+    public routing<R = SimAtomic, M = any>(i: Intent): Promise<RouterModule>;
+    public routing<R = SimAtomic, M = any>(i: Intent | string, data?: any): Promise<RouterModule> {
+        if (i instanceof Intent) {
+            return this.routerManager.routing(i);
+        } else {
+            return this.routerManager.routing(new Intent(i, data));
+        }
     }
 }

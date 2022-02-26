@@ -57,6 +57,4 @@ export class ReflectUtils {
             Reflect.defineMetadata(metadataKey, value, target);
         }
     }
-
-    // const existingInjectdParameters: number[] = Reflect.getOwnMetadata(InjectMetadataKey, target, propertyKey) || [];
 }

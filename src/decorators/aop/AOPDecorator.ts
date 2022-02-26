@@ -7,17 +7,11 @@ import { ConstructorType, ReflectMethod } from '../../types/Types';
 const AfterMetadataKey = Symbol('After');
 const BeforeMetadataKey = Symbol('Before');
 const AroundMetadataKey = Symbol('Around');
-// export enum AOPAction {
-//     // get = 'get',
-//     // set = 'set',
-//     // call = 'call',
-// }
 type AOPOption = {type?: ConstructorType<any>, property: string}
 type AroundOption = {after?: (obj: any, propertyKey: string, args: any[], beforeReturn: any) => any[], before?: (obj: any, propertyKey: string, args: any[]) => any[]}
 
 // after
 export const After = (data: AOPOption) => {
-    // console.log('---after')
     return ReflectUtils.metadata(AfterMetadataKey, data);
 }
 export const getAfter = (target: any, propertyKey: string): AOPOption => {
@@ -91,33 +85,10 @@ export const Around = (config: AroundOption):  ReflectMethod => {
                 }
             }
             return r;
-            // let requiredParameters: number[] = Reflect.getOwnMetadata(requiredMetadataKey, target, propertyKey);
-            // const r = method.apply(this, args);
-            // config.after?.apply(this, r);
-            // if (requiredParameters) {
-            //     for (let parameterIndex of requiredParameters) {
-            //         if (parameterIndex >= arguments.length || arguments[parameterIndex] === undefined) {
-            //             throw new Error("Missing required argument.");
-            //         }
-            //     }
-            // }
         }
     }
 }
-// => {
-//     return ReflectUtils.metadata(Around, data);
-// }
 
 export const getAround = (target: any, propertyKey: string): AroundOption => {
     return ReflectUtils.getMetadata(AroundMetadataKey, target, propertyKey);
 }
-
-// export const getArounds = (target: any): MetaDataPropertyAtomic<any, AOPOption>[] => {
-//     return ObjectUtils.getAllProtoTypeName(target)
-//         .map(it => new MetaDataPropertyAtomic<any, AOPOption>(target, getBefore(target, it), it))
-//         .filter(it => it.metaData !== undefined) || [];
-// }
-
-// export const getProtoBefores = (target: any, propertyKey: string, type?: ConstructorType<any>): MetaDataPropertyAtomic<any, AOPOption>[] => {
-//     return getBefores(target).filter(it => propertyKey === it.metaData.property && type === it.metaData.type?.prototype) || [];
-// }

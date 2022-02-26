@@ -14,7 +14,6 @@ export const RouterMetadataKey = Symbol('Router');
 export const Router = (config: RouterConfig): GenericClassDecorator<ConstructorType<any>> => {
     return (target: ConstructorType<any>) => {
         (getRoutes(target) ?? []).forEach(it => {
-            // console.log('route---->', it);
             config.route = (config.route ?? {})
             if (config.route[it.config.path]) {
                 (config.route[it.config.path] as RouteTargetMethod).propertyKeys.push(it.propertyKey);
@@ -22,7 +21,6 @@ export const Router = (config: RouterConfig): GenericClassDecorator<ConstructorT
                 config.route[it.config.path] = {target, propertyKeys: [it.propertyKey]} as RouteTargetMethod;
             }
         });
-        // console.log('-->', routes);
         ReflectUtils.defineMetadata(RouterMetadataKey, config, target);
     }
 }

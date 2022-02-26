@@ -10,10 +10,6 @@ export class MetaDataPropertyAtomic<T = any, M = any> extends MetaDataAtomic<T, 
     }
 
     public call(...parameter: any) {
-        // if (typeof this.property === 'function') {
-        //     return this.property.apply(this.target, parameter)
-        // } else if (typeof this.property === 'string') {
-        // }
         return (this.target as any)[this.property](...parameter);
     }
 }

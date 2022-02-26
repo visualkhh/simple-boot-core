@@ -1,18 +1,18 @@
 export class ValidUtils {
     static isNullOrUndefined(data: any): boolean {
-        if (data == null || undefined === data) {
-            return true
-        } else {
-            return false
-        }
+        return data == null || undefined === data;
+    }
+
+    static isNotNullUndefined(data: any) {
+        return data !== null && data !== undefined;
     }
 
     static isNull(data: any): boolean {
-        if (data == null) {
-            return true
-        } else {
-            return false
-        }
+       return data === null;
+    }
+
+    static isUndefined(data: any): boolean {
+       return data === undefined;
     }
 
     static isArray(object_o: any): boolean {
@@ -45,11 +45,6 @@ export class ValidUtils {
         } else {
             return Object.prototype.toString.call(object_o).trim() === '[object Function]'
         }
-        // if (typeof object_o === 'function') {
-        //     return true;
-        // }else {
-        //     return false;
-        // }
     }
 
     static isObject(object_o: any): boolean {

@@ -21,15 +21,6 @@ export class ConvertUtils {
         return new Map(JSON.parse(jsonStr));
     }
 
-    // public static strMapToObj(strMap: Map<string, string>) {
-    //     const obj = Object.create(null);
-    //     for (const [k, v] of strMap) {
-    //         // We don’t escape the key '__proto__'
-    //         // which can cause problems on older engines
-    //         obj[k] = v;
-    //     }
-    //     return obj;
-    // }
     public static objToStrMap(obj: any): Map<string, string> {
         const strMap = new Map();
         for (const k of Object.keys(obj)) {
@@ -38,9 +29,6 @@ export class ConvertUtils {
         return strMap;
     }
 
-    // public static strMapToJson(strMap: Map<string, string>) {
-    //     return JSON.stringify(this.strMapToObj(strMap));
-    // }
     public static jsonToStrMap(jsonStr: string) {
         return this.objToStrMap(JSON.parse(jsonStr));
     }
@@ -77,9 +65,7 @@ export class ConvertUtils {
                 arr[i] = this.toObject(arr[i]);
             }
         }
-        // if (ValidUtil.isFunction(obj)) {
-        //     obj = this.toObject(obj());
-        // }
+
         if (ValidUtils.isObject(obj)) {
             for (const property in obj) {
                 obj[property] = this.toObject(obj[property]);
@@ -92,32 +78,6 @@ export class ConvertUtils {
     static iteratorToArray <T>(it: any): T[] {
         return Array.from(it) as T[];
     }
-
-    // static clone <T>(obj: T): T {
-    //     if (obj == null || typeof obj !== 'object') {
-    //         return obj;
-    //     }
-    //     const copy = new Object() as any;
-    //     for (const attr in obj) {
-    //         // eslint-disable-next-line no-prototype-builtins
-    //         // @ts-ignore
-    //         if (obj.hasOwnProperty(attr)) {
-    //             copy[attr] = obj[attr];
-    //         }
-    //     }
-    //     return copy;
-    // }
-    // static merge <T>(target: T, obj: any): T {
-    //     if (null == obj || 'object' !== typeof obj) {
-    //         return obj;
-    //     }
-    //     for (const attr in obj) {
-    //         if (obj.hasOwnProperty(attr)) {
-    //             target[attr] = obj[attr];
-    //         }
-    //     }
-    //     return target;
-    // }
 
     static toJson(obj: any): string {
         const at = this.toObject(obj);

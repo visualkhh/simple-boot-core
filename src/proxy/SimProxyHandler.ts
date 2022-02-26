@@ -2,11 +2,7 @@ import {SimstanceManager} from '../simstance/SimstanceManager'
 import {getProtoAfters, getProtoBefores} from '../decorators/aop/AOPDecorator';
 import {ObjectUtils} from '../utils/object/ObjectUtils';
 import {SimOption} from '../SimOption';
-import {
-    ExceptionHandlerSituationType,
-    SaveExceptionHandlerConfig,
-    targetExceptionHandler
-} from '../decorators/exception/ExceptionDecorator';
+import {ExceptionHandlerSituationType, SaveExceptionHandlerConfig, targetExceptionHandler} from '../decorators/exception/ExceptionDecorator';
 import {ConstructorType} from '../types/Types';
 import {SituationTypeContainer} from '../decorators/inject/Inject';
 
@@ -25,9 +21,7 @@ export class SimProxyHandler implements ProxyHandler<any> {
     }
 
     public set(obj: any, prop: string, value: any, receiver: any): boolean {
-        // console.log('proxy set-->')
         value = this.simstanceManager?.proxy(value)
-        // this.aopBefore(AOPAction.set, obj, prop, value);
         obj[prop] = value
         return true
     }
@@ -73,7 +67,7 @@ export class SimProxyHandler implements ProxyHandler<any> {
         }
         if (inHandler.config.config.throw) {
             let exceptionHandler = this.getExceptionHandler(e, inHandler.thisArg, inHandler.config.method);
-            if ((exceptionHandler?.length??0) > 0) {
+            if ((exceptionHandler?.length ?? 0) > 0) {
                 this.executeExceptionHandler(e, argumentsList, exceptionHandler[0]);
             }
             // throw e;

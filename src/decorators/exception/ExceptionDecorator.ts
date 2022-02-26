@@ -33,15 +33,12 @@ export const getExceptionHandlers = (target: any): SaveExceptionHandlerConfig[] 
 }
 
 export const targetExceptionHandlers = (target: any, error: any): SaveExceptionHandlerConfig[] => {
-    // return getExceptionHandlers(target)?.filter(it => ObjectUtils.isPrototypeOfTarget(it.config.type, error))
     const exceptionHandlers = getExceptionHandlers(target);
     const emptyTargets = exceptionHandlers?.filter(it => it.config.type === undefined);
     const targets = exceptionHandlers?.filter(it => ObjectUtils.isPrototypeOfTarget(it.config.type, error));
     const targetSorts = targets?.sort((a, b) => {
         const aPrototypeOfDepth = ObjectUtils.getPrototypeOfDepth(error, a.config.type);
         const bPrototypeOfDepth = ObjectUtils.getPrototypeOfDepth(error, b.config.type);
-        // console.log('-', error, a.config.type, b.config.type);
-        // console.log('--', aPrototypeOfDepth, bPrototypeOfDepth);
         return aPrototypeOfDepth.length - bPrototypeOfDepth.length
     });
     return (targetSorts ?? []).concat(...emptyTargets ?? []);
@@ -56,20 +53,3 @@ export const targetExceptionHandler = (target: any, error: any, excludeMethods: 
         return undefined;
     }
 }
-//
-// export const getExceptionHandlers = (target: any): MetaDataPropertyAtomic<any, ConstructorType<any> | null>[] => {
-//     return ObjectUtils.getAllProtoTypeName(target)
-//         .map(it => new MetaDataPropertyAtomic<any, ConstructorType<any> | null>(target, getExceptionHandler(target, it), it, ReflectUtils.getParameterTypes(target, it)))
-//         .filter(it => it.metaData !== undefined) || [];
-// }
-
-// export const getTargetAndIncludeNullAndSortExceptionHandlers = (target: any, error: any): MetaDataPropertyAtomic<any, ConstructorType<any> | null>[] => {
-//     return getExceptionHandlers(target).filter(it => it.metaData == null || ObjectUtils.isPrototypeOfTarget(it.metaData, error))
-//         .sort((a, b) => ObjectUtils.getAllProtoType(a.metaData).length - ObjectUtils.getAllProtoType(b.metaData).length);
-// }
-
-// export const getExceptionHandlers = (target: any): MetaDataPropertyAtomic<ConstructorType<any> | null>[] => {
-//     return ObjectUtils.getAllProtoTypeName(target)
-//         .map(it => new MetaDataPropertyAtomic<ConstructorType<any> | null>(target, getExceptionHandler(target, it), it, ReflectUtils.getParameterTypes(target, it)))
-//         .filter(it => it.metaData !== undefined) || [];
-// }

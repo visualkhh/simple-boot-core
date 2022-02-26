@@ -17,7 +17,7 @@ simpleApplication.routing<SimAtomic<any>, any>(intent).then(it => {
     // console.log('--->', it);
     // console.log('--->', it.pathData, it.routerChains);
     // let moduleInstance = it.getModuleInstance<User>();
-    let moduleInstance = it.executeModuleProperty(new UserSim('test'));
+    let moduleInstance = it.executeModuleProperty(it.propertyKeys[0]!, new UserSim('test'));
     console.log('-22->', moduleInstance);
     // try {
         // moduleInstance?.print();

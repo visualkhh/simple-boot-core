@@ -51,5 +51,3 @@ export class IntentManager {
         return r;
     }
 }
-
-// export const intentManager = new IntentManager();

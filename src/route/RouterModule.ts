@@ -1,31 +1,21 @@
-import { ConstructorType } from '../types/Types';
-import { SimAtomic } from '../simstance/SimAtomic';
-import { Intent } from '../intent/Intent';
-import { SimstanceManager } from '../simstance/SimstanceManager';
+import {ConstructorType} from '../types/Types';
+import {SimAtomic} from '../simstance/SimAtomic';
+import {Intent} from '../intent/Intent';
+import {SimstanceManager} from '../simstance/SimstanceManager';
 import {getInjection} from '../decorators/inject/Injection';
 
 export class RouterModule<R = SimAtomic, M = any> {
     public pathData?: { [name: string]: string };
     public data?: any;
     public intent?: Intent;
-    public propertyKeys?: (string|symbol)[];
-    // public onRouteDatas: {simAtomic: SimAtomic, onRouteData: any}[] = []
+    public propertyKeys?: (string | symbol)[];
+
     constructor(private simstanceManager: SimstanceManager, public router?: R, public module?: ConstructorType<M>, public routerChains: R[] = []) {
     }
 
     getModuleInstance<T = M>(): T | undefined {
         return this.simstanceManager.getOrNewSim<T>(this.module as any);
     }
-
-    // executeModulePropertyBindParameter(): any {
-    //     const target = this.getModuleInstance() as any;
-    //     return this.simstanceManager.executeBindParameterSim({target, targetKey: this.propertyKey})
-    // }
-    //
-    // async executeModulePropertyBindParameterPromise() {
-    //     const target = this.getModuleInstance() as any;
-    //     return await this.simstanceManager.executeBindParameterSimPromise({target, targetKey: this.propertyKey})
-    // }
 
     executeModuleProperty(propertyKey: string | symbol, ...param: any[]): any {
         const target = this.getModuleInstance() as any;
@@ -53,13 +43,13 @@ export class RouterModule<R = SimAtomic, M = any> {
         return this.lastRouteChainValue?.hasActivate(obj) === true;
     }
 
-    get queryParams(): { [key:string]: string } | undefined{
+    get queryParams(): { [key: string]: string } | undefined {
         if (this.intent) {
             return this.intent.queryParams;
         }
     }
 
-    get queryParamsAfterDecodeURI(): { [key:string]: string } | undefined{
+    get queryParamsAfterDecodeURI(): { [key: string]: string } | undefined {
         if (this.intent) {
             return this.intent.queryParamsAfterDecodeURI;
         }

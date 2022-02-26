@@ -1,21 +1,17 @@
-// import { URLSearchParams } from "url";
-
 export enum PublishType {
     DATA_PARAMETERS = 'DATA_PARAMETERS',
     INLINE_DATA_PARAMETERS = 'INLINE_DATA_PARAMETERS',
 }
+/* uri struct
+    uri example: mymodule://asd/asd/b?a=545&aa=33&wow=wow
+    uri example: ://asd/asd/b?a=545&aa=33&wow=wow
+    uri example: /asd/asd/b?a=545&aa=33&wow=wow
+    <스킴>://<사용자이름>:<비밀번호>@<호스트>:<포트>/<경로>?<질의>#<프레그먼트>
+*/
 export class Intent<T = any, E = any> {
-    // uri example: mymodule://asd/asd/b?a=545&aa=33&wow=wow
-    // uri example: ://asd/asd/b?a=545&aa=33&wow=wow
-    // uri example: /asd/asd/b?a=545&aa=33&wow=wow
-    // <스킴>://<사용자이름>:<비밀번호>@<호스트>:<포트>/<경로>?<질의>#<프레그먼트>
     public publishType?: PublishType;
     constructor(public uri: string, public data?: T, public event?: E) {
     }
-
-    // get publishData(): T | undefined | this {
-    //     return this.publishOnlyData ? this.data : this;
-    // }
 
     get scheme() {
         return this.uri.split('://')[0];
@@ -40,10 +36,6 @@ export class Intent<T = any, E = any> {
         return paths[1] ?? '';
     }
 
-    // get urlQueryParams(): URLSearchParams {
-    //     return new URLSearchParams(this.query.split('&')[1] ?? '');
-    // }
-
     get queryParams(): { [key:string]: string } {
         const param = {} as { [key:string]: string };
         this.query.split('&')?.forEach(it => {
@@ -63,7 +55,6 @@ export class Intent<T = any, E = any> {
         return params;
     }
 
-
     getPathnameData(urlExpression: string) {
         const urls = this.pathname.split('/');
         const urlExpressions = urlExpression.split('/');
@@ -74,7 +65,7 @@ export class Intent<T = any, E = any> {
         for (let i = 0; i < urlExpressions.length; i++) {
             const it = urlExpressions[i];
             const urlit = urls[i];
-            // 예) {serialNo:[0-9]+} 또는 {no} 등등
+            // ex) {serialNo:[0-9]+} or {no}  ..
             const execResult = /^\{(.+)\}$/g.exec(it);
             if (!execResult) {
                 if (it !== urlit) {
@@ -82,7 +73,6 @@ export class Intent<T = any, E = any> {
                 }
                 continue;
             }
-
             //regex check
             const [name, regex] = execResult[1].split(':'); // group1
             if (regex && !new RegExp(regex).test(urlit)) {
@@ -92,24 +82,4 @@ export class Intent<T = any, E = any> {
         }
         return data;
     }
-    // getPathnameData(urlExpression: string) {
-    //     const urls = this.pathname.split('/');
-    //     const urlExpressions = urlExpression.split('/');
-    //     if (urls.length !== urlExpressions.length) {
-    //         return;
-    //     }
-    //     const data: {[name: string]: string } = {}
-    //     for (let i = 0; i < urlExpressions.length; i++) {
-    //         const it = urlExpressions[i];
-    //         const urlit = urls[i];
-    //         if (!it.startsWith(':')) {
-    //             if (it !== urlit) {
-    //                 return;
-    //             }
-    //             continue;
-    //         }
-    //         data[it.slice(1)] = urlit;
-    //     }
-    //     return data;
-    // }
 }

@@ -1,11 +1,5 @@
 import {ConstructorType, MethodParameter, ReflectField} from '../../types/Types';
 import {ReflectUtils} from '../../utils/reflect/ReflectUtils';
-import {InjectConfig, SaveInjectConfig, SituationType} from '../inject/Inject';
-
-
-// export type ValidConfig = {
-//     checker?: any;
-// }
 const ValidMetadataKey = Symbol('ValidMetadataKey');
 export const Valid: MethodParameter = (target: Object, propertyKey: string | symbol | undefined, parameterIndex: number) => {
     if (propertyKey && typeof target === 'object') { // <-- object: method
@@ -45,7 +39,6 @@ export const Validation = (validator: Validator): ReflectField => {
             propertyKey,
             validator
         });
-        // console.log('save validator', saves, target);
         ReflectUtils.defineMetadata(ValidationMetadataKey, saves, target.constructor);
         ReflectUtils.defineMetadata(ValidationMetadataKey, validator, target, propertyKey);
     }
@@ -84,16 +77,12 @@ export type ValidationResult = {
     valid: boolean;
     message?: string;
 }
-// export type ValidationResultContainer = {
-//     [k: string]: ValidationResult;
-// }
 export const execValidationInValid = (obj: any) => {
     return execValidation(obj).filter(it => !it.valid);
 }
 
 export const execValidation = (obj: any) => {
     const validators = getValidators(obj);
-    // console.log('validators-->', validators);
     const reesults: ValidationResult[] = [];
     validators.forEach(it => {
         reesults.push({

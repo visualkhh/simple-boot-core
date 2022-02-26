@@ -18,7 +18,6 @@ export const OnRoute = (config?: OnRouteOption): ReflectMethod => {
         onRoutes.get(target)?.push(propertyKey);
         ReflectUtils.defineMetadata(OnRouteMetadataKey, config, target, propertyKey);
         const metadata = ReflectUtils.getMetadata(OnRouteMetadataKey, target, propertyKey);
-        // console.log('set MetaData??', metadata, target, propertyKey);
     };
 }
 
@@ -26,6 +25,5 @@ export const getOnRoute = (target: any, propertyKey: string): OnRouteOption => {
     if (null != target && undefined != target && typeof target === 'object') {
         target = target.constructor;
     }
-    // console.log('get MetaData??', ReflectUtils.getMetadata(OnRouteMetadataKey, target, propertyKey));
     return ReflectUtils.getMetadata(OnRouteMetadataKey, target, propertyKey);
 }
