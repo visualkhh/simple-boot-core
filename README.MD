@@ -16,17 +16,7 @@ It provides convenience in service development.
 ```shell
 npm init -y
 npm install simple-boot-core
-npm install ts-node --save-dev
 tsc --init --experimentalDecorators --emitDecoratorMetadata
-```
-```json
-// package.json   add scripts ts-node
-{
-  // ...
-  "scripts": {
-    "start": "ts-node index.ts",
-  }
-}
 ```
 ```typescript
 // index.ts
@@ -48,7 +38,7 @@ new SimpleApplication(AppRouter).run().routing('/user').then(it => {
 })
 ```
 ```shell
-npm start
+npx ts-node index.ts
 # say~ hello
 ```
 
@@ -77,7 +67,8 @@ class User {
     console.log(`say~ hello: ${this.projectService.sum(5, 25)}`);
   }
 }
-// result: say~ hello: 30
+// 💥 call say()
+// say~ hello: 30
 ```
 </details>
 
@@ -245,7 +236,7 @@ class AppRouter {
 <details>
   <summary>RouterAction Interface<strong>🔻(click)</strong></summary>
 
-### route change call canActivate merhod
+### route change call canActivate meehod
 
 ```typescript
 @Sim()
