@@ -1,6 +1,6 @@
 SIMPLE-BOOT-CORE
 ===
-It provides convenience in service development.   
+### It provides convenience in service development.  
 ![typescript](https://img.shields.io/badge/-typescript-black?logo=typescript) [![typescript](https://img.shields.io/badge/-npm-black?logo=npm)](https://www.npmjs.com/package/simple-boot-core) [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE.md)  
 
 * Object management.
@@ -42,6 +42,8 @@ npx ts-node index.ts
 # say~ hello
 ```
 
+# 😃 examples
+- [examples](./examples)
 
 ## Object management.
 <details>
@@ -217,7 +219,7 @@ new SimpleApplication(AppRouter, option).run().routing('/user').then(it => {
 
 
 
-## Router System
+## Route System
 <details>
   <summary>@Router<strong>🔻(click)</strong></summary>
 

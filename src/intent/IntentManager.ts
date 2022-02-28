@@ -13,10 +13,10 @@ export class IntentManager {
         }
         const intent = it as Intent;
         const r: any[] = [];
-        this.simstanceManager.getSimConfig(intent.scheme).forEach((data) => {
+        const target = intent.scheme ? this.simstanceManager.getSimConfig(intent.scheme) : this.simstanceManager.getSimAtomics();
+        target.forEach((data) => {
             let orNewSim = this.simstanceManager?.getOrNewSim(data.type) as any;
             if (orNewSim) {
-                // console.log('-->', orNewSim, it.paths)
                 if (intent.paths.length > 0) {
                     let callthis = orNewSim;
                     let lastProp = '';

@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "declaration": true,
+    "sourceMap": false,
+    "allowJs": true,
+//    "outDir": "./dist",
+//    "rootDir": "./src",
+//    "baseUrl": "./src",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "types": [
+      "node"
+    ],
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "forceConsistentCasingInFileNames": true,
+    "lib": [
+      "es5",
+      "es2015",
+      "scripthost",
+      "es2015.proxy",
+      "es2015.collection"
+    ]
+  }
+}
