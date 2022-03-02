@@ -9,7 +9,7 @@ import {RouterModule} from './route/RouterModule';
 import {SimAtomic} from './simstance/SimAtomic';
 import 'reflect-metadata'
 
-export class SimpleApplication implements Runnable {
+export class SimpleApplication {
     public simstanceManager: SimstanceManager;
     public intentManager: IntentManager;
     public routerManager: RouterManager;
@@ -24,7 +24,19 @@ export class SimpleApplication implements Runnable {
         this.simstanceManager.storage.set(RouterManager, this.routerManager);
     }
 
-    public run(otherInstanceSim?: Map<ConstructorType<any>, any>): SimpleApplication {
+    public getSimstanceManager() {
+        return this.simstanceManager;
+    }
+
+    public getIntentManager() {
+        return this.intentManager;
+    }
+
+    public getRouterManager() {
+        return this.routerManager;
+    }
+
+    protected run(otherInstanceSim?: Map<ConstructorType<any>, any>): SimpleApplication {
         this.simstanceManager.run(otherInstanceSim);
         return this;
     }
