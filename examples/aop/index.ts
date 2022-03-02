@@ -12,6 +12,20 @@ class User {
         console.log('sayBefore')
     }
 
+    @Around({
+        before: (obj, propertyKey, args) => {
+            console.log('around before', propertyKey, args)
+            return ['newName'];
+        },
+        after: (obj, propertyKey, args, beforeReturn) => {
+            console.log('around after', propertyKey, args)
+            return args;
+        }
+    })
+    aroundSayName(name: string) {
+        console.log(`aroundSayName: My name is ${name}`);
+    }
+
     sayName() {
         console.log('My name is visualkhh');
     }
@@ -33,5 +47,7 @@ class AppRouter {
 const app = new SimpleApplication(AppRouter);
 app.run();
 app.routing('/user').then(it => {
-    it.getModuleInstance<User>().sayName();
+    const target = it.getModuleInstance<User>();
+    target.sayName();
+    target.aroundSayName('oldName');
 })

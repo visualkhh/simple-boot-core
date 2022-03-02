@@ -8,7 +8,7 @@ const AfterMetadataKey = Symbol('After');
 const BeforeMetadataKey = Symbol('Before');
 const AroundMetadataKey = Symbol('Around');
 type AOPOption = {type?: ConstructorType<any>, property: string}
-type AroundOption = {after?: (obj: any, propertyKey: string, args: any[], beforeReturn: any) => any[], before?: (obj: any, propertyKey: string, args: any[]) => any[]}
+type AroundOption = {before?: (obj: any, propertyKey: string, args: any[]) => any[], after?: (obj: any, propertyKey: string, args: any[], beforeReturn: any) => any[]}
 
 // after
 export const After = (data: AOPOption) => {

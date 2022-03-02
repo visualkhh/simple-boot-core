@@ -120,7 +120,7 @@ class User {
 }
 // 💥 call say()
 // sayBefore
-// say~ hello: 30
+// say~ hello
 // sayAfter
 ```
 </details>
