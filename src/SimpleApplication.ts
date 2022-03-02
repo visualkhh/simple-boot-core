@@ -36,9 +36,8 @@ export class SimpleApplication {
         return this.routerManager;
     }
 
-    protected run(otherInstanceSim?: Map<ConstructorType<any>, any>): SimpleApplication {
+    protected run(otherInstanceSim?: Map<ConstructorType<any>, any>) {
         this.simstanceManager.run(otherInstanceSim);
-        return this;
     }
 
     public publishIntent(i: string, data?: any): any[];
