@@ -49,10 +49,7 @@
     "npm-build": "rm -rf dist && tsc --sourceMap false --outDir dist --declarationDir dist && cp package.json dist && cp README.MD dist",
     "npm-publish": "npm run npm-build && npm publish ./dist",
     "tsc": "tsc",
-    "setting:root-dist": "rm -rf ../dist-simple-boot-core && mkdirp ../dist-simple-boot-core && cp package-root-dist.json ../dist-simple-boot-core/package.json",
-    "tsc:root-dist": "npm run setting:root-dist && tsc --outDir ../dist-simple-boot-core --declarationDir ../dist-simple-boot-core",
     "tsc:watch": "rm -rf ./dist && mkdir dist && cp package.json dist && tsc --watch --sourceMap true",
-    "tsc:watch:root-dist": "npm run setting:root-dist && tsc --outDir ../dist-simple-boot-core --declarationDir ../dist-simple-boot-core --watch --sourceMap true",
     "test": "jest --detectOpenHandles --forceExit"
   },
   "dependencies": {
