@@ -36,7 +36,7 @@ export class SimpleApplication {
         return this.routerManager;
     }
 
-    protected run(otherInstanceSim?: Map<ConstructorType<any>, any>) {
+    public run(otherInstanceSim?: Map<ConstructorType<any>, any>) {
         this.simstanceManager.run(otherInstanceSim);
     }
 

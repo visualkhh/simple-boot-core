@@ -11,7 +11,8 @@ export const SimMetadataKey = Symbol('Sim');
 export const Sim = (config: SimConfig = {}): GenericClassDecorator<ConstructorType<any>> => {
     return (target: ConstructorType<any>) => {
         ReflectUtils.defineMetadata(SimMetadataKey, config, target);
-        sims.add(target)
+        sims.add(target);
+        console.log('-----simstore->', target, sims)
     }
 }
 
