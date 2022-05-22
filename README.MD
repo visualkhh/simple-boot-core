@@ -277,13 +277,20 @@ new SimpleApplication(AppRouter, option).run().routing('/user').then(it => {
   path: ''
 })
 class AppRouter {
+    
   @Route({path:'/user'})
   user1() {
     console.log('user say1~')
   }
+  
   @Route({path:'/user'})
   user2() {
     console.log('user say2~')
+  }
+  
+  @Route({path:'/user-props'})
+  user2(props: string) {
+    console.log('user propss', props)
   }
 }
 
@@ -291,7 +298,13 @@ const option = new SimOption([GlobalAdvice])
 new SimpleApplication(AppRouter, option).run().routing('/user').then(it => {
   it.propertyKeys?.forEach(key => {
     it.executeModuleProperty(key);
-  })
+  });
+})
+new SimpleApplication(AppRouter, option).run().routing('/user-props').then(it => {
+  // direct call
+  let propertyKey = it.propertyKeys?.[0];
+  let moduleInstance = routerModule.getModuleInstance<(props: string) => void>(propertyKey);
+  moduleInstance('propData');
 })
 // output 💥
 // user say1~

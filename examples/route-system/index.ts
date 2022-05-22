@@ -1,5 +1,5 @@
 import {SimpleApplication} from 'simple-boot-core';
-import {Router} from 'simple-boot-core/decorators/route/Router';
+import {Route, Router} from 'simple-boot-core/decorators/route/Router';
 import {Sim} from 'simple-boot-core/decorators/SimDecorator';
 import {RouterAction} from 'simple-boot-core/route/RouterAction';
 import {Intent} from 'simple-boot-core/intent/Intent';
@@ -53,17 +53,27 @@ class Welcome {
     routers: [UsersRouter]
 })
 class AppRouter implements RouterAction {
+    name = 'appRouter-name'
+    @Route({path: '/sub-route'})
+    test(props: string) {
+        console.log('test--', props, this.name);
+    }
 
     async canActivate(url: Intent, module: any) {
         console.log('activate route: ', url, module);
     }
-
-
 }
 
 const app = new SimpleApplication(AppRouter);
 app.run();
 (async() => {
+    // route in router
+    let routerModule = await app.routing('/sub-route');
+    let propertyKey = routerModule.propertyKeys?.[0];
+    let moduleInstance = routerModule.getModuleInstance<(props: string) => void>(propertyKey);
+    moduleInstance('propData');
+
+    // router
     (await app.routing('/welcome')).getModuleInstance<Welcome>().say();
     (await app.routing('/users/office?name=newName')).getModuleInstance<Office>().sayName();
 })();

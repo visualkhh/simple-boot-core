@@ -7,11 +7,11 @@ SIMPLE-BOOT-CORE
 ### STEP 1
 * simple-boot-core build
 
-root directory
+
 ```shell
+# cd root directory
 npm run npm-build
 ```
-
 
 ### STEP 2
 ```shell

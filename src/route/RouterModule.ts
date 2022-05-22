@@ -13,8 +13,19 @@ export class RouterModule<R = SimAtomic, M = any> {
     constructor(private simstanceManager: SimstanceManager, public router?: R, public module?: ConstructorType<M>, public routerChains: R[] = []) {
     }
 
-    getModuleInstance<T = M>(): T | undefined {
-        return this.simstanceManager.getOrNewSim<T>(this.module as any);
+    getModuleInstance<T = M>(propertyKey?: string | symbol, instanceBind: boolean | any = true): T | undefined {
+        const instance = this.simstanceManager.getOrNewSim<T>(this.module as any);
+        if (propertyKey && this.propertyKeys && this.propertyKeys.includes(propertyKey)) {
+            let instanceElement = (instance as any)[propertyKey];
+            if (instanceBind && typeof instanceBind === 'boolean') {
+                instanceElement = instanceElement.bind(instance);
+            } else if (instanceBind && typeof instanceBind === 'object') {
+                instanceElement = instanceElement.bind(instanceBind);
+            }
+            return instanceElement;
+        } else {
+            return instance;
+        }
     }
 
     executeModuleProperty(propertyKey: string | symbol, ...param: any[]): any {
