@@ -16,6 +16,6 @@ export class SimAtomic<T extends Object = Object> {
     }
 
     get value(): T | undefined {
-        return this.simstanceManager?.getOrNewSim(this.type);
+        return this.simstanceManager.getOrNewSim(this.type);
     }
 }

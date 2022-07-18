@@ -9,28 +9,33 @@ import {getOnRoute, onRoutes} from '../decorators/route/OnRoute';
 export class RouterManager {
     public activeRouterModule?: RouterModule;
 
-    constructor(private simstanceManager: SimstanceManager, private rootRouter: ConstructorType<any>) {
+    constructor(private simstanceManager: SimstanceManager, private rootRouter?: ConstructorType<any>) {
     }
 
     public routingMap(prefix: string = '', router = this.rootRouter): { [key: string]: string | any } {
         const map = {} as { [key: string]: string | any };
-        const routerAtomic = new SimAtomic(router, this.simstanceManager);
-        const routerData = routerAtomic.getConfig<RouterConfig>(RouterMetadataKey);
-        if (routerData) {
-            const currentPrefix = prefix + routerData.path;
-            if (routerData.route) {
-                Object.entries(routerData.route).forEach(([key, value]) => {
-                    map[currentPrefix + key] = value;
-                });
+        if (router) {
+            const routerAtomic = new SimAtomic(router, this.simstanceManager);
+            const routerData = routerAtomic.getConfig<RouterConfig>(RouterMetadataKey);
+            if (routerData) {
+                const currentPrefix = prefix + routerData.path;
+                if (routerData.route) {
+                    Object.entries(routerData.route).forEach(([key, value]) => {
+                        map[currentPrefix + key] = value;
+                    });
+                }
+                routerData.routers?.forEach(it => {
+                    Object.assign(map, this.routingMap(currentPrefix, it));
+                })
             }
-            routerData.routers?.forEach(it => {
-                Object.assign(map, this.routingMap(currentPrefix, it));
-            })
         }
         return map;
     }
 
     public async routing(intent: Intent): Promise<RouterModule> {
+        if (!this.rootRouter) {
+            throw new Error('no root router');
+        }
         const routers: any[] = [];
         const routerAtomic = new SimAtomic(this.rootRouter, this.simstanceManager);
         const rootRouter = routerAtomic.value!;

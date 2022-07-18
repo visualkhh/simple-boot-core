@@ -14,7 +14,7 @@ export class SimpleApplication {
     public intentManager: IntentManager;
     public routerManager: RouterManager;
 
-    constructor(public rootRouter: ConstructorType<Object>, public option = new SimOption()) {
+    constructor(public rootRouter?: ConstructorType<Object>, public option = new SimOption()) {
         this.simstanceManager = new SimstanceManager(option)
         this.simstanceManager.storage.set(SimpleApplication, this);
         this.intentManager = new IntentManager(this.simstanceManager);
@@ -38,6 +38,16 @@ export class SimpleApplication {
 
     public run(otherInstanceSim?: Map<ConstructorType<any>, any>) {
         this.simstanceManager.run(otherInstanceSim);
+        return this.simstanceManager;
+    }
+
+    public simAtomic(type: ConstructorType<any>) {
+        const routerAtomic = new SimAtomic(type, this.simstanceManager);
+        return routerAtomic;
+    }
+
+    public sim(type: ConstructorType<any>) {
+        return this.simAtomic(type).value;
     }
 
     public publishIntent(i: string, data?: any): any[];
