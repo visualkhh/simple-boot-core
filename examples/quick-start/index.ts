@@ -18,7 +18,21 @@ class AppRouter {
 }
 
 const app = new SimpleApplication(AppRouter);
+// type 1
 app.run();
-app.routing('/user').then(it => {
-    it.getModuleInstance<User>()?.say();
-})
+app.sim(User).say();
+
+// type 2
+// app.run().getOrNewSim(User).say();
+
+// type 3
+// app.run();
+// const atomic = app.simAtomic(User);
+// atomic.value.say();
+
+// type 4 routing
+// app.run();
+// app.routing('/user').then(it => {
+//     it.getModuleInstance<User>()?.say();
+// })
+
