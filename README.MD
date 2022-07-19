@@ -33,9 +33,26 @@ class User {
 @Sim() @Router({ path: '', route: {'/user': User}})
 class AppRouter {}
 
-new SimpleApplication(AppRouter).run().routing('/user').then(it => {
-  it.getModuleInstance<User>()?.say();
-})
+const app = new SimpleApplication(AppRouter);
+
+// type 1
+app.run();
+app.sim(User).say();
+
+// type 2
+// app.run().getOrNewSim(User).say();
+
+// type 3
+// app.run();
+// const atomic = app.simAtomic(User);
+// atomic.value.say();
+
+// type 4 routing
+// app.run();
+// app.routing('/user').then(it => {
+//     it.getModuleInstance<User>()?.say();
+// })
+
 ```
 ```shell
 npx ts-node index.ts
