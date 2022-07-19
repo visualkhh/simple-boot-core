@@ -1,4 +1,3 @@
-import {Runnable} from './run/Runnable';
 import {SimstanceManager} from './simstance/SimstanceManager';
 import {SimOption} from './SimOption';
 import {IntentManager} from './intent/IntentManager';
@@ -13,8 +12,19 @@ export class SimpleApplication {
     public simstanceManager: SimstanceManager;
     public intentManager: IntentManager;
     public routerManager: RouterManager;
-
-    constructor(public rootRouter?: ConstructorType<Object>, public option = new SimOption()) {
+    public rootRouter?: ConstructorType<Object>;
+    public option: SimOption;
+    constructor();
+    constructor(option: SimOption);
+    constructor(rootRouter?: ConstructorType<Object>);
+    constructor(rootRouter?: ConstructorType<Object>, option?: SimOption);
+    constructor(rootRouter?: ConstructorType<Object> | SimOption, option = new SimOption()) {
+        if (rootRouter instanceof SimOption) {
+            option = rootRouter;
+        } else if (typeof rootRouter === 'function') {
+            this.rootRouter = rootRouter;
+        }
+        this.option = option;
         this.simstanceManager = new SimstanceManager(option)
         this.simstanceManager.storage.set(SimpleApplication, this);
         this.intentManager = new IntentManager(this.simstanceManager);
