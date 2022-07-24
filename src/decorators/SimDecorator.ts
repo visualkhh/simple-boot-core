@@ -8,12 +8,21 @@ export interface SimConfig {
 }
 
 export const SimMetadataKey = Symbol('Sim');
-export const Sim = (config: SimConfig = {}): GenericClassDecorator<ConstructorType<any>> => {
-    return (target: ConstructorType<any>) => {
-        ReflectUtils.defineMetadata(SimMetadataKey, config, target);
-        sims.add(target);
+
+export function Sim (target: ConstructorType<any>): void ;
+export function Sim (config: SimConfig): GenericClassDecorator<ConstructorType<any>>;
+export function Sim (config: SimConfig | ConstructorType<any>): void | GenericClassDecorator<ConstructorType<any>>  {
+    if (typeof config === 'function') {
+        ReflectUtils.defineMetadata(SimMetadataKey, {}, config);
+        sims.add(config);
+    } else {
+        return (target: ConstructorType<any>) => {
+            ReflectUtils.defineMetadata(SimMetadataKey, config, target);
+            sims.add(target);
+        }
     }
 }
+
 
 export const getSim = (target: ConstructorType<any> | Function | any): SimConfig | undefined => {
     if (null != target && undefined != target && typeof target === 'object') {
