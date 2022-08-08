@@ -2,14 +2,14 @@ import {SimpleApplication} from 'simple-boot-core';
 import {Router} from 'simple-boot-core/decorators/route/Router';
 import {Sim} from 'simple-boot-core/decorators/SimDecorator';
 
-@Sim()
+@Sim
 class User {
     say() {
         console.log('say~ hello');
     }
 }
 
-@Sim()
+@Sim
 @Router({
     path: '',
     route: {'/user': User}

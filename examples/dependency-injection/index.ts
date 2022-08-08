@@ -2,14 +2,14 @@ import {SimpleApplication} from 'simple-boot-core';
 import {Router} from 'simple-boot-core/decorators/route/Router';
 import {Sim} from 'simple-boot-core/decorators/SimDecorator';
 
-@Sim()
+@Sim
 class ProjectService {
     sum(x: number, y: number){
         return x + y;
     }
 }
 
-@Sim()
+@Sim
 class User {
 
     constructor(private projectService: ProjectService) {
@@ -20,7 +20,7 @@ class User {
     }
 }
 
-@Sim()
+@Sim
 @Router({
     path: '',
     route: {'/user': User}
@@ -28,9 +28,14 @@ class User {
 class AppRouter {
 }
 
-const app = new SimpleApplication(AppRouter);
+const app = new SimpleApplication();
 app.run();
-app.routing('/user').then(it => {
-    const sum = it.getModuleInstance<User>()?.sum(1, 5);
-    console.log(`sum: ${sum}`);
-})
+const sum = app.sim(User).sum(1,3);
+console.log(sum)
+
+// const app = new SimpleApplication(AppRouter);
+// app.run();
+// app.routing('/user').then(it => {
+//     const sum = it.getModuleInstance<User>()?.sum(1, 5);
+//     console.log(`sum: ${sum}`);
+// })

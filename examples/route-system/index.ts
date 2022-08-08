@@ -6,7 +6,7 @@ import {Intent} from 'simple-boot-core/intent/Intent';
 import {OnRoute} from 'simple-boot-core/decorators/route/OnRoute';
 import {RouterModule} from 'simple-boot-core/route/RouterModule';
 
-@Sim()
+@Sim
 class Office {
     name = 'oldName'
     sayName() {
@@ -20,7 +20,7 @@ class Office {
     }
 }
 
-@Sim()
+@Sim
 @Router({
     path: '/users',
     route: {'/office': Office}
@@ -36,9 +36,7 @@ class UsersRouter implements RouterAction {
     }
 }
 
-
-
-@Sim()
+@Sim
 class Welcome {
 
     say() {
@@ -46,7 +44,7 @@ class Welcome {
     }
 }
 
-@Sim()
+@Sim
 @Router({
     path: '',
     route: {'/welcome': Welcome},

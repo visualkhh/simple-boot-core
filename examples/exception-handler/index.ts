@@ -13,7 +13,7 @@ class GlobalError {
     }
 }
 
-@Sim()
+@Sim
 class GlobalAdvice {
     @ExceptionHandler()
     otherException(@Inject({situationType: ExceptionHandlerSituationType.ERROR_OBJECT}) e: any) {
@@ -33,7 +33,7 @@ class GlobalAdvice {
 
 
 
-@Sim()
+@Sim
 class User {
     // @ExceptionHandler({throw: true})
     // otherException(@Inject({situationType: ExceptionHandlerSituationType.ERROR_OBJECT}) e: any) {
