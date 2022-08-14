@@ -52,16 +52,29 @@ export class RouterManager {
                     }
                 }
             }
-            this.activeRouterModule = executeModule
-            // not found page
+            this.activeRouterModule = executeModule;
+
+            // not found page TODO: notFound 로직 처리해야될듯.? 아래는 임시방편
             if (!executeModule?.module) {
                 const routerChain = executeModule.routerChains[executeModule.routerChains.length - 1] as any;
                 await routerChain?.value?.canActivate?.(intent, executeModule.getModuleInstance());
             } else { // find page
-                await (executeModule.router?.value! as any)?.canActivate?.(intent, executeModule.getModuleInstance());
+                let module = null;
+                // 페이지를 찾았지만도 property쪽에 @Route로 지정된거 있을시.. 그거 첫번째껄로 처리한다.
+                if (executeModule && executeModule.propertyKeys && executeModule.propertyKeys.length) {
+                    const ep = executeModule.executeModuleProperty(executeModule.propertyKeys[0]);
+                    if (typeof ep === 'function') {
+                        module = this.simstanceManager.getOrNewSim<any>(ep);
+                    } else {
+                        module = ep;
+                    }
+                } else {
+                    module = executeModule.getModuleInstance();
+                }
+                await (executeModule.router?.value! as any)?.canActivate?.(intent, module);
             }
-            this.activeRouterModule = executeModule;
 
+            // 라우팅 완료된 후 호출 되어야 할 decoration TODO: 리펙토링 필요
             const otherStorage = new Map<ConstructorType<any>, any>();
             otherStorage.set(Intent, intent);
             otherStorage.set(RouterModule, executeModule);
@@ -129,7 +142,7 @@ export class RouterManager {
         }
     }
 
-    private isRootUrl(path: string, parentRoots: string[], url: string): boolean {
+    private isRootUrl(path: string | undefined, parentRoots: string[], url: string): boolean {
         return url.startsWith(parentRoots.join('') + (path || ''))
     }
 

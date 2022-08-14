@@ -1,4 +1,4 @@
-import "reflect-metadata"
+import 'reflect-metadata'
 import {ConstructorType, GenericClassDecorator} from '../../types/Types'
 import {ReflectUtils} from '../../utils/reflect/ReflectUtils';
 
@@ -14,7 +14,7 @@ export const Injectable = (config?: InjectableConfig): GenericClassDecorator<Con
 }
 
 export const getInjectable = (target: ConstructorType<any> | Function | any): InjectableConfig | undefined => {
-    if (null != target && undefined != target && typeof target === 'object') {
+    if (target != null && target !== undefined && typeof target === 'object') {
         target = target.constructor;
     }
     try {

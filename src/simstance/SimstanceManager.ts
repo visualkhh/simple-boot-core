@@ -1,4 +1,4 @@
-import "reflect-metadata"
+import 'reflect-metadata'
 import {ConstructorType} from '../types/Types'
 import {SimNoSuch} from '../throwable/SimNoSuch'
 import {getPostConstruct, getSim, PostConstruct, sims} from '../decorators/SimDecorator';
@@ -126,7 +126,7 @@ export class SimstanceManager implements Runnable {
     }
 
     public async executeBindParameterSimPromise({target, targetKey, firstCheckMaker}: { target: Object, targetKey?: string | symbol, firstCheckMaker?: FirstCheckMaker[] },
-                                                otherStorage?: Map<ConstructorType<any>, any>) {
+        otherStorage?: Map<ConstructorType<any>, any>) {
         let value = this.executeBindParameterSim({target, targetKey, firstCheckMaker}, otherStorage);
         if (value instanceof Promise) {
             value = await value;
@@ -135,7 +135,7 @@ export class SimstanceManager implements Runnable {
     }
 
     public executeBindParameterSim({target, targetKey, firstCheckMaker}: { target: Object, targetKey?: string | symbol, firstCheckMaker?: FirstCheckMaker[] },
-                                   otherStorage?: Map<ConstructorType<any>, any>) {
+        otherStorage?: Map<ConstructorType<any>, any>) {
         const binds = this.getParameterSim({target, targetKey, firstCheckMaker}, otherStorage);
         if (typeof target === 'object' && targetKey) {
             const targetMethod = (target as any)[targetKey];
@@ -146,14 +146,16 @@ export class SimstanceManager implements Runnable {
     }
 
     public getParameterSim({target, targetKey, firstCheckMaker}: { target: Object, targetKey?: string | symbol, firstCheckMaker?: FirstCheckMaker[] },
-                           otherStorage?: Map<ConstructorType<any>, any>): any[] {
+        otherStorage?: Map<ConstructorType<any>, any>): any[] {
         const paramTypes = ReflectUtils.getParameterTypes(target, targetKey);
         const paramNames = FunctionUtils.getParameterNames(target, targetKey);
         let injections = [];
         const injects = getInject(target, targetKey);
         injections = paramTypes.map((token: ConstructorType<any>, idx: number) => {
             const saveInject = injects?.find(it => it.index === idx);
-
+            if (saveInject?.config.disabled) {
+                return undefined;
+            }
             for (const f of firstCheckMaker ?? []) {
                 const firstCheckObj = f({target, targetKey}, token, idx, saveInject);
                 if (undefined !== firstCheckObj) {

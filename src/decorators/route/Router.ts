@@ -5,23 +5,36 @@ export type RouteTargetMethod = {target: ConstructorType<Object>, propertyKeys: 
 export type RouteProperty = ConstructorType<Object> | [ConstructorType<Object>, any] | RouteTargetMethod | string;
 export type Route = {[name: string]: RouteProperty};
 export interface RouterConfig {
-    path: string;
+    path?: string;
     route?: Route;
     routers?: ConstructorType<Object>[];
 }
 
 export const RouterMetadataKey = Symbol('Router');
-export const Router = (config: RouterConfig): GenericClassDecorator<ConstructorType<any>> => {
-    return (target: ConstructorType<any>) => {
-        (getRoutes(target) ?? []).forEach(it => {
-            config.route = (config.route ?? {})
-            if (config.route[it.config.path]) {
-                (config.route[it.config.path] as RouteTargetMethod).propertyKeys.push(it.propertyKey);
-            } else {
-                config.route[it.config.path] = {target, propertyKeys: [it.propertyKey]} as RouteTargetMethod;
-            }
-        });
-        ReflectUtils.defineMetadata(RouterMetadataKey, config, target);
+const routerProcess = (config: RouterConfig, target: ConstructorType<any>) => {
+    getRoutes(target)?.forEach(it => {
+        config.route = (config.route ?? {})
+        if (config.route[it.config.path]) {
+            (config.route[it.config.path] as RouteTargetMethod).propertyKeys.push(it.propertyKey);
+        } else {
+            config.route[it.config.path] = {target, propertyKeys: [it.propertyKey]} as RouteTargetMethod;
+        }
+    });
+    ReflectUtils.defineMetadata(RouterMetadataKey, config, target);
+}
+export function Router(target: ConstructorType<any>): void;
+export function Router(config: RouterConfig): GenericClassDecorator<ConstructorType<any>>;
+export function Router(config: RouterConfig | ConstructorType<any>): void | GenericClassDecorator<ConstructorType<any>> {
+    if (typeof config === 'function') {
+        const routerConfig: RouterConfig = {
+            path: ''
+        }
+        routerProcess(routerConfig, config);
+    } else {
+        return (target: ConstructorType<any>) => {
+            config.path = config.path ?? '';
+            routerProcess(config, target);
+        }
     }
 }
 

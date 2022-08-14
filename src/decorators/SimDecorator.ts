@@ -1,4 +1,4 @@
-import "reflect-metadata"
+import 'reflect-metadata'
 import {ConstructorType, GenericClassDecorator, ReflectMethod} from '../types/Types'
 import {ReflectUtils} from '../utils/reflect/ReflectUtils';
 
@@ -8,10 +8,9 @@ export interface SimConfig {
 }
 
 export const SimMetadataKey = Symbol('Sim');
-
-export function Sim (target: ConstructorType<any>): void ;
-export function Sim (config: SimConfig): GenericClassDecorator<ConstructorType<any>>;
-export function Sim (config: SimConfig | ConstructorType<any>): void | GenericClassDecorator<ConstructorType<any>>  {
+export function Sim(target: ConstructorType<any>): void;
+export function Sim(config: SimConfig): GenericClassDecorator<ConstructorType<any>>;
+export function Sim(config: SimConfig | ConstructorType<any>): void | GenericClassDecorator<ConstructorType<any>> {
     if (typeof config === 'function') {
         ReflectUtils.defineMetadata(SimMetadataKey, {}, config);
         sims.add(config);
@@ -23,14 +22,12 @@ export function Sim (config: SimConfig | ConstructorType<any>): void | GenericCl
     }
 }
 
-
 export const getSim = (target: ConstructorType<any> | Function | any): SimConfig | undefined => {
-    if (null != target && undefined != target && typeof target === 'object') {
+    if (target != null && target !== undefined && typeof target === 'object') {
         target = target.constructor;
     }
     try { return ReflectUtils.getMetadata(SimMetadataKey, target); } catch (e) {}
 }
-
 
 const PostConstructMetadataKey = Symbol('PostConstruct');
 export const PostConstruct = (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
