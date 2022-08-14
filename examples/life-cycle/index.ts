@@ -3,7 +3,7 @@ import {Router} from 'simple-boot-core/decorators/route/Router';
 import {Sim} from 'simple-boot-core/decorators/SimDecorator';
 import {OnSimCreate} from '../../src/lifecycle/OnSimCreate';
 
-@Sim()
+@Sim
 class User implements OnSimCreate{
     name = 'old name';
     constructor() {

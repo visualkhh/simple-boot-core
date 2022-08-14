@@ -19,19 +19,21 @@ class User {
         return this.projectService.sum(x, y);
     }
 }
-
-@Sim
-@Router({
-    path: '',
-    route: {'/user': User}
-})
-class AppRouter {
-}
-
 const app = new SimpleApplication();
 app.run();
 const sum = app.sim(User).sum(1,3);
 console.log(sum)
+
+
+
+// @Sim
+// @Router({
+//     path: '',
+//     route: {'/user': User}
+// })
+// class AppRouter {
+// }
+
 
 // const app = new SimpleApplication(AppRouter);
 // app.run();

@@ -4,7 +4,7 @@ import {Sim} from 'simple-boot-core/decorators/SimDecorator';
 import {OnSimCreate} from '../../src/lifecycle/OnSimCreate';
 import {After, Around, Before} from 'simple-boot-core/decorators/aop/AOPDecorator';
 
-@Sim()
+@Sim
 class User {
 
     @Before({property: 'sayName'})

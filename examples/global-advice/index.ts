@@ -9,7 +9,7 @@ import {Inject} from 'simple-boot-core/decorators/inject/Inject';
 import {SimOption} from 'simple-boot-core/SimOption';
 import {After, Before} from 'simple-boot-core/decorators/aop/AOPDecorator';
 
-@Sim()
+@Sim
 class User {
     sayName() {
         console.log('My name is visualkhh');
