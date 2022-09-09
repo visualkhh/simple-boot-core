@@ -1,3 +1,4 @@
+import 'reflect-metadata'
 import {SimstanceManager} from './simstance/SimstanceManager';
 import {SimOption} from './SimOption';
 import {IntentManager} from './intent/IntentManager';
@@ -6,7 +7,7 @@ import {Intent} from './intent/Intent';
 import {ConstructorType} from './types/Types';
 import {RouterModule} from './route/RouterModule';
 import {SimAtomic} from './simstance/SimAtomic';
-import 'reflect-metadata'
+import {SimNoSuch} from './throwable/SimNoSuch';
 
 export class SimpleApplication {
     public simstanceManager: SimstanceManager;
@@ -51,12 +52,21 @@ export class SimpleApplication {
         return this.simstanceManager;
     }
 
-    public simAtomic(type: ConstructorType<any>) {
-        const routerAtomic = new SimAtomic(type, this.simstanceManager);
+    public simAtomic<T>(type: ConstructorType<T>) {
+        const routerAtomic = new SimAtomic<T>(type, this.simstanceManager);
         return routerAtomic;
     }
 
-    public sim(type: ConstructorType<any>) {
+    public getInstance<T>(type: ConstructorType<T>) {
+        const i = this.sim<T>(type);
+        if (i) {
+            return i;
+        } else {
+            throw new SimNoSuch('SimNoSuch: no simple instance. ' + 'name:' + type?.prototype?.constructor?.name + ',' + type)
+        }
+    }
+
+    public sim<T>(type: ConstructorType<T>) {
         return this.simAtomic(type).value;
     }
 

@@ -54,7 +54,7 @@ export class RouterManager {
             }
             this.activeRouterModule = executeModule;
 
-            // not found page TODO: notFound 로직 처리해야될듯.? 아래는 임시방편
+            // not found page TODO: notFound 됐을때 처음 router있을시 canActivate 호출
             if (!executeModule?.module) {
                 const routerChain = executeModule.routerChains[executeModule.routerChains.length - 1] as any;
                 await routerChain?.value?.canActivate?.(intent, executeModule.getModuleInstance());
