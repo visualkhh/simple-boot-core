@@ -3,7 +3,7 @@ import { SimMetadataKey } from '../decorators/SimDecorator';
 import { SimstanceManager } from './SimstanceManager';
 import { ReflectUtils } from '../utils/reflect/ReflectUtils';
 
-export class SimAtomic<T extends Object = Object> {
+export class SimAtomic<T = object> {
     constructor(public type: ConstructorType<T>, private simstanceManager: SimstanceManager) {
     }
 
