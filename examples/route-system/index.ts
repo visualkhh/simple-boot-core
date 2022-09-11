@@ -5,6 +5,7 @@ import {RouterAction} from 'simple-boot-core/route/RouterAction';
 import {Intent} from 'simple-boot-core/intent/Intent';
 import {OnRoute} from 'simple-boot-core/decorators/route/OnRoute';
 import {RouterModule} from 'simple-boot-core/route/RouterModule';
+import {SimOption} from 'simple-boot-core/SimOption';
 
 @Sim
 class Office {
@@ -53,8 +54,8 @@ class Welcome {
 class AppRouter implements RouterAction {
     name = 'appRouter-name'
     @Route({path: '/sub-route'})
-    test(props: string) {
-        console.log('test--', props, this.name);
+    test(props: string, simOption: SimOption) {
+        console.log('test--', props, simOption, this.name);
     }
 
     async canActivate(url: Intent, module: any) {
@@ -67,11 +68,12 @@ app.run();
 (async() => {
     // route in router
     let routerModule = await app.routing('/sub-route');
+    // console.log('---?', routerModule)
     let propertyKey = routerModule.propertyKeys?.[0];
     let moduleInstance = routerModule.getModuleInstance<(props: string) => void>(propertyKey);
     moduleInstance('propData');
-
-    // router
-    (await app.routing('/welcome')).getModuleInstance<Welcome>().say();
-    (await app.routing('/users/office?name=newName')).getModuleInstance<Office>().sayName();
+    //
+    // // router
+    // (await app.routing('/welcome')).getModuleInstance<Welcome>().say();
+    // (await app.routing('/users/office?name=newName')).getModuleInstance<Office>().sayName();
 })();

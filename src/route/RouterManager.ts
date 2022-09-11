@@ -60,12 +60,13 @@ export class RouterManager {
                 await routerChain?.value?.canActivate?.(intent, executeModule.getModuleInstance());
             } else { // find page
                 let module = null;
-                // 페이지를 찾았지만도 property쪽에 @Route로 지정된거 있을시.. 그거 첫번째껄로 처리한다.
-                if (executeModule && executeModule.propertyKeys && executeModule.propertyKeys.length) {
-                    module = executeModule.executeModuleProperty(executeModule.propertyKeys[0]);
-                } else {
-                    module = executeModule.getModuleInstance();
-                }
+                // 페이지를 찾았지만도 property쪽에 @Route로 지정된거 있을시.. 그거 첫번째껄로 처리한다. TODO: 왜 호출해야되지?
+                // if (executeModule && executeModule.propertyKeys && executeModule.propertyKeys.length) {
+                //     module = executeModule.executeModuleProperty(executeModule.propertyKeys[0]);
+                // } else {
+                //     module = executeModule.getModuleInstance();
+                // }
+                module = executeModule.getModuleInstance();
                 await (executeModule.router?.value! as any)?.canActivate?.(intent, module);
             }
 
