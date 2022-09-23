@@ -13,27 +13,31 @@ export interface RouterConfig {
 export const RouterMetadataKey = Symbol('Router');
 const routerProcess = (config: RouterConfig, target: ConstructorType<any>) => {
     getRoutes(target)?.forEach(it => {
-        config.route = (config.route ?? {})
-        if (config.route[it.config.path]) {
-            (config.route[it.config.path] as RouteTargetMethod).propertyKeys.push(it.propertyKey);
-        } else {
-            config.route[it.config.path] = {target, propertyKeys: [it.propertyKey]} as RouteTargetMethod;
+        config.route = (config.route ?? {});
+        const paths = Array.isArray(it.config.path) ? it.config.path : [it.config.path];
+        for (let path of paths) {
+            if (config.route[path]) {
+                (config.route[path] as RouteTargetMethod).propertyKeys.push(it.propertyKey);
+            } else {
+                config.route[path] = {target, propertyKeys: [it.propertyKey]} as RouteTargetMethod;
+            }
+
         }
     });
     ReflectUtils.defineMetadata(RouterMetadataKey, config, target);
 }
 export function Router(target: ConstructorType<any>): void;
 export function Router(config: RouterConfig): GenericClassDecorator<ConstructorType<any>>;
-export function Router(config: RouterConfig | ConstructorType<any>): void | GenericClassDecorator<ConstructorType<any>> {
-    if (typeof config === 'function') {
+export function Router(configOrTarget: RouterConfig | ConstructorType<any>): void | GenericClassDecorator<ConstructorType<any>> {
+    if (typeof configOrTarget === 'function') {
         const routerConfig: RouterConfig = {
             path: ''
         }
-        routerProcess(routerConfig, config);
+        routerProcess(routerConfig, configOrTarget);
     } else {
         return (target: ConstructorType<any>) => {
-            config.path = config.path ?? '';
-            routerProcess(config, target);
+            configOrTarget.path = configOrTarget.path ?? '';
+            routerProcess(configOrTarget, target);
         }
     }
 }
@@ -45,7 +49,7 @@ export const getRouter = (target: ConstructorType<any> | Function | any): Router
     try { return ReflectUtils.getMetadata(RouterMetadataKey, target); } catch (e) {}
 }
 
-type RouteConfig = { path: string }
+type RouteConfig = { path: string | string[] }
 export type SaveRouteConfig = { propertyKey: string | symbol; method: Function; config: RouteConfig; }
 export const RouteMetadataKey = Symbol('RouteMetadataKey');
 export const Route = (config: RouteConfig): ReflectMethod => {

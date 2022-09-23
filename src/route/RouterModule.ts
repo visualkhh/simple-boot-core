@@ -3,6 +3,7 @@ import {SimAtomic} from '../simstance/SimAtomic';
 import {Intent} from '../intent/Intent';
 import {SimstanceManager} from '../simstance/SimstanceManager';
 import {getInjection} from '../decorators/inject/Injection';
+import { MethodNoSuch } from '../throwable/MethodNoSuch';
 
 export class RouterModule<R = SimAtomic, M = any> {
     public pathData?: { [name: string]: string };
@@ -37,7 +38,11 @@ export class RouterModule<R = SimAtomic, M = any> {
                 param.forEach(it => other.set(it.constructor, it));
                 return this.simstanceManager.executeBindParameterSim({target, targetKey: propertyKey}, other)
             } else {
-                return target[propertyKey](...param);
+                if (target[propertyKey]) {
+                    return target[propertyKey]?.(...param);
+                } else {
+                    throw new MethodNoSuch(`${propertyKey.toString()} noSuch`, propertyKey.toString(), propertyKey)
+                }
             }
         }
     }

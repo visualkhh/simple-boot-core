@@ -6,6 +6,8 @@ import {Intent} from 'simple-boot-core/intent/Intent';
 import {OnRoute} from 'simple-boot-core/decorators/route/OnRoute';
 import {RouterModule} from 'simple-boot-core/route/RouterModule';
 import {SimOption} from 'simple-boot-core/SimOption';
+import { Injection } from 'simple-boot-core/decorators/inject/Injection';
+import { Inject } from 'simple-boot-core/decorators/inject/Inject';
 
 @Sim
 class Office {
@@ -53,25 +55,42 @@ class Welcome {
 })
 class AppRouter implements RouterAction {
     name = 'appRouter-name'
-    @Route({path: '/sub-route'})
-    test(props: string, simOption: SimOption) {
+
+    @Injection
+    @Route({path: ['/sub-route', '/ss', '/zz']})
+    test(@Inject({disabled: true})props: string, simOption: SimOption) {
         console.log('test--', props, simOption, this.name);
     }
 
     async canActivate(url: Intent, module: any) {
-        console.log('activate route: ', url, module);
+        // console.log('activate route: ', url, module);
     }
 }
-
-const app = new SimpleApplication(AppRouter);
+const option = new SimOption();
+const app = new SimpleApplication(AppRouter, option);
 app.run();
 (async() => {
     // route in router
     let routerModule = await app.routing('/sub-route');
     // console.log('---?', routerModule)
     let propertyKey = routerModule.propertyKeys?.[0];
-    let moduleInstance = routerModule.getModuleInstance<(props: string) => void>(propertyKey);
-    moduleInstance('propData');
+    console.log('key-->', propertyKey);
+    // let moduleInstance = routerModule.getModuleInstance<(props: string) => void>(propertyKey);
+    // moduleInstance('propData');
+    routerModule.executeModuleProperty(propertyKey);
+
+
+    // route in router
+    routerModule = await app.routing('/zz');
+    propertyKey = routerModule.propertyKeys?.[0];
+    routerModule.executeModuleProperty(propertyKey)
+
+    // route in router
+    routerModule = await app.routing('/ss');
+    propertyKey = routerModule.propertyKeys?.[0];
+    routerModule.executeModuleProperty(propertyKey)
+
+
     //
     // // router
     // (await app.routing('/welcome')).getModuleInstance<Welcome>().say();
