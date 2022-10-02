@@ -7,7 +7,7 @@ import {SimstanceManager} from '../simstance/SimstanceManager';
 import {getOnRoute, onRoutes} from '../decorators/route/OnRoute';
 
 export class RouterManager {
-    public activeRouterModule?: RouterModule;
+    public activeRouterModule?: RouterModule<SimAtomic, any>;
 
     constructor(private simstanceManager: SimstanceManager, private rootRouter?: ConstructorType<any>) {
     }
@@ -32,7 +32,7 @@ export class RouterManager {
         return map;
     }
 
-    public async routing(intent: Intent): Promise<RouterModule> {
+    public async routing<R = SimAtomic, M = any>(intent: Intent): Promise<RouterModule<R, M>> {
         if (!this.rootRouter) {
             throw new Error('no root router');
         }
@@ -93,7 +93,7 @@ export class RouterManager {
                     // skip catch
                 }
             }
-            return this.activeRouterModule;
+            return this.activeRouterModule as RouterModule<any, any>;
         } else {
             if (routers.length && routers.length > 0) {
                 for (let i = 0; i < routers.length; i++) {
@@ -105,7 +105,7 @@ export class RouterManager {
             }
             const routerModule = new RouterModule(this.simstanceManager, rootRouter, undefined, routers);
             this.activeRouterModule = routerModule;
-            return this.activeRouterModule;
+            return this.activeRouterModule as RouterModule<any, any>;
         }
     }
 

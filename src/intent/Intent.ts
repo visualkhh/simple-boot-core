@@ -73,7 +73,7 @@ export class Intent<T = any, E = any> {
                 }
                 continue;
             }
-            //regex check
+            // regex check
             const [name, regex] = execResult[1].split(':'); // group1
             if (regex && !new RegExp(regex).test(urlit)) {
                 return;

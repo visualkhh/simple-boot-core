@@ -80,13 +80,13 @@ export class SimpleApplication {
         }
     }
 
-    public routing<R = SimAtomic, M = any>(i: string, data?: any): Promise<RouterModule>;
-    public routing<R = SimAtomic, M = any>(i: Intent): Promise<RouterModule>;
-    public routing<R = SimAtomic, M = any>(i: Intent | string, data?: any): Promise<RouterModule> {
+    public routing<R = SimAtomic, M = any>(i: string, data?: any): Promise<RouterModule<R, M>>;
+    public routing<R = SimAtomic, M = any>(i: Intent): Promise<RouterModule<R, M>>;
+    public routing<R = SimAtomic, M = any>(i: Intent | string, data?: any): Promise<RouterModule<R, M>> {
         if (i instanceof Intent) {
-            return this.routerManager.routing(i);
+            return this.routerManager.routing<R, M>(i);
         } else {
-            return this.routerManager.routing(new Intent(i, data));
+            return this.routerManager.routing<R, M>(new Intent(i, data));
         }
     }
 }

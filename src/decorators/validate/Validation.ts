@@ -4,22 +4,22 @@ const ValidMetadataKey = Symbol('ValidMetadataKey');
 export const Valid: MethodParameter = (target: Object, propertyKey: string | symbol | undefined, parameterIndex: number) => {
     if (propertyKey && typeof target === 'object') { // <-- object: method
         target = target.constructor;
-        let existingRequiredParameters: number[] = Reflect.getOwnMetadata(ValidMetadataKey, target, propertyKey) || [];
+        const existingRequiredParameters: number[] = Reflect.getOwnMetadata(ValidMetadataKey, target, propertyKey) || [];
         existingRequiredParameters.push(parameterIndex);
         Reflect.defineMetadata(ValidMetadataKey, existingRequiredParameters, target, propertyKey);
     } else if (!propertyKey || typeof target === 'function') { // <-- function: constructor
-        let existingRequiredParameters: number[] = Reflect.getOwnMetadata(ValidMetadataKey, target) || [];
+        const existingRequiredParameters: number[] = Reflect.getOwnMetadata(ValidMetadataKey, target) || [];
         existingRequiredParameters.push(parameterIndex);
         Reflect.defineMetadata(ValidMetadataKey, existingRequiredParameters, target);
     }
 }
 
 export const getValidIndex = (target: ConstructorType<any> | Function | any, propertyKey?: string | symbol): number[] => {
-    if (null != target && undefined != target && typeof target === 'object') {
+    if (target !== null && undefined !== target && typeof target === 'object') {
         target = target.constructor;
     }
     if (propertyKey) {
-        let parameters: number[] = Reflect.getOwnMetadata(ValidMetadataKey, target, propertyKey);
+        const parameters: number[] = Reflect.getOwnMetadata(ValidMetadataKey, target, propertyKey);
         return parameters ?? [];
     } else {
         return ReflectUtils.getMetadata(ValidMetadataKey, target) ?? [];
@@ -55,7 +55,6 @@ export const getValidators = (target: any): SaveValidator[] => {
     return ReflectUtils.getMetadata(ValidationMetadataKey, target);
 }
 
-
 export const Regexp = (regexp: RegExp) => {
     const content: Validator = (value: any, ...params: any[]) => {
         return regexp.test(value);
@@ -70,7 +69,6 @@ export const NotNull: Validator = (value: any, ...params: any[]) => {
 export const NotEmpty: Validator = (value: any, ...params: any[]) => {
     return value !== null && value !== undefined && (typeof value === 'string' && value.length > 0 || Array.isArray(value) && value.length > 0);
 }
-
 
 export type ValidationResult = {
     name: string;

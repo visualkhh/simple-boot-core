@@ -66,7 +66,7 @@ export class SimProxyHandler implements ProxyHandler<any> {
             e = es;
         }
         if (inHandler.config.config.throw) {
-            let exceptionHandler = this.getExceptionHandler(e, inHandler.thisArg, inHandler.config.method);
+            const exceptionHandler = this.getExceptionHandler(e, inHandler.thisArg, inHandler.config.method);
             if ((exceptionHandler?.length ?? 0) > 0) {
                 this.executeExceptionHandler(e, argumentsList, exceptionHandler[0]);
             }

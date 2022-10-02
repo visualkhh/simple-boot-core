@@ -2,7 +2,7 @@ import 'reflect-metadata'
 import {ReflectUtils} from '../../utils/reflect/ReflectUtils';
 
 export interface EventListenerOption {
-    target: string|any;
+    target: string | any;
     name: string;
 }
 const EventListenerMetadataKey = Symbol('EventListener');

@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import {ConstructorType, GenericClassDecorator, ReflectMethod} from '../types/Types'
+import {ConstructorType, GenericClassDecorator} from '../types/Types'
 import {ReflectUtils} from '../utils/reflect/ReflectUtils';
 
 export const sims = new Set<ConstructorType<any>>();

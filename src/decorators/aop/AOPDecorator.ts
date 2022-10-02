@@ -76,9 +76,9 @@ export const Around = (config: AroundOption):  ReflectMethod => {
             }
 
             if (config.after) {
-                try{
+                try {
                     r = config.after?.(this, propertyKey, args, r);
-                } catch (e){
+                } catch (e) {
                     if (e instanceof AroundForceReturn) {
                         return e.value;
                     }
