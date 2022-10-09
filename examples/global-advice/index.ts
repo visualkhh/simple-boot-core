@@ -22,7 +22,7 @@ class User {
     }
 }
 
-@Sim()
+@Sim
 @Router({
     path: '',
     route: {'/user': User}
@@ -30,7 +30,7 @@ class User {
 class AppRouter {
 }
 
-@Sim()
+@Sim
 class GlobalAdvice {
     @ExceptionHandler()
     otherException(@Inject({situationType: ExceptionHandlerSituationType.ERROR_OBJECT}) e: any) {

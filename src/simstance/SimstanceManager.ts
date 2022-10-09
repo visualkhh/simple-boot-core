@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import {ConstructorType} from '../types/Types'
 import {SimNoSuch} from '../throwable/SimNoSuch'
-import {getPostConstruct, getSim, PostConstruct, sims} from '../decorators/SimDecorator';
+import {getPostConstruct, getSim, sims} from '../decorators/SimDecorator';
 import {Runnable} from '../run/Runnable';
 import {ObjectUtils} from '../utils/object/ObjectUtils';
 import {SimAtomic} from './SimAtomic';
@@ -14,18 +14,18 @@ import {SimProxyHandler} from '../proxy/SimProxyHandler';
 export type FirstCheckMaker = (obj: { target: Object, targetKey?: string | symbol }, token: ConstructorType<any>, idx: number, saveInjectConfig?: SaveInjectConfig) => any | undefined;
 
 export class SimstanceManager implements Runnable {
-    private _storage = new Map<ConstructorType<any>, any>()
+    private _storage = new Map<ConstructorType<any>, Map<ConstructorType<any>, undefined | any>>()
     private simProxyHandler: SimProxyHandler;
     private otherInstanceSim?: Map<ConstructorType<any>, any>;
 
     constructor(private option: SimOption) {
-        this._storage.set(SimstanceManager, this);
-        this._storage.set((option as any).constructor, option);
-        this._storage.set(SimOption, option);
+        this.set(SimstanceManager, this);
+        this.set((option as any).constructor, option);
+        this.set(SimOption, option);
         this.simProxyHandler = new SimProxyHandler(this, option);
     }
 
-    get storage(): Map<ConstructorType<any>, any> {
+    get storage() {
         return this._storage
     }
 
@@ -50,58 +50,78 @@ export class SimstanceManager implements Runnable {
         }
     }
 
-    getOrNewSim<T>(k?: ConstructorType<T>): T | undefined {
-        if (k) {
-            let newVar = this.storage.get(k)
-            if (!newVar) {
-                newVar = this.resolve(k)
+    getStoreSets<T>(targetKey: ConstructorType<T>): {type: ConstructorType<T>, instance?: T} [] {
+        const map = this.storage.get(targetKey);
+        const datas = (Array.from(map?.entries?.() ?? []) ?? []).reverse();
+        return datas.map(it => ({type: it[0], instance: it[1]}));
+    }
+
+    getStoreSet<T>(targetKey: ConstructorType<T>, target?: ConstructorType<any>): {type: ConstructorType<T>, instance?: T} | undefined {
+        return this.getStoreSets(targetKey).find(it => it.type === target) ?? this.getStoreSets(targetKey)[0];
+    }
+
+    getStoreInstance<T>(targetKey: ConstructorType<T>, target?: ConstructorType<any>) {
+        return this.getStoreSet(targetKey, target)?.instance;
+    }
+
+    getOrNewSim<T>(target?: ConstructorType<T>): T | undefined {
+        if (target) {
+            const registed = this.getStoreSet(target);
+            if (registed?.type && !registed?.instance) {
+                return this.resolve(target)
             }
-            return newVar
+            return registed?.instance
         }
     }
 
-    getOrNewSims<T>(k: ConstructorType<T>): T[] {
-        const list = new Array<T>(0);
-        this.storage.forEach((value, key, mapObject) => {
-            let sw = false;
-            if (value && value instanceof k) {
-                sw = true;
-                // eslint-disable-next-line no-prototype-builtins
-            } else if (key === k || k.isPrototypeOf(key)) {
-                sw = true;
-            }
-            if (sw) {
-                if (!value) {
-                    value = this.resolve(key);
-                }
-                list.push(value);
+    // getOrNewSims<T>(k: ConstructorType<T>): T[] {
+    //     const list = new Array<T>(0);
+    //     this.storage.forEach((value, key, mapObject) => {
+    //         let sw = false;
+    //         if (value && value instanceof k) {
+    //             sw = true;
+    //             // eslint-disable-next-line no-prototype-builtins
+    //         } else if (key === k || k.isPrototypeOf(key)) {
+    //             sw = true;
+    //         }
+    //         if (sw) {
+    //             if (!value) {
+    //                 value = this.resolve(key);
+    //             }
+    //             list.push(value);
+    //         }
+    //     })
+    //     return list;
+    // }
+
+    register(keyType: ConstructorType<any>, regTyps: Set<ConstructorType<any>>): void {
+        const itemMap = this._storage.get(keyType) ?? new Map<ConstructorType<any>, any>();
+        regTyps.forEach(it => {
+            if (!itemMap.has(it)) {
+                itemMap.set(it, undefined);
             }
         })
-        return list;
+        this._storage.set(keyType, itemMap);
     }
 
-    register(target: ConstructorType<any>): void {
-        if (!this._storage.has(target)) {
-            this._storage.set(target, undefined)
-        }
+    set(targetKey: ConstructorType<any>, obj: any, target: ConstructorType<any> = targetKey): void {
+        const itemMap = this._storage.get(targetKey) ?? new Map<ConstructorType<any>, any>();
+        itemMap.set(target, obj);
+        this._storage.set(targetKey, itemMap)
     }
 
-    set(target: ConstructorType<any>, obj: any): void {
-        this._storage.set(target, obj)
-    }
-
-    resolve<T>(target: ConstructorType<any>): T {
-        const registed = this._storage.get(target)
-        if (registed) {
-            return registed as T
+    resolve<T>(targetKey: ConstructorType<any>, target?: ConstructorType<any>): T {
+        const registed = this.getStoreSet(targetKey, target);
+        if (registed?.instance) {
+            return registed.instance;
         }
 
-        if (this._storage.has(target) && undefined === registed) {
-            const newSim = this.newSim(target, (data) => this._storage.set(target, data));
+        if (this._storage.has(targetKey) && undefined === registed?.instance) {
+            const newSim = this.newSim(registed?.type ?? targetKey, (data) => this.set(targetKey, data, target));
             newSim?.onSimCreate?.();
             return newSim
         }
-        const simNoSuch = new SimNoSuch('SimNoSuch: no simple instance ' + 'name:' + target?.prototype?.constructor?.name + ',' + target);
+        const simNoSuch = new SimNoSuch('SimNoSuch: no simple instance ' + 'name:' + targetKey?.prototype?.constructor?.name + ',' + targetKey);
         console.error(simNoSuch);
         throw simNoSuch
     }
@@ -145,10 +165,10 @@ export class SimstanceManager implements Runnable {
         }
     }
 
-    public getParameterSim({target, targetKey, firstCheckMaker}: { target: Object, targetKey?: string | symbol, firstCheckMaker?: FirstCheckMaker[] },
-        otherStorage?: Map<ConstructorType<any>, any>): any[] {
+    public getParameterSim({target, targetKey, firstCheckMaker}: { target: Object, targetKey?: string | symbol, firstCheckMaker?: FirstCheckMaker[] }, otherStorage?: Map<ConstructorType<any>, any>): any[] {
         const paramTypes = ReflectUtils.getParameterTypes(target, targetKey);
         const paramNames = FunctionUtils.getParameterNames(target, targetKey);
+        // const a = ReflectUtils.getType(target, 'user');
         let injections = [];
         const injects = getInject(target, targetKey);
         injections = paramTypes.map((token: ConstructorType<any>, idx: number) => {
@@ -165,6 +185,10 @@ export class SimstanceManager implements Runnable {
             if (saveInject) {
                 const inject = saveInject.config;
                 let obj = otherStorage?.get(token);
+                if (token === Array && inject.type) {
+                    const p = this.getStoreSets(inject.type).map(it => this.resolve(inject.type!, it.type));
+                    return p;
+                }
 
                 // situational
                 if (inject.situationType && otherStorage) {
@@ -228,8 +252,8 @@ export class SimstanceManager implements Runnable {
         this.otherInstanceSim?.forEach((value, key) => {
             this.set(key, value);
         })
-        sims.forEach((data: any) => {
-            this.register(data);
+        sims.forEach((regTypes, k) => {
+            this.register(k, regTypes);
         })
         this.callBindPostConstruct(this);
     }

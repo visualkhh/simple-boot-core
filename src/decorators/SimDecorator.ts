@@ -2,22 +2,39 @@ import 'reflect-metadata'
 import {ConstructorType, GenericClassDecorator} from '../types/Types'
 import {ReflectUtils} from '../utils/reflect/ReflectUtils';
 
-export const sims = new Set<ConstructorType<any>>();
+// export const sims = new Set<ConstructorType<any>>();
+export const sims = new Map<ConstructorType<any>, Set<ConstructorType<any>>>();
 export interface SimConfig {
     scheme?: string;
+    type?: ConstructorType<any> | ConstructorType<any>[];
 }
 
 export const SimMetadataKey = Symbol('Sim');
+const simProcess = (config: SimConfig, target: ConstructorType<any>) => {
+    ReflectUtils.defineMetadata(SimMetadataKey, {}, target);
+    const adding = (targetKey: ConstructorType<any>, target: ConstructorType<any> = targetKey) => {
+        const items = sims.get(targetKey) ?? new Set<ConstructorType<any>>();
+        items.add(target);
+        sims.set(targetKey, items);
+    }
+    if (Array.isArray(config?.type)) {
+        config?.type.forEach(it => {
+            adding(it, target);
+        })
+    } else if (config.type) {
+        adding(config?.type, target);
+    } else {
+        adding(target)
+    }
+}
 export function Sim(target: ConstructorType<any>): void;
 export function Sim(config: SimConfig): GenericClassDecorator<ConstructorType<any>>;
-export function Sim(config: SimConfig | ConstructorType<any>): void | GenericClassDecorator<ConstructorType<any>> {
-    if (typeof config === 'function') {
-        ReflectUtils.defineMetadata(SimMetadataKey, {}, config);
-        sims.add(config);
+export function Sim(configOrTarget: SimConfig | ConstructorType<any>): void | GenericClassDecorator<ConstructorType<any>> {
+    if (typeof configOrTarget === 'function') {
+        simProcess({}, configOrTarget);
     } else {
         return (target: ConstructorType<any>) => {
-            ReflectUtils.defineMetadata(SimMetadataKey, config, target);
-            sims.add(target);
+            simProcess(configOrTarget, target);
         }
     }
 }

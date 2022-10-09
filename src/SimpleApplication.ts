@@ -27,12 +27,12 @@ export class SimpleApplication {
         }
         this.option = option;
         this.simstanceManager = new SimstanceManager(option)
-        this.simstanceManager.storage.set(SimpleApplication, this);
+        this.simstanceManager.set(SimpleApplication, this);
         this.intentManager = new IntentManager(this.simstanceManager);
         this.routerManager = new RouterManager(this.simstanceManager, this.rootRouter);
-        this.simstanceManager.storage.set(SimstanceManager, this.simstanceManager);
-        this.simstanceManager.storage.set(IntentManager, this.intentManager);
-        this.simstanceManager.storage.set(RouterManager, this.routerManager);
+        this.simstanceManager.set(SimstanceManager, this.simstanceManager);
+        this.simstanceManager.set(IntentManager, this.intentManager);
+        this.simstanceManager.set(RouterManager, this.routerManager);
     }
 
     public getSimstanceManager() {
@@ -67,7 +67,7 @@ export class SimpleApplication {
     }
 
     public sim<T>(type: ConstructorType<T>) {
-        return this.simAtomic(type).value;
+        return this.simAtomic<T>(type).value;
     }
 
     public publishIntent(i: string, data?: any): any[];

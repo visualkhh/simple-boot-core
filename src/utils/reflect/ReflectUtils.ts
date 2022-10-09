@@ -1,6 +1,7 @@
 import 'reflect-metadata'
+import {ConstructorType} from '../../types/Types';
 export class ReflectUtils {
-    static getParameterTypes(target: any, propertyKey?: string | symbol): any[] {
+    static getParameterTypes(target: any, propertyKey?: string | symbol): ConstructorType<any>[] {
         if (propertyKey) {
             return Reflect.getMetadata('design:paramtypes', target, propertyKey) || [];
         } else {
