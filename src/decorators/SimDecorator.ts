@@ -2,21 +2,36 @@ import 'reflect-metadata'
 import {ConstructorType, GenericClassDecorator} from '../types/Types'
 import {ReflectUtils} from '../utils/reflect/ReflectUtils';
 
-// export const sims = new Set<ConstructorType<any>>();
+export enum Lifecycle {
+    /**
+     * Each resolve will return the same instance (including resolves from child containers)
+     */
+    Singleton = 'Singleton',
+    /**
+     * The default registration scope, a new instance will be created with each resolve
+     */
+    Transient = 'Transient'
+}
+
 export const sims = new Map<ConstructorType<any>, Set<ConstructorType<any>>>();
 export interface SimConfig {
     scheme?: string;
+    scope?: Lifecycle;
     type?: ConstructorType<any> | ConstructorType<any>[];
 }
 
 export const SimMetadataKey = Symbol('Sim');
 const simProcess = (config: SimConfig, target: ConstructorType<any>) => {
-    ReflectUtils.defineMetadata(SimMetadataKey, {}, target);
+    ReflectUtils.defineMetadata(SimMetadataKey, config, target);
     const adding = (targetKey: ConstructorType<any>, target: ConstructorType<any> = targetKey) => {
         const items = sims.get(targetKey) ?? new Set<ConstructorType<any>>();
         items.add(target);
         sims.set(targetKey, items);
     }
+
+    // default setting
+    config.scope = config?.scope ?? Lifecycle.Singleton;
+
     if (Array.isArray(config?.type)) {
         config?.type.forEach(it => {
             adding(it, target);
@@ -30,6 +45,7 @@ const simProcess = (config: SimConfig, target: ConstructorType<any>) => {
 export function Sim(target: ConstructorType<any>): void;
 export function Sim(config: SimConfig): GenericClassDecorator<ConstructorType<any>>;
 export function Sim(configOrTarget: SimConfig | ConstructorType<any>): void | GenericClassDecorator<ConstructorType<any>> {
+    console.log('SimSim   ', configOrTarget, typeof configOrTarget === 'function')
     if (typeof configOrTarget === 'function') {
         simProcess({}, configOrTarget);
     } else {

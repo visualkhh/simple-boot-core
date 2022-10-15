@@ -1,12 +1,11 @@
 import 'reflect-metadata'
 import {ConstructorType} from '../types/Types'
 import {SimNoSuch} from '../throwable/SimNoSuch'
-import {getPostConstruct, getSim, sims} from '../decorators/SimDecorator';
+import {getPostConstruct, getSim, Lifecycle, sims} from '../decorators/SimDecorator';
 import {Runnable} from '../run/Runnable';
 import {ObjectUtils} from '../utils/object/ObjectUtils';
 import {SimAtomic} from './SimAtomic';
 import {ReflectUtils} from '../utils/reflect/ReflectUtils';
-import {FunctionUtils} from '../utils/function/FunctionUtils';
 import {getInject, SaveInjectConfig, SituationTypeContainer, SituationTypeContainers} from '../decorators/inject/Inject';
 import {SimOption} from '../SimOption';
 import {SimProxyHandler} from '../proxy/SimProxyHandler';
@@ -30,11 +29,17 @@ export class SimstanceManager implements Runnable {
     }
 
     getSimAtomics(): SimAtomic[] {
-        return Array.from(this._storage.keys()).map(it => new SimAtomic(it, this));
+        const r: SimAtomic[] = [];
+        Array.from(this._storage.values()).forEach(it => {
+            r.push(...Array.from(Array.from(it.keys())).map(sit => new SimAtomic(sit, this)));
+        });
+        return r;
     }
 
     getSimConfig(scheme: string | undefined): SimAtomic<any>[] {
-        const newVar = this.getSimAtomics().filter(it => scheme && it && scheme === it?.getConfig()?.scheme) || [];
+        const newVar = this.getSimAtomics().filter(it => {
+            return scheme && it && scheme === it?.getConfig()?.scheme
+        }) || [];
         return newVar;
     }
 
@@ -117,7 +122,13 @@ export class SimstanceManager implements Runnable {
         }
 
         if (this._storage.has(targetKey) && undefined === registed?.instance) {
-            const newSim = this.newSim(registed?.type ?? targetKey, (data) => this.set(targetKey, data, target));
+            const newSim = this.newSim(registed?.type ?? targetKey, (data) => {
+                // scope check! and action
+                // this.getSimConfig()
+                if (getSim(registed?.type ?? target ?? targetKey)?.scope === Lifecycle.Singleton) {
+                    this.set(targetKey, data, target)
+                }
+            });
             newSim?.onSimCreate?.();
             return newSim
         }
@@ -167,7 +178,7 @@ export class SimstanceManager implements Runnable {
 
     public getParameterSim({target, targetKey, firstCheckMaker}: { target: Object, targetKey?: string | symbol, firstCheckMaker?: FirstCheckMaker[] }, otherStorage?: Map<ConstructorType<any>, any>): any[] {
         const paramTypes = ReflectUtils.getParameterTypes(target, targetKey);
-        const paramNames = FunctionUtils.getParameterNames(target, targetKey);
+        // const paramNames = FunctionUtils.getParameterNames(target, targetKey);
         // const a = ReflectUtils.getType(target, 'user');
         let injections = [];
         const injects = getInject(target, targetKey);
@@ -185,11 +196,16 @@ export class SimstanceManager implements Runnable {
             if (saveInject) {
                 const inject = saveInject.config;
                 let obj = otherStorage?.get(token);
-                if (token === Array && inject.type) {
-                    const p = this.getStoreSets(inject.type).map(it => this.resolve(inject.type!, it.type));
+                if (token === Array && (inject.type || inject.scheme)) {
+                    const p = [];
+                    if (inject.type) {
+                        p.push(...this.getStoreSets(inject.type).map(it => this.resolve(inject.type!, it.type)).reverse());
+                    }
+                    if (inject.scheme) {
+                        p.push(...this.getSimConfig(inject.scheme).map(it => it.value));
+                    }
                     return p;
                 }
-
                 // situational
                 if (inject.situationType && otherStorage) {
                     const situations = otherStorage.get(SituationTypeContainers) as SituationTypeContainers;
@@ -219,6 +235,7 @@ export class SimstanceManager implements Runnable {
             } else if (token) {
                 return otherStorage?.get(token) ?? this.resolve<any>(token);
             }
+            return undefined;
         });
         return injections;
     }
