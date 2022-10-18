@@ -23,14 +23,14 @@ tsc --init --experimentalDecorators --emitDecoratorMetadata
 import {SimpleApplication} from 'simple-boot-core';
 import {Router} from 'simple-boot-core/decorators/route/Router';
 import {Sim} from 'simple-boot-core/decorators/SimDecorator';
-@Sim()
+@Sim
 class User {
   say() {
     console.log('say~ hello');
   }
 }
 
-@Sim() @Router({ path: '', route: {'/user': User}})
+@Sim @Router({ path: '', route: {'/user': User}})
 class AppRouter {}
 
 const app = new SimpleApplication(AppRouter);
@@ -69,14 +69,14 @@ npx ts-node index.ts
 ## @Sim
 Decorators must be declared to be managed.
 ```typescript
-@Sim()
+@Sim
 class ProjectService {
   sum(x: number, y: number) {
     return x + y;
   }
 }
 
-@Sim()
+@Sim
 class User {
 
   constructor(private projectService: ProjectService) {
@@ -97,7 +97,7 @@ class User {
 ## OnSimCreate interface
 Sim Object created just one call
 ```typescript
-@Sim()
+@Sim
 class User implements OnSimCreate {
   onSimCreate(): void {
     console.log('on Create')
@@ -118,7 +118,7 @@ class User implements OnSimCreate {
 
 ## @Before @After
 ```typescript
-@Sim()
+@Sim
 class User {
 
   @Before({property: 'say'})
@@ -150,7 +150,7 @@ class User {
 
 ## @ExceptionHandler
 ```typescript
-@Sim()
+@Sim
 class User {
 
   @ExceptionHandler()
@@ -191,7 +191,7 @@ class User {
   <summary>Global Exception Advice <strong>🔻(click)</strong></summary>
 
 ```typescript
-@Sim()
+@Sim
 class GlobalAdvice {
   @ExceptionHandler()
   otherException(@Inject({situationType: ExceptionHandlerSituationType.ERROR_OBJECT}) e: any) {
@@ -204,7 +204,7 @@ class GlobalAdvice {
   }
 }
 
-@Sim()
+@Sim
 class User {
   say1() {
     console.log(`say~ hello`);
@@ -241,7 +241,7 @@ new SimpleApplication(AppRouter, option).run().routing('/user').then(it => {
   <summary>@Router<strong>🔻(click)</strong></summary>
 
 ```typescript
-@Sim()
+@Sim
 @Router({
   path: '',
   route: {
@@ -258,7 +258,7 @@ class AppRouter {
 ### route change call canActivate meehod
 
 ```typescript
-@Sim()
+@Sim
 @Router({
   path: '',
   route: {
@@ -289,7 +289,7 @@ new SimpleApplication(AppRouter, option).run().routing('/user').then(it => {
   <summary>@Route<strong>🔻(click)</strong></summary>  
 
 ```typescript
-@Sim()
+@Sim
 @Router({
   path: ''
 })
