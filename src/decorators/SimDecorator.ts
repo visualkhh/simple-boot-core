@@ -45,7 +45,6 @@ const simProcess = (config: SimConfig, target: ConstructorType<any>) => {
 export function Sim(target: ConstructorType<any>): void;
 export function Sim(config: SimConfig): GenericClassDecorator<ConstructorType<any>>;
 export function Sim(configOrTarget: SimConfig | ConstructorType<any>): void | GenericClassDecorator<ConstructorType<any>> {
-    console.log('SimSim   ', configOrTarget, typeof configOrTarget === 'function')
     if (typeof configOrTarget === 'function') {
         simProcess({}, configOrTarget);
     } else {
