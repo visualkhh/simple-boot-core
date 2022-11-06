@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import {ConstructorType} from '../types/Types'
 import {SimNoSuch} from '../throwable/SimNoSuch'
-import {getPostConstruct, getSim, Lifecycle, sims} from '../decorators/SimDecorator';
+import { getPostConstruct, getSim, Lifecycle, Sim, sims } from '../decorators/SimDecorator';
 import {Runnable} from '../run/Runnable';
 import {ObjectUtils} from '../utils/object/ObjectUtils';
 import {SimAtomic} from './SimAtomic';
@@ -78,26 +78,6 @@ export class SimstanceManager implements Runnable {
             return registed?.instance
         }
     }
-
-    // getOrNewSims<T>(k: ConstructorType<T>): T[] {
-    //     const list = new Array<T>(0);
-    //     this.storage.forEach((value, key, mapObject) => {
-    //         let sw = false;
-    //         if (value && value instanceof k) {
-    //             sw = true;
-    //             // eslint-disable-next-line no-prototype-builtins
-    //         } else if (key === k || k.isPrototypeOf(key)) {
-    //             sw = true;
-    //         }
-    //         if (sw) {
-    //             if (!value) {
-    //                 value = this.resolve(key);
-    //             }
-    //             list.push(value);
-    //         }
-    //     })
-    //     return list;
-    // }
 
     register(keyType: ConstructorType<any>, regTyps: Set<ConstructorType<any>>): void {
         const itemMap = this._storage.get(keyType) ?? new Map<ConstructorType<any>, any>();

@@ -1,6 +1,8 @@
 import { Intent, PublishType } from './Intent';
 import {SimstanceManager} from '../simstance/SimstanceManager';
+import { Sim } from '../decorators/SimDecorator';
 
+@Sim
 export class IntentManager {
     constructor(public simstanceManager: SimstanceManager) {
     }

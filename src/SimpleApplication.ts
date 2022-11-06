@@ -8,7 +8,7 @@ import {ConstructorType} from './types/Types';
 import {RouterModule} from './route/RouterModule';
 import {SimAtomic} from './simstance/SimAtomic';
 import {SimNoSuch} from './throwable/SimNoSuch';
-
+import { Sim } from './decorators/SimDecorator';
 export class SimpleApplication {
     public simstanceManager: SimstanceManager;
     public intentManager: IntentManager;
@@ -26,11 +26,12 @@ export class SimpleApplication {
             this.rootRouter = rootRouter;
         }
         this.option = option;
-        this.simstanceManager = new SimstanceManager(option)
+        this.simstanceManager = new SimstanceManager(option);
         this.simstanceManager.set(SimpleApplication, this);
-        this.intentManager = new IntentManager(this.simstanceManager);
-        this.routerManager = new RouterManager(this.simstanceManager, this.rootRouter);
         this.simstanceManager.set(SimstanceManager, this.simstanceManager);
+
+        this.intentManager = this.simstanceManager.proxy(new IntentManager(this.simstanceManager));
+        this.routerManager = this.simstanceManager.proxy(new RouterManager(this.simstanceManager, this.rootRouter));
         this.simstanceManager.set(IntentManager, this.intentManager);
         this.simstanceManager.set(RouterManager, this.routerManager);
     }

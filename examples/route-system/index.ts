@@ -9,6 +9,7 @@ import {SimOption} from 'simple-boot-core/SimOption';
 import {Injection} from 'simple-boot-core/decorators/inject/Injection';
 import {Inject} from 'simple-boot-core/decorators/inject/Inject';
 import {RouteFilter} from 'simple-boot-core/route/RouteFilter';
+import { GlobalAdvice } from './GlobalAdvice';
 
 @Sim
 class Office {
@@ -44,7 +45,6 @@ class UsersRouter implements RouterAction {
 
 @Sim
 class Welcome {
-
     say() {
         console.log('welcome');
     }
@@ -52,10 +52,13 @@ class Welcome {
 
 export class AFilter implements RouteFilter {
     isAccept(indent: Intent): boolean {
-        console.log('aaaa', indent)
+        console.log('aaaa', indent);
+
+        throw new Error('zzzzzzzzzzzz22zz')
         return true;
     }
 }
+
 @Sim
 export class RFilter implements RouteFilter {
     isAccept(indent: Intent): boolean {
@@ -67,7 +70,7 @@ export class RFilter implements RouteFilter {
 @Sim
 @Router({
     path: '',
-    route: {'/welcome': {filters: [new AFilter()], target: Welcome}},
+    route: {'/welcome': {filters: [new AFilter(), RFilter], target: Welcome}},
     routers: [UsersRouter],
     // filters: [new AFilter(), RFilter, {
     //     isAccept(intent: Intent): boolean {
@@ -98,6 +101,7 @@ class AppRouter implements RouterAction {
 }
 
 const option = new SimOption();
+option.advice = [GlobalAdvice];
 const app = new SimpleApplication(AppRouter, option);
 app.run();
 (async () => {
@@ -109,7 +113,6 @@ app.run();
     // let moduleInstance = routerModule.getModuleInstance<(props: string) => void>(propertyKey);
     // moduleInstance('propData');
     // routerModule.executeModuleProperty(propertyKey);
-
 
     // route in router
     // routerModule = await app.routing('/zz');

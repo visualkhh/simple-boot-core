@@ -1,12 +1,14 @@
 import {Intent} from '../intent/Intent';
 import {ConstructorType} from '../types/Types';
 import {RouterModule} from './RouterModule';
-import {RoteAndFilter, Route, RouterConfig, RouterMetadataKey, RouteTargetMethod} from '../decorators/route/Router';
+import {Route, RouterConfig, RouterMetadataKey} from '../decorators/route/Router';
 import {SimAtomic} from '../simstance/SimAtomic';
 import {SimstanceManager} from '../simstance/SimstanceManager';
 import {getOnRoute, onRoutes} from '../decorators/route/OnRoute';
 import {RouteFilter} from './RouteFilter';
+import { Sim } from '../decorators/SimDecorator';
 
+@Sim
 export class RouterManager {
     public activeRouterModule?: RouterModule<SimAtomic, any>;
 
@@ -156,12 +158,15 @@ export class RouterManager {
             for (const it of Object.keys(routerData.route).filter(it => !it.startsWith('_'))) {
                 const pathnameData = intent.getPathnameData(urlRoot + it);
                 if (pathnameData) {
-                    const {child, data, propertyKeys} = this.findRouteProperty(routerData.route, it, intent);
-                    const rm = new RouterModule(this.simstanceManager, router, child);
-                    rm.data = data;
-                    rm.pathData = pathnameData;
-                    rm.propertyKeys = propertyKeys;
-                    return rm;
+                    try {
+                        const dataSet = this.findRouteProperty(routerData.route, it, intent);
+                        const rm = new RouterModule(this.simstanceManager, router, dataSet.child);
+                        rm.data = dataSet.data;
+                        rm.pathData = pathnameData;
+                        rm.propertyKeys = dataSet.propertyKeys;
+                        return rm;
+                    } catch (e) {
+                    }
                 }
             }
         }
