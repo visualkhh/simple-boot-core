@@ -6,19 +6,21 @@ import {Intent} from 'simple-boot-core/intent/Intent';
 import {OnRoute} from 'simple-boot-core/decorators/route/OnRoute';
 import {RouterModule} from 'simple-boot-core/route/RouterModule';
 import {SimOption} from 'simple-boot-core/SimOption';
-import { Injection } from 'simple-boot-core/decorators/inject/Injection';
-import { Inject } from 'simple-boot-core/decorators/inject/Inject';
+import {Injection} from 'simple-boot-core/decorators/inject/Injection';
+import {Inject} from 'simple-boot-core/decorators/inject/Inject';
+import {RouteFilter} from 'simple-boot-core/route/RouteFilter';
 
 @Sim
 class Office {
     name = 'oldName'
+
     sayName() {
         console.log(`My office Name is ${this.name}`);
     }
 
     @OnRoute({isActivateMe: true})
     onRoute(routeModule: RouterModule) {
-        console.log('onRoute');
+        console.log('onRoute22');
         this.name = routeModule.queryParams.name;
     }
 }
@@ -30,7 +32,8 @@ class Office {
 })
 class UsersRouter implements RouterAction {
     child: any;
-    async canActivate(url: Intent, module: any){
+
+    async canActivate(url: Intent, module: any) {
         this.child = module;
     }
 
@@ -47,18 +50,45 @@ class Welcome {
     }
 }
 
+export class AFilter implements RouteFilter {
+    isAccept(indent: Intent): boolean {
+        console.log('aaaa', indent)
+        return true;
+    }
+}
+@Sim
+export class RFilter implements RouteFilter {
+    isAccept(indent: Intent): boolean {
+        console.log('rrrr', indent)
+        return true;
+    }
+}
+
 @Sim
 @Router({
     path: '',
-    route: {'/welcome': Welcome},
-    routers: [UsersRouter]
+    route: {'/welcome': {filters: [new AFilter()], target: Welcome}},
+    routers: [UsersRouter],
+    // filters: [new AFilter(), RFilter, {
+    //     isAccept(intent: Intent): boolean {
+    //         console.log('-fff')
+    //         return true;
+    //     }
+    // }]
 })
 class AppRouter implements RouterAction {
     name = 'appRouter-name'
 
     @Injection
-    @Route({path: ['/sub-route', '/ss', '/zz']})
-    test(@Inject({disabled: true})props: string, simOption: SimOption) {
+    @Route({path: ['/sub-route', '/ss', '/zz'],
+        // filters: [new AFilter(), RFilter, {
+        //     isAccept(intent: Intent): boolean {
+        //         console.log('-fff')
+        //         return false;
+        //     }
+        // }]
+    })
+    test(@Inject({disabled: true}) props: string, simOption: SimOption) {
         console.log('test--', props, simOption, this.name);
     }
 
@@ -66,33 +96,32 @@ class AppRouter implements RouterAction {
         // console.log('activate route: ', url, module);
     }
 }
+
 const option = new SimOption();
 const app = new SimpleApplication(AppRouter, option);
 app.run();
-(async() => {
+(async () => {
     // route in router
-    let routerModule = await app.routing('/sub-route');
+    // let routerModule = await app.routing('/sub-route');
     // console.log('---?', routerModule)
-    let propertyKey = routerModule.propertyKeys?.[0];
-    console.log('key-->', propertyKey);
+    // let propertyKey = routerModule.propertyKeys?.[0];
+    // console.log('key-->', propertyKey);
     // let moduleInstance = routerModule.getModuleInstance<(props: string) => void>(propertyKey);
     // moduleInstance('propData');
-    routerModule.executeModuleProperty(propertyKey);
+    // routerModule.executeModuleProperty(propertyKey);
 
 
     // route in router
-    routerModule = await app.routing('/zz');
-    propertyKey = routerModule.propertyKeys?.[0];
-    routerModule.executeModuleProperty(propertyKey)
-
-    // route in router
-    routerModule = await app.routing('/ss');
-    propertyKey = routerModule.propertyKeys?.[0];
-    routerModule.executeModuleProperty(propertyKey)
-
-
+    // routerModule = await app.routing('/zz');
+    // propertyKey = routerModule.propertyKeys?.[0];
+    // routerModule.executeModuleProperty(propertyKey, '2')
+    //
+    // // route in router
+    // routerModule = await app.routing('/ss');
+    // propertyKey = routerModule.propertyKeys?.[0];
+    // routerModule.executeModuleProperty(propertyKey)
     //
     // // router
-    // (await app.routing('/welcome')).getModuleInstance<Welcome>().say();
+    (await app.routing('/welcome')).getModuleInstance<Welcome>()?.say();
     // (await app.routing('/users/office?name=newName')).getModuleInstance<Office>().sayName();
 })();

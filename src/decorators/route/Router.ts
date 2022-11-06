@@ -1,13 +1,18 @@
 import {ConstructorType, GenericClassDecorator, ReflectMethod} from '../../types/Types';
 import {ReflectUtils} from '../../utils/reflect/ReflectUtils';
+import {RouteFilter} from '../../route/RouteFilter';
 
-export type RouteTargetMethod = {target: ConstructorType<Object>, propertyKeys: (string|symbol)[]}
-export type RouteProperty = ConstructorType<Object> | [ConstructorType<Object>, any] | RouteTargetMethod | string;
+export type Filterss = (RouteFilter | ConstructorType<RouteFilter>)[];
+export type Filters = RouteFilter | ConstructorType<RouteFilter> | Filterss;
+export type RoteAndFilter = {filters: Filters, target: ConstructorType<Object>};
+export type RouteTargetMethod = {target: ConstructorType<Object>, propertyKeys: (string|symbol)[], filters?: Filterss}
+export type RouteProperty = ConstructorType<Object> | RoteAndFilter | [ConstructorType<Object> | RoteAndFilter, any] | RouteTargetMethod | string;
 export type Route = {[name: string]: RouteProperty};
 export interface RouterConfig {
     path?: string;
     route?: Route;
     routers?: ConstructorType<Object>[];
+    filters?: Filters;
 }
 
 export const RouterMetadataKey = Symbol('Router');
@@ -15,13 +20,19 @@ const routerProcess = (config: RouterConfig, target: ConstructorType<any>) => {
     getRoutes(target)?.forEach(it => {
         config.route = (config.route ?? {});
         const paths = Array.isArray(it.config.path) ? it.config.path : [it.config.path];
-        for (let path of paths) {
+        for (const path of paths) {
             if (config.route[path]) {
-                (config.route[path] as RouteTargetMethod).propertyKeys.push(it.propertyKey);
+                const route = config.route[path] as RouteTargetMethod;
+                route.propertyKeys.push(it.propertyKey);
+                route.filters = route.filters ?? [];
+                if (Array.isArray(it.config.filters)) {
+                    route.filters.push(...it.config.filters)
+                } else if (it.config.filters) {
+                    route.filters.push(it.config.filters)
+                }
             } else {
-                config.route[path] = {target, propertyKeys: [it.propertyKey]} as RouteTargetMethod;
+                config.route[path] = {target, propertyKeys: [it.propertyKey], filters: it.config.filters} as RouteTargetMethod;
             }
-
         }
     });
     ReflectUtils.defineMetadata(RouterMetadataKey, config, target);
@@ -49,7 +60,7 @@ export const getRouter = (target: ConstructorType<any> | Function | any): Router
     try { return ReflectUtils.getMetadata(RouterMetadataKey, target); } catch (e) {}
 }
 
-type RouteConfig = { path: string | string[] }
+type RouteConfig = { path: string | string[], filters?: Filters }
 export type SaveRouteConfig = { propertyKey: string | symbol; method: Function; config: RouteConfig; }
 export const RouteMetadataKey = Symbol('RouteMetadataKey');
 export const Route = (config: RouteConfig): ReflectMethod => {

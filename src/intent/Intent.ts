@@ -10,6 +10,7 @@ export enum PublishType {
 */
 export class Intent<T = any, E = any> {
     public publishType?: PublishType;
+    public sessionData = new Map<string, any>();
     constructor(public uri: string, public data?: T, public event?: E) {
     }
 

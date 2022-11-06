@@ -1,10 +1,11 @@
 import {Intent} from '../intent/Intent';
 import {ConstructorType} from '../types/Types';
 import {RouterModule} from './RouterModule';
-import {Route, RouterConfig, RouterMetadataKey} from '../decorators/route/Router';
+import {RoteAndFilter, Route, RouterConfig, RouterMetadataKey, RouteTargetMethod} from '../decorators/route/Router';
 import {SimAtomic} from '../simstance/SimAtomic';
 import {SimstanceManager} from '../simstance/SimstanceManager';
 import {getOnRoute, onRoutes} from '../decorators/route/OnRoute';
+import {RouteFilter} from './RouteFilter';
 
 export class RouterManager {
     public activeRouterModule?: RouterModule<SimAtomic, any>;
@@ -60,12 +61,6 @@ export class RouterManager {
                 await routerChain?.value?.canActivate?.(intent, executeModule.getModuleInstance());
             } else { // find page
                 let module = null;
-                // 페이지를 찾았지만도 property쪽에 @Route로 지정된거 있을시.. 그거 첫번째껄로 처리한다. TODO: 왜 호출해야되지?
-                // if (executeModule && executeModule.propertyKeys && executeModule.propertyKeys.length) {
-                //     module = executeModule.executeModuleProperty(executeModule.propertyKeys[0]);
-                // } else {
-                //     module = executeModule.getModuleInstance();
-                // }
                 module = executeModule.getModuleInstance();
                 await (executeModule.router?.value! as any)?.canActivate?.(intent, module);
             }
@@ -113,6 +108,19 @@ export class RouterManager {
         const path = intent.pathname;
         const routerConfig = router.getConfig<RouterConfig>(RouterMetadataKey);
         if (routerConfig) {
+            // filter
+
+            const filters: (RouteFilter | ConstructorType<any>)[] = [];
+            if (Array.isArray(routerConfig.filters)) {
+                filters.push(...routerConfig.filters);
+            } else if (routerConfig.filters) {
+                filters.push(routerConfig.filters);
+            }
+            const noAccept = filters.some(it => (typeof it === 'function' ? this.simstanceManager.getOrNewSim(it) : it)?.isAccept(intent) === false);
+            if (noAccept) {
+                return;
+            }
+
             const routerStrings = parentRouters.slice(1).map(it => it.getConfig<RouterConfig>(RouterMetadataKey)?.path || '');
             const isRoot = this.isRootUrl(routerConfig.path, routerStrings, path)
             if (isRoot) {
@@ -148,8 +156,7 @@ export class RouterManager {
             for (const it of Object.keys(routerData.route).filter(it => !it.startsWith('_'))) {
                 const pathnameData = intent.getPathnameData(urlRoot + it);
                 if (pathnameData) {
-                    // const routeElement = routerData.route[it];
-                    const {child, data, propertyKeys} = this.findRouteProperty(routerData.route, it);
+                    const {child, data, propertyKeys} = this.findRouteProperty(routerData.route, it, intent);
                     const rm = new RouterModule(this.simstanceManager, router, child);
                     rm.data = data;
                     rm.pathData = pathnameData;
@@ -160,7 +167,7 @@ export class RouterManager {
         }
     }
 
-    private findRouteProperty(route: Route, propertyName: string): { child?: ConstructorType<any>, data?: any, propertyKeys?: (string | symbol)[] } {
+    private findRouteProperty(route: Route, propertyName: string, intent: Intent): { child?: ConstructorType<any>, data?: any, propertyKeys?: (string | symbol)[] } {
         let child: ConstructorType<any> | undefined;
         let data: any;
         let propertyKeys: undefined | (string | symbol)[];
@@ -168,13 +175,41 @@ export class RouterManager {
         if (typeof routeElement === 'function') {
             child = routeElement;
         } else if (typeof routeElement === 'string') {
-            return this.findRouteProperty(route, routeElement)
+            return this.findRouteProperty(route, routeElement, intent)
         } else if (Array.isArray(routeElement)) {
-            child = routeElement?.[0];
+            const r = routeElement?.[0];
+            if (typeof r === 'object' && 'filters' in r && 'target' in r) {
+                const filters: (RouteFilter | ConstructorType<any>)[] = [];
+                if (Array.isArray(r.filters)) {
+                    filters.push(...r.filters);
+                } else if (r.filters) {
+                    filters.push(r.filters);
+                }
+                const noAccept = filters.some(it => (typeof it === 'function' ? this.simstanceManager.getOrNewSim(it) : it)?.isAccept(intent) === false);
+                if (!noAccept) {
+                    child = r.target;
+                }
+            } else {
+                child = r;
+            }
             data = routeElement?.[1];
         } else if (typeof routeElement === 'object' && 'target' in routeElement && 'propertyKeys' in routeElement) { // RouteTargetMethod
-            child = routeElement.target;
-            propertyKeys = routeElement.propertyKeys as (string | symbol)[];
+            const noAccept = routeElement.filters?.filter(it => it).some(it => (typeof it === 'function' ? this.simstanceManager.getOrNewSim(it) : it)?.isAccept(intent) === false);
+            if (!noAccept) {
+                child = routeElement.target;
+                propertyKeys = routeElement.propertyKeys as (string | symbol)[];
+            }
+        } else if (typeof routeElement === 'object' && 'filters' in routeElement && 'target' in routeElement) {
+            const filters: (RouteFilter | ConstructorType<any>)[] = [];
+            if (Array.isArray(routeElement.filters)) {
+                filters.push(...routeElement.filters);
+            } else if (routeElement.filters) {
+                filters.push(routeElement.filters);
+            }
+            const noAccept = filters.some(it => (typeof it === 'function' ? this.simstanceManager.getOrNewSim(it) : it)?.isAccept(intent) === false);
+            if (!noAccept) {
+                child = routeElement.target;
+            }
         }
         return {
             child,
