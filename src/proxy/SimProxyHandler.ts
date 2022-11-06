@@ -4,7 +4,7 @@ import {ObjectUtils} from '../utils/object/ObjectUtils';
 import {SimOption} from '../SimOption';
 import {ExceptionHandlerSituationType, SaveExceptionHandlerConfig, targetExceptionHandler} from '../decorators/exception/ExceptionDecorator';
 import {ConstructorType} from '../types/Types';
-import {SituationTypeContainer} from '../decorators/inject/Inject';
+import {SituationTypeContainer, SituationTypeContainers} from '../decorators/inject/Inject';
 
 export class SimProxyHandler implements ProxyHandler<any> {
     constructor(private simstanceManager: SimstanceManager, private simOption: SimOption) {
@@ -26,18 +26,24 @@ export class SimProxyHandler implements ProxyHandler<any> {
         return true
     }
 
-    apply(target: Function, thisArg: any, argumentsList?: any): any {
+    apply(target: Function, thisArg: any, argumentsList?: any[]): any {
         let r;
         try {
             this.aopBefore(thisArg, target);
-            r = target.apply(thisArg, argumentsList);
-            this.aopAfter(thisArg, target);
+            try {
+                r = target.apply(thisArg, argumentsList);
+                // eslint-disable-next-line no-useless-catch
+            } catch (e) {
+                throw e;
+            } finally {
+                this.aopAfter(thisArg, target);
+            }
         } catch (e: Error | any) {
             console.error(e);
             const inHandlers = this.getExceptionHandler(e, thisArg, target);
             if (inHandlers.length > 0 && inHandlers[0]) {
                 const inHandler = inHandlers[0];
-                this.executeExceptionHandler(e, argumentsList, inHandler);
+                this.executeExceptionHandler(e, inHandler, argumentsList);
             } else {
                 throw e;
             }
@@ -45,18 +51,21 @@ export class SimProxyHandler implements ProxyHandler<any> {
         return r
     }
 
-    private executeExceptionHandler(e: any, argumentsList: any, inHandler: { thisArg: any; config: SaveExceptionHandlerConfig }) {
+    private executeExceptionHandler(e: any, inHandler: { thisArg: any; config: SaveExceptionHandlerConfig }, argumentsList?: any[]) {
         const otherStorage = new Map<ConstructorType<any>, any>();
         otherStorage.set(e.constructor, e);
-        const situationTypeContainer = new SituationTypeContainer({
+        const situationErrorTypeContainer = new SituationTypeContainer({
             situationType: ExceptionHandlerSituationType.ERROR_OBJECT,
             data: e
         });
-        otherStorage.set(SituationTypeContainer, situationTypeContainer);
-        (argumentsList as Array<any>)?.forEach(it => {
-            otherStorage.set(e.constructor, e);
+        const situationParameterTypeContainer = new SituationTypeContainer({
+            situationType: ExceptionHandlerSituationType.PARAMETER,
+            data: argumentsList
         });
-
+        otherStorage.set(SituationTypeContainers, new SituationTypeContainers([situationErrorTypeContainer, situationParameterTypeContainer]));
+        argumentsList?.forEach(it => {
+            otherStorage.set(it.constructor, it);
+        });
         try {
             this.simstanceManager.executeBindParameterSim({
                 target: inHandler.thisArg,
@@ -68,9 +77,8 @@ export class SimProxyHandler implements ProxyHandler<any> {
         if (inHandler.config.config.throw) {
             const exceptionHandler = this.getExceptionHandler(e, inHandler.thisArg, inHandler.config.method);
             if ((exceptionHandler?.length ?? 0) > 0) {
-                this.executeExceptionHandler(e, argumentsList, exceptionHandler[0]);
+                this.executeExceptionHandler(e, exceptionHandler[0], argumentsList);
             }
-            // throw e;
         }
     }
 

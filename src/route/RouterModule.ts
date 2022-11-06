@@ -14,6 +14,7 @@ export class RouterModule<R = SimAtomic, M = any> {
     constructor(private simstanceManager: SimstanceManager, public router?: R, public module?: ConstructorType<M>, public routerChains: R[] = []) {
     }
 
+    getModuleInstance<T = M>(): T | undefined ;
     getModuleInstance<T = M>(propertyKey?: string | symbol, instanceBind: boolean | any = true): T | undefined {
         const instance = this.simstanceManager.getOrNewSim<T>(this.module as any);
         if (propertyKey && this.propertyKeys && this.propertyKeys.includes(propertyKey)) {

@@ -5,6 +5,7 @@ import {ObjectUtils} from '../../utils/object/ObjectUtils';
 
 export enum ExceptionHandlerSituationType {
     ERROR_OBJECT = 'SIMPLE_BOOT_CORE://ExceptionHandler/ERROR_OBJECT',
+    PARAMETER = 'SIMPLE_BOOT_CORE://ExceptionHandler/PARAMETER',
 }
 export type ExceptionHandlerConfig = { type?: ConstructorType<any>; throw?: boolean }
 export type SaveExceptionHandlerConfig = { propertyKey?: string | symbol; method: Function; config: ExceptionHandlerConfig; }

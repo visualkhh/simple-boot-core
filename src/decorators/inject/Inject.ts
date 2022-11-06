@@ -24,6 +24,12 @@ export class SituationTypeContainer {
 export class SituationTypeContainers {
     public containers: SituationTypeContainer[] = [];
 
+    constructor(containers?: SituationTypeContainer[]) {
+        if (containers) {
+            this.containers.push(...containers);
+        }
+    }
+
     public push(...item: SituationTypeContainer[]) {
         this.containers.push(...item)
     }
