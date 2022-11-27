@@ -18,6 +18,7 @@ export interface SimConfig {
     scheme?: string;
     scope?: Lifecycle;
     type?: ConstructorType<any> | ConstructorType<any>[];
+    using?: (ConstructorType<any>)[];
 }
 
 export const SimMetadataKey = Symbol('Sim');
