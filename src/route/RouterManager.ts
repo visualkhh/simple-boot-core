@@ -39,6 +39,7 @@ export class RouterManager {
         if (!this.rootRouter) {
             throw new Error('no root router');
         }
+        await new Promise((r)=> setTimeout(r, 0)); // <-- 이거 넣어야지 두번불러지는게 없어지는듯? 뭐지 event loop 변경된건가?
         const routers: any[] = [];
         const routerAtomic = new SimAtomic(this.rootRouter, this.simstanceManager);
         const rootRouter = routerAtomic.value!;
