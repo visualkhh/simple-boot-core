@@ -193,7 +193,13 @@ export class SimstanceManager implements Runnable {
                     if (inject.situationType === situation?.situationType) {
                         obj = situation.data;
                     } else if (situations && situations.length > 0) {
-                        const find = situations.find(a => a.situationType === inject.situationType)
+                        const find = situations.find(a => {
+                            if (a.index !== undefined) {
+                                return a.situationType === inject.situationType && a.index === idx
+                            } else {
+                                return a.situationType === inject.situationType
+                            }
+                        })
                         if (find) {
                             obj = find.data;
                         }

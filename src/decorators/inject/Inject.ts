@@ -7,7 +7,7 @@ export enum InjectSituationType {
     INDEX = 'SIMPLE_BOOT_CORE://Inject/INDEX',
 }
 
-export type SituationType = string | InjectSituationType | ExceptionHandlerSituationType;
+export type SituationType = string | Symbol | ConstructorType<any> | InjectSituationType | ExceptionHandlerSituationType;
 
 export class SituationTypeContainer {
     public situationType: SituationType;
