@@ -47,6 +47,7 @@ export type InjectConfig = {
     scheme?: string;
     type?: ConstructorType<any>;
     situationType?: SituationType;
+    argument?: any;
     applyProxy?: { type: ConstructorType<ProxyHandler<any>>, param?: any[] };
     disabled?: boolean;
 }
