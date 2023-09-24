@@ -16,7 +16,7 @@ export interface RouterConfig {
 }
 
 export const RouterMetadataKey = Symbol('Router');
-const routerProcess = (config: RouterConfig, target: ConstructorType<any>) => {
+const routerProcess = (config: RouterConfig, target: ConstructorType<any> | Function) => {
     getRoutes(target)?.forEach(it => {
         config.route = (config.route ?? {});
         const paths = Array.isArray(it.config.path) ? it.config.path : [it.config.path];
@@ -37,9 +37,9 @@ const routerProcess = (config: RouterConfig, target: ConstructorType<any>) => {
     });
     ReflectUtils.defineMetadata(RouterMetadataKey, config, target);
 }
-export function Router(target: ConstructorType<any>): void;
-export function Router(config: RouterConfig): GenericClassDecorator<ConstructorType<any>>;
-export function Router(configOrTarget: RouterConfig | ConstructorType<any>): void | GenericClassDecorator<ConstructorType<any>> {
+export function Router(target: ConstructorType<any> | Function): void;
+export function Router(config: RouterConfig): GenericClassDecorator<ConstructorType<any> | Function>;
+export function Router(configOrTarget: RouterConfig | ConstructorType<any> | Function): void | GenericClassDecorator<ConstructorType<any>> {
     if (typeof configOrTarget === 'function') {
         const routerConfig: RouterConfig = {
             path: ''
