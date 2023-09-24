@@ -13,7 +13,7 @@ export enum Lifecycle {
     Transient = 'Transient'
 }
 
-export const sims = new Map<ConstructorType<any>, Set<ConstructorType<any>>>();
+export const sims = new Map<ConstructorType<any> | Function, Set<ConstructorType<any> | Function>>();
 export interface SimConfig {
     symbol?: Symbol;
     scheme?: string;
@@ -23,9 +23,9 @@ export interface SimConfig {
 }
 
 export const SimMetadataKey = Symbol('Sim');
-const simProcess = (config: SimConfig, target: ConstructorType<any>) => {
+const simProcess = (config: SimConfig, target: ConstructorType<any> | Function) => {
     ReflectUtils.defineMetadata(SimMetadataKey, config, target);
-    const adding = (targetKey: ConstructorType<any>, target: ConstructorType<any> = targetKey) => {
+    const adding = (targetKey: ConstructorType<any> | Function, target: ConstructorType<any> | Function = targetKey) => {
         const items = sims.get(targetKey) ?? new Set<ConstructorType<any>>();
         items.add(target);
         sims.set(targetKey, items);
@@ -44,9 +44,9 @@ const simProcess = (config: SimConfig, target: ConstructorType<any>) => {
         adding(target)
     }
 }
-export function Sim(target: ConstructorType<any>): void;
+export function Sim(target: ConstructorType<any> | Function): void;
 export function Sim(config: SimConfig): GenericClassDecorator<ConstructorType<any>>;
-export function Sim(configOrTarget: SimConfig | ConstructorType<any>): void | GenericClassDecorator<ConstructorType<any>> {
+export function Sim(configOrTarget: SimConfig | ConstructorType<any> | Function): void | GenericClassDecorator<ConstructorType<any>> {
     if (typeof configOrTarget === 'function') {
         simProcess({}, configOrTarget);
     } else {
