@@ -180,6 +180,8 @@ export class RouterManager {
     const routeElement = route[propertyName];
     if (typeof routeElement === 'function') {
       child = routeElement;
+    } else if (typeof routeElement === 'symbol') {
+      child = this.simstanceManager.findFirstSim(routeElement)?.type;
     } else if (typeof routeElement === 'string') {
       return this.findRouteProperty(route, routeElement, intent)
     } else if (Array.isArray(routeElement)) {

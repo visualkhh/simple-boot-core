@@ -15,6 +15,7 @@ export enum Lifecycle {
 
 export const sims = new Map<ConstructorType<any>, Set<ConstructorType<any>>>();
 export interface SimConfig {
+    symbol?: Symbol;
     scheme?: string;
     scope?: Lifecycle;
     type?: ConstructorType<any> | ConstructorType<any>[];

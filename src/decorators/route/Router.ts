@@ -6,7 +6,7 @@ export type Filterss = (RouteFilter | ConstructorType<RouteFilter>)[];
 export type Filters = RouteFilter | ConstructorType<RouteFilter> | Filterss;
 export type RoteAndFilter = {filters: Filters, target: ConstructorType<Object>};
 export type RouteTargetMethod = {target: ConstructorType<Object>, propertyKeys: (string|symbol)[], filters?: Filterss}
-export type RouteProperty = ConstructorType<Object> | RoteAndFilter | [ConstructorType<Object> | RoteAndFilter, any] | RouteTargetMethod | string;
+export type RouteProperty = ConstructorType<Object> | RoteAndFilter | [ConstructorType<Object> | RoteAndFilter, any] | RouteTargetMethod | string | Symbol;
 export type Route = {[name: string]: RouteProperty};
 export interface RouterConfig {
     path?: string;
