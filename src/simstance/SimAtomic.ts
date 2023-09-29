@@ -4,7 +4,7 @@ import { SimstanceManager } from './SimstanceManager';
 import { ReflectUtils } from '../utils/reflect/ReflectUtils';
 
 export class SimAtomic<T = object> {
-    constructor(public type: ConstructorType<T>, private simstanceManager: SimstanceManager) {
+    constructor(public type: ConstructorType<T>|Function, private simstanceManager: SimstanceManager) {
     }
 
     getConfig<C = any>(key: symbol = SimMetadataKey): C | undefined {

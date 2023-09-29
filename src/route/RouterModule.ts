@@ -11,7 +11,7 @@ export class RouterModule<R = SimAtomic, M = any> {
     public intent?: Intent;
     public propertyKeys?: (string | symbol)[];
 
-    constructor(private simstanceManager: SimstanceManager, public router?: R, public module?: ConstructorType<M>, public routerChains: R[] = []) {
+    constructor(private simstanceManager: SimstanceManager, public router?: R, public module?: ConstructorType<M> | Function, public routerChains: R[] = []) {
     }
 
     getModuleInstance<T = M>(): T | undefined ;

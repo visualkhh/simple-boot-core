@@ -173,8 +173,8 @@ export class RouterManager {
     }
   }
 
-  private findRouteProperty(route: Route, propertyName: string, intent: Intent): { child?: ConstructorType<any>, data?: any, propertyKeys?: (string | symbol)[] } {
-    let child: ConstructorType<any> | undefined;
+  private findRouteProperty(route: Route, propertyName: string, intent: Intent): { child?: ConstructorType<any> | Function, data?: any, propertyKeys?: (string | symbol)[] } {
+    let child: ConstructorType<any> | Function| undefined;
     let data: any;
     let propertyKeys: undefined | (string | symbol)[];
     const routeElement = route[propertyName];
