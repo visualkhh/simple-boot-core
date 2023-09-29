@@ -104,7 +104,6 @@ export class SimstanceManager implements Runnable {
     if (target) {
       const registed = this.getStoreSet(target);
       if (registed?.type && !registed?.instance) {
-        console.log('----targe', target);
         return this.resolve(target)
       }
       return registed?.instance
@@ -152,7 +151,11 @@ export class SimstanceManager implements Runnable {
   public newSim<T = any>(target: ConstructorType<T> | Function, simCreateAfter?: (data: T) => void, otherStorage?: Map<ConstructorType<any>, any>): T {
     // @ts-ignore
     const r = new target(...this.getParameterSim({target}, otherStorage))
-    const p = this.proxy(r);
+    let p = this.proxy(r);
+    const config = getSim(target);
+    if (config?.proxy) {
+      p = new Proxy(p, config.proxy);
+    }
     // 순환참조 막기위한 콜백 처리
     simCreateAfter?.(p);
     this.callBindPostConstruct(p);
@@ -262,7 +265,6 @@ export class SimstanceManager implements Runnable {
   public proxy<T = any>(target: T): T {
     if (target !== null && getSim(target) && (typeof target === 'object') && (!('isProxy' in target))) {
       for (const key in target) {
-        // console.log('target->', target, key)
         target[key] = this.proxy(target[key]);
       }
 

@@ -8,6 +8,7 @@ import {SituationTypeContainer, SituationTypeContainers} from '../decorators/inj
 
 export class SimProxyHandler implements ProxyHandler<any> {
     constructor(private simstanceManager: SimstanceManager, private simOption: SimOption) {
+        // console.log('SimProxyHandler', simstanceManager, simOption)
     }
 
     public get(target: any, name: string): any {

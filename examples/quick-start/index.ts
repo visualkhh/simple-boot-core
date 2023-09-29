@@ -1,6 +1,6 @@
 import {SimpleApplication} from 'simple-boot-core';
 import {Router} from 'simple-boot-core/decorators/route/Router';
-import {Lifecycle, Sim} from 'simple-boot-core/decorators/SimDecorator';
+import { Lifecycle, PostConstruct, Sim } from 'simple-boot-core/decorators/SimDecorator';
 import {Inject} from 'simple-boot-core/decorators/inject/Inject';
 
 @Sim
@@ -44,6 +44,10 @@ class User2 {
     routeSay() {
         console.log('routerSay', this.date);
     }
+  @PostConstruct
+  post() {
+    console.log('---------22-postConstruct')
+  }
 }
 @Sim({
   type: AppRouter,
@@ -57,6 +61,8 @@ class AppRouter2 extends AppRouter {
   routeSay() {
     console.log('routerSay!!!!!!!');
   }
+
+
 }
 
 const app = new SimpleApplication(AppRouter);

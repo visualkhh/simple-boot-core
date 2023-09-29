@@ -18,6 +18,7 @@ export interface SimConfig {
     symbol?: Symbol;
     scheme?: string;
     scope?: Lifecycle;
+    proxy?: ProxyHandler<any>;
     type?: ConstructorType<any> | ConstructorType<any>[] | Function | Function[];
     using?: (ConstructorType<any> | Function)[];
 }
