@@ -31,7 +31,7 @@ class User2 {
     path: '',
     route: {'/user': User}
 })
-class AppRouter {
+ abstract class AppRouter {
     private date = new Date().toISOString();
     constructor(@Inject({type: User, scheme: 'User'}) private users: User[]) {
         console.log('users-->constructor-!!!!', users);
@@ -45,16 +45,34 @@ class AppRouter {
         console.log('routerSay', this.date);
     }
 }
+@Sim({
+  type: AppRouter,
+  scope: Lifecycle.Transient
+})
+class AppRouter2 extends AppRouter {
+    constructor(@Inject({type: User, scheme: 'User'}) users: User[]) {
+        super(users);
+    }
+
+  routeSay() {
+    console.log('routerSay!!!!!!!');
+  }
+}
 
 const app = new SimpleApplication(AppRouter);
 // type 1
 app.run();
+// const a = app.simAtomic(AppRouter)
+// console.log('---->',a)
+// const c = a.getConfig()
+// console.log('---->',c)
 // app.sim(User).say();
 let appRouter = app.sim(AppRouter);
+// console.log('!!!', appRouter)
 appRouter?.routeSay();
 
-appRouter = app.sim(AppRouter);
-appRouter?.routeSay();
+// appRouter = app.sim(AppRouter);
+// appRouter?.routeSay();
 // ssd  ssd
 // type 2
 // app.run().getOrNewSim(User).say();

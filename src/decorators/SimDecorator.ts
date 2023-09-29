@@ -18,8 +18,8 @@ export interface SimConfig {
     symbol?: Symbol;
     scheme?: string;
     scope?: Lifecycle;
-    type?: ConstructorType<any> | ConstructorType<any>[];
-    using?: (ConstructorType<any>)[];
+    type?: ConstructorType<any> | ConstructorType<any>[] | Function | Function[];
+    using?: (ConstructorType<any> | Function)[];
 }
 
 export const SimMetadataKey = Symbol('Sim');
@@ -45,12 +45,12 @@ const simProcess = (config: SimConfig, target: ConstructorType<any> | Function) 
     }
 }
 export function Sim(target: ConstructorType<any> | Function): void;
-export function Sim(config: SimConfig): GenericClassDecorator<ConstructorType<any>>;
-export function Sim(configOrTarget: SimConfig | ConstructorType<any> | Function): void | GenericClassDecorator<ConstructorType<any>> {
+export function Sim(config: SimConfig): GenericClassDecorator<ConstructorType<any> | Function>;
+export function Sim(configOrTarget: SimConfig | ConstructorType<any> | Function): void | GenericClassDecorator<ConstructorType<any> | Function> {
     if (typeof configOrTarget === 'function') {
         simProcess({}, configOrTarget);
     } else {
-        return (target: ConstructorType<any>) => {
+        return  (target: ConstructorType<any> | Function) => {
             simProcess(configOrTarget, target);
         }
     }

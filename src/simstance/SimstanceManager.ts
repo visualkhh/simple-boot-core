@@ -64,12 +64,35 @@ export class SimstanceManager implements Runnable {
   }
 
   getStoreSets<T>(targetKey: ConstructorType<T> | Function): { type: ConstructorType<T> | Function, instance?: T } [] {
+    // const depths = ObjectUtils.getAllProtoType(targetKey);
+    // const keys = Array.from(this.storage.keys()).filter(it => depths.includes(it)); //.map(it => ({isMatch: depths.includes(it)}));
+    // keys.sort((a, b) => { return depths.indexOf(a) - depths.indexOf(b) });
+
+    // console.log('------', keys);
+    // this.storage.forEach((value, key) => {
+    // })
+    // const map = this.storage.get(keys[0] ?? targetKey);
     const map = this.storage.get(targetKey);
+    // console.log('-------', map)
     const datas = (Array.from(map?.entries?.() ?? []) ?? []).reverse();
     return datas.map(it => ({type: it[0], instance: it[1]}));
   }
 
   getStoreSet<T>(targetKey: ConstructorType<T> | Function, target?: ConstructorType<any> | Function): { type: ConstructorType<T>| Function, instance?: T } | undefined {
+    // const chain = this.getStoreSets(targetKey).find(it => Object.prototype.isPrototypeOf.call(start.prototype, target));
+    // console.log('?????', targetKey, this.getStoreSets(targetKey))
+    // this.getStoreSets(targetKey).forEach(it => {
+    //   console.log('for----->', it);
+    //   const depth = (target:  ConstructorType<T> | Function,  bowl: any[] = []) => {
+    //     if (target.prototype) {
+    //       bowl.push(target);
+    //       depth(Object.getPrototypeOf(target), bowl);
+    //     }
+    //     return bowl;
+    //   }
+    //   const data = depth(it.type);
+    //   console.log('------>data', data);
+    // })
     return this.getStoreSets(targetKey).find(it => it.type === target) ?? this.getStoreSets(targetKey)[0];
   }
 
@@ -81,6 +104,7 @@ export class SimstanceManager implements Runnable {
     if (target) {
       const registed = this.getStoreSet(target);
       if (registed?.type && !registed?.instance) {
+        console.log('----targe', target);
         return this.resolve(target)
       }
       return registed?.instance

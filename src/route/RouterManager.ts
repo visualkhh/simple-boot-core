@@ -12,7 +12,7 @@ import { Sim } from '../decorators/SimDecorator';
 export class RouterManager {
   public activeRouterModule?: RouterModule<SimAtomic, any>;
 
-  constructor(private simstanceManager: SimstanceManager, private rootRouter?: ConstructorType<any>) {
+  constructor(private simstanceManager: SimstanceManager, private rootRouter?: ConstructorType<any> | Function) {
   }
 
   public routingMap(prefix: string = '', router = this.rootRouter): { [key: string]: string | any } {

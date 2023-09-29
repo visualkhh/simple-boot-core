@@ -53,7 +53,7 @@ export class ObjectUtils {
     Object.prototype.isPrototypeOf()
     isPrototypeOf() 메소드는 해당 객체가 다른 객체의 프로토타입 체인에 속한 객체인지 확인하기 위해 사용됩니다.
      */
-    static isPrototypeOfTarget(start: ConstructorType<any> | null | undefined, target: any | null | undefined): boolean {
+    static isPrototypeOfTarget(start: ConstructorType<any> | Function | null | undefined, target: any | null | undefined): boolean {
         if (start && target) {
             return Object.prototype.isPrototypeOf.call(start.prototype, target);
         } else {
@@ -61,8 +61,7 @@ export class ObjectUtils {
         }
     }
 
-    static getPrototypeOfDepth(target: any, dest: ConstructorType<any> | null | undefined): object[] {
-
+    static getPrototypeOfDepth(target: any, dest: ConstructorType<any> | Function | null | undefined): object[] {
         let object = target;
         const r = [];
         if (dest) {
@@ -77,13 +76,22 @@ export class ObjectUtils {
         return r;
     }
 
-    static getAllProtoType(start: ConstructorType<any> | null | undefined): ConstructorType<any>[] {
-        const protos: ConstructorType<any>[] = []
-        while (start) {
-            protos.push(start);
-            start = Object.getPrototypeOf(start)
+    static getAllProtoType(start: ConstructorType<any> | Function): (ConstructorType<any> | Function)[] {
+        const depth = (target:  ConstructorType<any> | Function,  bowl: (ConstructorType<any> | Function)[] = []) => {
+            if (target.prototype) {
+                bowl.push(target);
+                depth(Object.getPrototypeOf(target), bowl);
+            }
+            return bowl;
         }
-        return protos;
+        const d = depth(start);
+        return d;
+        // const protos: (ConstructorType<any> | Function)[] = []
+        // while (start) {
+        //     protos.push(start);
+        //     start = Object.getPrototypeOf(start)
+        // }
+        // return protos;
     }
 
     static getPrototypeOf(start: any) {

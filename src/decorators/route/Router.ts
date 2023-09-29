@@ -39,14 +39,14 @@ const routerProcess = (config: RouterConfig, target: ConstructorType<any> | Func
 }
 export function Router(target: ConstructorType<any> | Function): void;
 export function Router(config: RouterConfig): GenericClassDecorator<ConstructorType<any> | Function>;
-export function Router(configOrTarget: RouterConfig | ConstructorType<any> | Function): void | GenericClassDecorator<ConstructorType<any>> {
+export function Router(configOrTarget: RouterConfig | ConstructorType<any> | Function): void | GenericClassDecorator<ConstructorType<any> | Function> {
     if (typeof configOrTarget === 'function') {
         const routerConfig: RouterConfig = {
             path: ''
         }
         routerProcess(routerConfig, configOrTarget);
     } else {
-        return (target: ConstructorType<any>) => {
+        return (target: ConstructorType<any> | Function) => {
             configOrTarget.path = configOrTarget.path ?? '';
             routerProcess(configOrTarget, target);
         }

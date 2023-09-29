@@ -13,13 +13,13 @@ export class SimpleApplication {
     public simstanceManager: SimstanceManager;
     public intentManager: IntentManager;
     public routerManager: RouterManager;
-    public rootRouter?: ConstructorType<Object>;
+    public rootRouter?: ConstructorType<Object> | Function;
     public option: SimOption;
     constructor();
     constructor(option: SimOption);
-    constructor(rootRouter?: ConstructorType<Object>);
-    constructor(rootRouter?: ConstructorType<Object>, option?: SimOption);
-    constructor(rootRouter?: ConstructorType<Object> | SimOption, option = new SimOption()) {
+    constructor(rootRouter?: ConstructorType<Object> | Function);
+    constructor(rootRouter?: ConstructorType<Object> | Function, option?: SimOption);
+    constructor(rootRouter?: (ConstructorType<Object> | Function) | SimOption, option = new SimOption()) {
         if (rootRouter instanceof SimOption) {
             option = rootRouter;
         } else if (typeof rootRouter === 'function') {
@@ -53,7 +53,7 @@ export class SimpleApplication {
         return this.simstanceManager;
     }
 
-    public simAtomic<T>(type: ConstructorType<T>) {
+    public simAtomic<T>(type: ConstructorType<T> | Function) {
         const routerAtomic = new SimAtomic<T>(type, this.simstanceManager);
         return routerAtomic;
     }
@@ -67,7 +67,7 @@ export class SimpleApplication {
         }
     }
 
-    public sim<T>(type: ConstructorType<T>) {
+    public sim<T>(type: ConstructorType<T> | Function) {
         return this.simAtomic<T>(type).value;
     }
 
