@@ -13,7 +13,7 @@ import { SimProxyHandler } from '../proxy/SimProxyHandler';
 export type FirstCheckMaker = (obj: { target: Object, targetKey?: string | symbol }, token: ConstructorType<any>, idx: number, saveInjectConfig?: SaveInjectConfig) => any | undefined;
 
 export class SimstanceManager implements Runnable {
-  private _storage = new Map<ConstructorType<any>| Function, Map<ConstructorType<any>|Function, undefined | any>>()
+  private _storage = new Map<ConstructorType<any> | Function, Map<ConstructorType<any> | Function, undefined | any>>()
   private simProxyHandler: SimProxyHandler;
   private otherInstanceSim?: Map<ConstructorType<any>, any>;
 
@@ -78,7 +78,7 @@ export class SimstanceManager implements Runnable {
     return datas.map(it => ({type: it[0], instance: it[1]}));
   }
 
-  getStoreSet<T>(targetKey: ConstructorType<T> | Function, target?: ConstructorType<any> | Function): { type: ConstructorType<T>| Function, instance?: T } | undefined {
+  getStoreSet<T>(targetKey: ConstructorType<T> | Function, target?: ConstructorType<any> | Function): { type: ConstructorType<T> | Function, instance?: T } | undefined {
     // const chain = this.getStoreSets(targetKey).find(it => Object.prototype.isPrototypeOf.call(start.prototype, target));
     // console.log('?????', targetKey, this.getStoreSets(targetKey))
     // this.getStoreSets(targetKey).forEach(it => {
@@ -110,8 +110,8 @@ export class SimstanceManager implements Runnable {
     }
   }
 
-  register(keyType: ConstructorType<any> | Function, regTyps: Set<ConstructorType<any>|Function>): void {
-    const itemMap = this._storage.get(keyType) ?? new Map<ConstructorType<any>|Function, any>();
+  register(keyType: ConstructorType<any> | Function, regTyps: Set<ConstructorType<any> | Function>): void {
+    const itemMap = this._storage.get(keyType) ?? new Map<ConstructorType<any> | Function, any>();
     regTyps.forEach(it => {
       if (!itemMap.has(it)) {
         itemMap.set(it, undefined);
@@ -120,7 +120,7 @@ export class SimstanceManager implements Runnable {
     this._storage.set(keyType, itemMap);
   }
 
-  set(targetKey: ConstructorType<any> | Function, obj: any, target: ConstructorType<any>|Function = targetKey): void {
+  set(targetKey: ConstructorType<any> | Function, obj: any, target: ConstructorType<any> | Function = targetKey): void {
     const itemMap = this._storage.get(targetKey) ?? new Map<ConstructorType<any>, any>();
     itemMap.set(target, obj);
     this._storage.set(targetKey, itemMap)
@@ -154,7 +154,14 @@ export class SimstanceManager implements Runnable {
     let p = this.proxy(r);
     const config = getSim(target);
     if (config?.proxy) {
-      p = new Proxy(p, config.proxy);
+      const proxys = Array.isArray(config.proxy) ? config.proxy : [config.proxy];
+      proxys.forEach(it => {
+        if (typeof it === 'object') {
+          p = new Proxy(p, it);
+        } else {
+          p = new Proxy(p, this.getOrNewSim(it));
+        }
+      })
     }
     // 순환참조 막기위한 콜백 처리
     simCreateAfter?.(p);
