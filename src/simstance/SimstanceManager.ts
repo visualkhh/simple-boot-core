@@ -36,9 +36,14 @@ export class SimstanceManager implements Runnable {
     return r;
   }
 
-  getSimConfig(scheme: string | undefined): SimAtomic<any>[] {
+  getSimConfig(schemeOrSymbol: string | Symbol | undefined): SimAtomic<any>[] {
     const newVar = this.getSimAtomics().filter(it => {
-      return scheme && it && scheme === it?.getConfig()?.scheme
+      if (typeof schemeOrSymbol === 'symbol') {
+        console.log('-------->', it?.getConfig(), schemeOrSymbol)
+        return schemeOrSymbol && it && schemeOrSymbol === it?.getConfig()?.symbol
+      } else {
+        return schemeOrSymbol && it && schemeOrSymbol === it?.getConfig()?.scheme
+      }
     }) || [];
     return newVar;
   }
@@ -219,10 +224,13 @@ export class SimstanceManager implements Runnable {
       if (saveInject) {
         const inject = saveInject.config;
         let obj = otherStorage?.get(token);
-        if (token === Array && (inject.type || inject.scheme)) {
+        if (token === Array && (inject.type || inject.scheme || inject.symbol)) {
           const p = [];
           if (inject.type) {
             p.push(...this.getStoreSets(inject.type).map(it => this.resolve(inject.type!, it.type)).reverse());
+          }
+          if (inject.symbol) {
+            p.push(...this.getSimConfig(inject.symbol).map(it => it.value));
           }
           if (inject.scheme) {
             p.push(...this.getSimConfig(inject.scheme).map(it => it.value));
@@ -250,7 +258,7 @@ export class SimstanceManager implements Runnable {
         }
 
         if (!obj) {
-          const findFirstSim = this.findFirstSim({scheme: inject.scheme, type: inject.type});
+          const findFirstSim = inject.symbol ? this.findFirstSim(inject.symbol) : this.findFirstSim({scheme: inject.scheme, type: inject.type});
           obj = findFirstSim ? this.resolve<any>(findFirstSim?.type ?? token) : this.resolve<any>(token);
         }
         if (inject.applyProxy) {

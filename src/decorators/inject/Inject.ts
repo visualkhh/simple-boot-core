@@ -45,6 +45,7 @@ export class SituationTypeContainers {
 
 export type InjectConfig = {
     scheme?: string;
+    symbol?: Symbol;
     type?: ConstructorType<any>;
     situationType?: SituationType;
     argument?: any;
