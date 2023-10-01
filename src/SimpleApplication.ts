@@ -63,7 +63,7 @@ export class SimpleApplication {
         if (i) {
             return i;
         } else {
-            throw new SimNoSuch('SimNoSuch: no simple instance. ' + 'name:' + type?.prototype?.constructor?.name + ',' + type)
+            throw new SimNoSuch('SimNoSuch: no simple instance(getInstance) ' + 'name:' + type?.prototype?.constructor?.name + ',' + type)
         }
     }
 

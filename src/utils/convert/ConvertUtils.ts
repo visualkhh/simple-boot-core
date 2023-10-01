@@ -75,6 +75,11 @@ export class ConvertUtils {
         return obj;
     }
 
+    static flatArray<T>(data?: T | T[]) {
+        const datas = (Array.isArray(data) ? data : (data ? [data] : []));
+        return datas.flat();
+    }
+
     static iteratorToArray <T>(it: any): T[] {
         return Array.from(it) as T[];
     }

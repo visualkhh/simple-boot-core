@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import { ConstructorType } from '../types/Types'
 import { SimNoSuch } from '../throwable/SimNoSuch'
-import { getPostConstruct, getSim, Lifecycle, Sim, sims } from '../decorators/SimDecorator';
+import { getPostConstruct, getSim, Lifecycle, Sim, SimConfig, sims } from '../decorators/SimDecorator';
 import { Runnable } from '../run/Runnable';
 import { ObjectUtils } from '../utils/object/ObjectUtils';
 import { SimAtomic } from './SimAtomic';
@@ -9,6 +9,7 @@ import { ReflectUtils } from '../utils/reflect/ReflectUtils';
 import { getInject, SaveInjectConfig, SituationTypeContainer, SituationTypeContainers } from '../decorators/inject/Inject';
 import { SimOption } from '../SimOption';
 import { SimProxyHandler } from '../proxy/SimProxyHandler';
+import { ConvertUtils } from '../utils/convert/ConvertUtils';
 
 export type FirstCheckMaker = (obj: { target: Object, targetKey?: string | symbol }, token: ConstructorType<any>, idx: number, saveInjectConfig?: SaveInjectConfig) => any | undefined;
 
@@ -38,11 +39,15 @@ export class SimstanceManager implements Runnable {
 
   getSimConfig(schemeOrSymbol: string | Symbol | undefined): SimAtomic<any>[] {
     const newVar = this.getSimAtomics().filter(it => {
+      const config = it?.getConfig();
+      const symbols = ConvertUtils.flatArray(config?.symbol);
+      const schemes = ConvertUtils.flatArray(config?.scheme);
       if (typeof schemeOrSymbol === 'symbol') {
-        console.log('-------->', it?.getConfig(), schemeOrSymbol)
-        return schemeOrSymbol && it && schemeOrSymbol === it?.getConfig()?.symbol
+        return schemeOrSymbol && it && symbols.includes(schemeOrSymbol)
+      } else if (typeof schemeOrSymbol === 'string') {
+        return schemeOrSymbol && it && schemes.includes(schemeOrSymbol)
       } else {
-        return schemeOrSymbol && it && schemeOrSymbol === it?.getConfig()?.scheme
+        return false;
       }
     }) || [];
     return newVar;
@@ -56,11 +61,14 @@ export class SimstanceManager implements Runnable {
       const simAtomics = this.getSimAtomics();
       const find = simAtomics.find(it => {
         let b = false;
+        const config = it.getConfig();
+        const symbols = ConvertUtils.flatArray(config?.symbol);
+        const schemes = ConvertUtils.flatArray(config?.scheme);
         if (typeof data === 'symbol') {
-          b = (data === it.getConfig()?.symbol);
+          b = symbols.includes(data);
         } else {
           const {scheme, type} = data as { scheme?: string, type?: ConstructorType<any> };
-          b = (scheme ? scheme === it.getConfig()?.scheme : true) && (type ? it.type === type : true);
+          b = (scheme ? schemes.includes(scheme) : true) && (type ? it.type === type : true);
         }
         return b
       });
@@ -148,7 +156,7 @@ export class SimstanceManager implements Runnable {
       newSim?.onSimCreate?.();
       return newSim
     }
-    const simNoSuch = new SimNoSuch('SimNoSuch: no simple instance ' + 'name:' + targetKey?.prototype?.constructor?.name + ',' + targetKey);
+    const simNoSuch = new SimNoSuch('SimNoSuch: no simple instance(resolve) ' + 'name:' + targetKey?.prototype?.constructor?.name + ',' + targetKey);
     console.error(simNoSuch);
     throw simNoSuch
   }
@@ -237,6 +245,7 @@ export class SimstanceManager implements Runnable {
           }
           return p;
         }
+
         // situational
         if (inject.situationType && otherStorage) {
           const situations = otherStorage.get(SituationTypeContainers) as SituationTypeContainers;
@@ -261,6 +270,7 @@ export class SimstanceManager implements Runnable {
           const findFirstSim = inject.symbol ? this.findFirstSim(inject.symbol) : this.findFirstSim({scheme: inject.scheme, type: inject.type});
           obj = findFirstSim ? this.resolve<any>(findFirstSim?.type ?? token) : this.resolve<any>(token);
         }
+
         if (inject.applyProxy) {
           if (inject.applyProxy.param) {
             obj = new Proxy(obj, new inject.applyProxy.type(...inject.applyProxy.param));
