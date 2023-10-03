@@ -8,6 +8,7 @@ import { ConstructorType } from './types/Types';
 import { RouterModule } from './route/RouterModule';
 import { SimAtomic } from './simstance/SimAtomic';
 import { SimNoSuch } from './throwable/SimNoSuch';
+import { containers } from './decorators/SimDecorator';
 
 export class SimpleApplication {
   public simstanceManager: SimstanceManager;
@@ -35,6 +36,7 @@ export class SimpleApplication {
     this.routerManager = this.simstanceManager.proxy(new RouterManager(this.simstanceManager, this.rootRouter));
     this.simstanceManager.setStoreSet(IntentManager, this.intentManager);
     this.simstanceManager.setStoreSet(RouterManager, this.routerManager);
+    containers.add(this);
   }
 
   public getSimstanceManager() {
@@ -49,7 +51,7 @@ export class SimpleApplication {
     return this.routerManager;
   }
 
-  public run(otherInstanceSim?: Map<ConstructorType<any>, any>) {
+  public run(otherInstanceSim?: Map<ConstructorType<any> | Function, any>) {
     this.simstanceManager.run(otherInstanceSim);
     return this.simstanceManager;
   }

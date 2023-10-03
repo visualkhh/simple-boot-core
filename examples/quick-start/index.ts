@@ -25,7 +25,7 @@ class User1 {
   }
 }
 
-@Sim({scheme: 'User2', type: User, autoStart: true})
+@Sim({scheme: 'User2', type: User, autoCreate: true})
 class User2 {
   uuid = Math.random();
   constructor() {

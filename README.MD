@@ -106,7 +106,7 @@ export interface SimConfig {
   symbol?: Symbol | (Symbol[]);
   scheme?: string | (string[]);
   scope?: Lifecycle;
-  autoStart?: boolean;  // auto start = auto new
+  autoCreate?: boolean;  // auto start = auto new
   proxy?: ((ProxyHandler<any> | ConstructorType<any> | Function)) | (ProxyHandler<any> | ConstructorType<any> | Function)[];
   type?: (ConstructorType<any> | Function) | (ConstructorType<any> | Function)[];
   using?: (ConstructorType<any> | Function) | (ConstructorType<any> | Function)[];

@@ -16,7 +16,7 @@ export type FirstCheckMaker = (obj: { target: Object, targetKey?: string | symbo
 export class SimstanceManager implements Runnable {
   private _storage = new Map<ConstructorType<any> | Function, Map<ConstructorType<any> | Function, undefined | any>>()
   private simProxyHandler: SimProxyHandler;
-  private otherInstanceSim?: Map<ConstructorType<any>, any>;
+  private otherInstanceSim?: Map<ConstructorType<any> | Function, any>;
 
   constructor(private option: SimOption) {
     this.setStoreSet(SimstanceManager, this);
@@ -116,7 +116,6 @@ export class SimstanceManager implements Runnable {
   getOrNewSim<T>(target?: ConstructorType<T> | Function, originTypeTarget = target): T | undefined {
     if (target) {
       const registed = this.getStoreSet(target, originTypeTarget);
-      console.log('getOrNewSim!!', target, originTypeTarget, registed?.instance);
       if (registed?.type && !registed?.instance) {
         return this.resolve(target, originTypeTarget);
       }
@@ -305,23 +304,40 @@ export class SimstanceManager implements Runnable {
     return target;
   }
 
-  run(otherInstanceSim?: Map<ConstructorType<any>, any>) {
+  run(otherInstanceSim: Map<ConstructorType<any> | Function, any> = new Map()) {
     this.otherInstanceSim = otherInstanceSim;
-    this.otherInstanceSim?.forEach((value, key) => {
-      if (!this.option.excludeSim.includes(key)) {
-        this.setStoreSet(key, value);
+    const types = Array.from(this.otherInstanceSim?.entries()).map(it => ({type: it[0], value: it[1], action: this.setStoreSet.bind(this)}));
+    types.push(...Array.from(sims.entries()).map(it => ({type: it[0], value: it[1], action: this.register.bind(this)})));
+    const myContainers = ConvertUtils.flatArray(this.option.container);
+    types.forEach(it => {
+      const targetContainers = ConvertUtils.flatArray(getSim(it.type)?.container);
+      let isInclude = false;
+      if (myContainers.length <= 0 && targetContainers.length <= 0) {
+        isInclude = true;
+      } else if (targetContainers.length <= 0) {
+        isInclude = true;
+      } else {
+        isInclude = myContainers.some(it => targetContainers.includes(it));
       }
-    })
-    sims.forEach((regTypes, key) => {
-      if (!this.option.excludeSim.includes(key)) {
-        this.register(key, regTypes);
+      // const isInclude = (myContainers.length <= 0 || targetContainers.length <= 0) ? true : myContainers.some(it => targetContainers.includes(it));
+      // const isInclude = (targetContainers.length <= 0) ? true : (myContainers.length > 0 ? true : (myContainers.some(it => targetContainers.includes(it))));
+      // const isInclude = (myContainers.length <= 0 || targetContainers.length <= 0) ? true : (myContainers.some(it => containers.includes(it)));
+      if (typeof this.option.excludeSim === 'function' && this.option.excludeSim(it.type)) {
+        if (isInclude) {
+          it.action(it.type, it.value);
+        }
+      } else if (Array.isArray(this.option.excludeSim) && !this.option.excludeSim.includes(it.type)) {
+        if (isInclude) {
+          it.action(it.type, it.value);
+        }
       }
-    })
+    });
+
     this.callBindPostConstruct(this);
 
     // auto start run
     this.getSimAtomics().forEach(it => {
-      if (it.getConfig()?.autoStart) {
+      if (it.getConfig()?.autoCreate) {
         it.value;
         // console.log('-----??--', it.type)
         // this.getOrNewSim(it.type);

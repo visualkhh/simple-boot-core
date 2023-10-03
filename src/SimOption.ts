@@ -1,14 +1,15 @@
 import {ConstructorType} from './types/Types';
 
 export type ProxyHandlerType = { onProxy: <T>(it: T) => T };
-export type InitOptionType = { excludeSim?: (ConstructorType<any> | Function)[], advice?: ConstructorType<any>[], proxy?: ProxyHandlerType };
+export type InitOptionType = { container?: string, excludeSim?: (ConstructorType<any> | Function)[], advice?: ConstructorType<any>[], proxy?: ProxyHandlerType };
 
 export class SimOption {
-    public name?: string;
+    public container?: string;
     public advice: ConstructorType<any>[];
     public proxy?: ProxyHandlerType;
-    public excludeSim: (ConstructorType<any> | Function)[]
-    constructor({excludeSim = [], advice = [], proxy}: InitOptionType = {}) {
+    public excludeSim: ((ConstructorType<any> | Function)[]) | ((type: (ConstructorType<any> | Function)) => boolean);
+    constructor({container, excludeSim = [], advice = [], proxy}: InitOptionType = {}) {
+        this.container = container;
         this.advice = advice;
         this.excludeSim = excludeSim;
         this.proxy = proxy;

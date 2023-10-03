@@ -1,6 +1,7 @@
 import 'reflect-metadata'
 import { ConstructorType, GenericClassDecorator } from '../types/Types'
 import { ReflectUtils } from '../utils/reflect/ReflectUtils';
+import { SimpleApplication } from 'SimpleApplication';
 
 export enum Lifecycle {
   /**
@@ -14,13 +15,14 @@ export enum Lifecycle {
 }
 
 export const sims = new Map<ConstructorType<any> | Function, Set<ConstructorType<any> | Function>>();
-
+export const containers = new Set<SimpleApplication>();
 
 export interface SimConfig {
   symbol?: Symbol | (Symbol[]);
   scheme?: string | (string[]);
   scope?: Lifecycle;
-  autoStart?: boolean;
+  container?: string | (string[]);
+  autoCreate?: boolean;
   proxy?: ((ProxyHandler<any> | ConstructorType<any> | Function)) | (ProxyHandler<any> | ConstructorType<any> | Function)[];
   type?: (ConstructorType<any> | Function) | (ConstructorType<any> | Function)[];
   using?: (ConstructorType<any> | Function) | (ConstructorType<any> | Function)[];
