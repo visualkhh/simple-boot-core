@@ -1,62 +1,78 @@
-import {SimpleApplication} from 'simple-boot-core';
-import {Router} from 'simple-boot-core/decorators/route/Router';
+import { SimpleApplication } from 'simple-boot-core';
+import { Router } from 'simple-boot-core/decorators/route/Router';
 import { Lifecycle, PostConstruct, Sim } from 'simple-boot-core/decorators/SimDecorator';
-import {Inject} from 'simple-boot-core/decorators/inject/Inject';
+import { Inject } from 'simple-boot-core/decorators/inject/Inject';
 
 @Sim
 class User {
-    say() {
-        console.log('User say');
-    }
+  constructor() {
+    console.log('User constructor');
+  }
+
+  say() {
+    console.log('User say');
+  }
 }
 
 @Sim({scheme: 'User'})
 class User1 {
-    say() {
-        console.log('User1 say');
-    }
+  constructor() {
+    console.log('User1 constructor');
+  }
+
+  say() {
+    console.log('User1 say');
+  }
 }
 
-@Sim({type: User})
+@Sim({scheme: 'User2', type: User, autoStart: true})
 class User2 {
-    say() {
-        console.log('User2 say');
-    }
+
+  constructor() {
+    console.log('User2 constructor');
+  }
+
+  say() {
+    console.log('User2 say');
+  }
 }
 
 @Sim({
-    scope: Lifecycle.Transient
+  scope: Lifecycle.Transient
 })
 @Router({
-    path: '',
-    route: {'/user': User}
+  path: '',
+  route: {'/user': User}
 })
- abstract class AppRouter {
-    private date = new Date().toISOString();
-    constructor(@Inject({type: User, scheme: 'User'}) private users: User[]) {
-        console.log('users-->constructor-!!!!', users);
-        users.forEach(it => {
-            it.say();
-        })
-        // this.user.say();
-    }
+abstract class AppRouter {
+  private date = new Date().toISOString();
 
-    routeSay() {
-        console.log('routerSay', this.date);
-    }
+  // constructor(@Inject({type: User, scheme: 'User'}) private users: User[]) {
+  //   console.log('users-->constructor-!!!!', users);
+  //   users.forEach(it => {
+  //     it.say();
+  //   })
+  //   // this.user.say();
+  // }
+
+  routeSay() {
+    console.log('routerSay', this.date);
+  }
+
   @PostConstruct
   post() {
     console.log('---------22-postConstruct')
   }
 }
+
 @Sim({
   type: AppRouter,
   scope: Lifecycle.Transient
 })
 class AppRouter2 extends AppRouter {
-    constructor(@Inject({type: User, scheme: 'User'}) users: User[]) {
-        super(users);
-    }
+  // constructor(@Inject({type: User, scheme: 'User'}) users: User[]) {
+  //   super(users);
+  // }
 
   routeSay() {
     console.log('routerSay!!!!!!!');

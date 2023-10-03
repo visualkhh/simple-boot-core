@@ -2,6 +2,7 @@ import { ConstructorType } from '../types/Types';
 import { SimConfig, SimMetadataKey } from '../decorators/SimDecorator';
 import { SimstanceManager } from './SimstanceManager';
 import { ReflectUtils } from '../utils/reflect/ReflectUtils';
+import { ConvertUtils } from '../utils/convert/ConvertUtils';
 
 export class SimAtomic<T = object> {
     constructor(public type: ConstructorType<T>|Function, private simstanceManager: SimstanceManager) {
@@ -18,6 +19,14 @@ export class SimAtomic<T = object> {
     }
 
     get value(): T | undefined {
-        return this.simstanceManager.getOrNewSim(this.type);
+        // return this.simstanceManager.getOrNewSim(this.type);
+        const types = ConvertUtils.flatArray(this.getConfig()?.type);
+        types.push(this.type);
+        for (const typeElement of types) {
+           const instance = this.simstanceManager.getOrNewSim(typeElement, this.type);
+            if (instance) {
+                return instance;
+            }
+        }
     }
 }

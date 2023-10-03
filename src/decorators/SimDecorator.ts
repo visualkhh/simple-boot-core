@@ -5,11 +5,11 @@ import { SimstanceManager } from '../simstance/SimstanceManager';
 
 export enum Lifecycle {
   /**
-   * Each resolve will return the same instance (including resolves from child containers)
+   * The default registration scope, Each resolve will return the same instance (including resolves from child containers)
    */
   Singleton = 'Singleton',
   /**
-   * The default registration scope, a new instance will be created with each resolve
+   * a new instance will be created with each resolve
    */
   Transient = 'Transient'
 }
@@ -20,6 +20,7 @@ export interface SimConfig {
   symbol?: Symbol | (Symbol[]);
   scheme?: string | (string[]);
   scope?: Lifecycle;
+  autoStart?: boolean;
   proxy?: ((ProxyHandler<any> | ConstructorType<any> | Function)) | (ProxyHandler<any> | ConstructorType<any> | Function)[];
   type?: (ConstructorType<any> | Function) | (ConstructorType<any> | Function)[];
   using?: (ConstructorType<any> | Function) | (ConstructorType<any> | Function)[];
@@ -27,15 +28,16 @@ export interface SimConfig {
 
 export const SimMetadataKey = Symbol('Sim');
 const simProcess = (config: SimConfig, target: ConstructorType<any> | Function) => {
+  // default setting
+  config.scope = config?.scope ?? Lifecycle.Singleton;
+
   ReflectUtils.defineMetadata(SimMetadataKey, config, target);
   const adding = (targetKey: ConstructorType<any> | Function, target: ConstructorType<any> | Function = targetKey) => {
-    const items = sims.get(targetKey) ?? new Set<ConstructorType<any>>();
+    const items = sims.get(targetKey) ?? new Set<ConstructorType<any> | Function>();
     items.add(target);
     sims.set(targetKey, items);
   }
 
-  // default setting
-  config.scope = config?.scope ?? Lifecycle.Singleton;
 
   if (Array.isArray(config?.type)) {
     config?.type.forEach(it => {

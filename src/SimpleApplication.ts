@@ -8,7 +8,7 @@ import {ConstructorType} from './types/Types';
 import {RouterModule} from './route/RouterModule';
 import {SimAtomic} from './simstance/SimAtomic';
 import {SimNoSuch} from './throwable/SimNoSuch';
-import { Sim } from './decorators/SimDecorator';
+
 export class SimpleApplication {
     public simstanceManager: SimstanceManager;
     public intentManager: IntentManager;
