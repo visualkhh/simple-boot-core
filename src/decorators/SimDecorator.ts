@@ -1,7 +1,6 @@
 import 'reflect-metadata'
 import { ConstructorType, GenericClassDecorator } from '../types/Types'
 import { ReflectUtils } from '../utils/reflect/ReflectUtils';
-import { SimstanceManager } from '../simstance/SimstanceManager';
 
 export enum Lifecycle {
   /**
@@ -15,6 +14,7 @@ export enum Lifecycle {
 }
 
 export const sims = new Map<ConstructorType<any> | Function, Set<ConstructorType<any> | Function>>();
+
 
 export interface SimConfig {
   symbol?: Symbol | (Symbol[]);

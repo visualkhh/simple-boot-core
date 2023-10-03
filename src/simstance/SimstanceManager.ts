@@ -116,6 +116,7 @@ export class SimstanceManager implements Runnable {
   getOrNewSim<T>(target?: ConstructorType<T> | Function, originTypeTarget = target): T | undefined {
     if (target) {
       const registed = this.getStoreSet(target, originTypeTarget);
+      console.log('getOrNewSim!!', target, originTypeTarget, registed?.instance);
       if (registed?.type && !registed?.instance) {
         return this.resolve(target, originTypeTarget);
       }
@@ -307,10 +308,14 @@ export class SimstanceManager implements Runnable {
   run(otherInstanceSim?: Map<ConstructorType<any>, any>) {
     this.otherInstanceSim = otherInstanceSim;
     this.otherInstanceSim?.forEach((value, key) => {
-      this.setStoreSet(key, value);
+      if (!this.option.excludeSim.includes(key)) {
+        this.setStoreSet(key, value);
+      }
     })
-    sims.forEach((regTypes, k) => {
-      this.register(k, regTypes);
+    sims.forEach((regTypes, key) => {
+      if (!this.option.excludeSim.includes(key)) {
+        this.register(key, regTypes);
+      }
     })
     this.callBindPostConstruct(this);
 
