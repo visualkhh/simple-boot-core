@@ -45,9 +45,11 @@ const simProcess = (config: SimConfig, target: ConstructorType<any> | Function) 
     })
   } else if (config.type) {
     adding(config?.type, target);
-  } else {
-    adding(target)
   }
+  // else {
+  //   adding(target)
+  // }
+  adding(target)
 }
 
 export function Sim(target: ConstructorType<any> | Function): void;

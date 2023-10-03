@@ -27,7 +27,7 @@ class User1 {
 
 @Sim({scheme: 'User2', type: User, autoStart: true})
 class User2 {
-
+  uuid = Math.random();
   constructor() {
     console.log('User2 constructor');
   }
@@ -47,13 +47,13 @@ class User2 {
 abstract class AppRouter {
   private date = new Date().toISOString();
 
-  // constructor(@Inject({type: User, scheme: 'User'}) private users: User[]) {
-  //   console.log('users-->constructor-!!!!', users);
-  //   users.forEach(it => {
-  //     it.say();
-  //   })
-  //   // this.user.say();
-  // }
+  constructor(@Inject({type: User, scheme: 'User'}) private users: User[], private user2: User2, private user22: User2) {
+    console.log('users-->constructor-!!!!', users, user2, user22);
+    users.forEach(it => {
+      it.say();
+    })
+    // this.user.say();
+  }
 
   routeSay() {
     console.log('routerSay', this.date);

@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import { ConstructorType } from '../types/Types'
 import { SimNoSuch } from '../throwable/SimNoSuch'
-import { getPostConstruct, getSim, Lifecycle, Sim, SimConfig, sims } from '../decorators/SimDecorator';
+import { getPostConstruct, getSim, Lifecycle, sims } from '../decorators/SimDecorator';
 import { Runnable } from '../run/Runnable';
 import { ObjectUtils } from '../utils/object/ObjectUtils';
 import { SimAtomic } from './SimAtomic';
@@ -19,9 +19,9 @@ export class SimstanceManager implements Runnable {
   private otherInstanceSim?: Map<ConstructorType<any>, any>;
 
   constructor(private option: SimOption) {
-    this.set(SimstanceManager, this);
-    this.set((option as any).constructor, option);
-    this.set(SimOption, option);
+    this.setStoreSet(SimstanceManager, this);
+    this.setStoreSet((option as any).constructor, option);
+    this.setStoreSet(SimOption, option);
     this.simProxyHandler = new SimProxyHandler(this, option);
   }
 
@@ -53,7 +53,6 @@ export class SimstanceManager implements Runnable {
     return newVar;
   }
 
-
   findFirstSim<T = any>(symbol: Symbol): SimAtomic<T> | undefined ;
   findFirstSim<T = any>(data: { scheme?: string, type?: ConstructorType<any> }): SimAtomic<T> | undefined ;
   findFirstSim<T = any>(data: { scheme?: string, type?: ConstructorType<any> } | Symbol): SimAtomic<T> | undefined {
@@ -72,28 +71,42 @@ export class SimstanceManager implements Runnable {
         }
         return b
       });
-      return find as SimAtomic<T>;
+      return find as unknown as SimAtomic<T>;
     }
   }
 
-  getStoreSets<T>(targetKey: ConstructorType<T> | Function): { type: ConstructorType<T> | Function, instance?: T } [] {
-    // const depths = ObjectUtils.getAllProtoType(targetKey);
-    // const keys = Array.from(this.storage.keys()).filter(it => depths.includes(it)); //.map(it => ({isMatch: depths.includes(it)}));
-    // keys.sort((a, b) => { return depths.indexOf(a) - depths.indexOf(b) });
+  flatStoreSets() {
+    return new Map(Array.from(this.storage.values()).map(it => Array.from(it.entries())).flat());
+  }
 
-    // console.log('------', keys);
-    // this.storage.forEach((value, key) => {
-    // })
-    // const map = this.storage.get(keys[0] ?? targetKey);
-    // console.log('----this.storage--', this.storage)
+  getStoreSets<T>(targetKey: ConstructorType<T> | Function): { type: ConstructorType<T> | Function, instance?: T } [] {
     const map = this.storage.get(targetKey);
-    // console.log('-------', map)
     const datas = (Array.from(map?.entries?.() ?? []) ?? []).reverse();
     return datas.map(it => ({type: it[0], instance: it[1]}));
   }
 
   getStoreSet<T>(targetKey: ConstructorType<T> | Function, target?: ConstructorType<any> | Function): { type: ConstructorType<T> | Function, instance?: T } | undefined {
-    return this.getStoreSets(targetKey).find(it => it.type === target) ?? this.getStoreSets(targetKey)[0];
+    const find = this.getStoreSets(targetKey).find(it => it.type === target);
+    // console.log('getStoreSet', targetKey, target, find)
+    if (!find?.instance) {
+      const type = target ?? targetKey;
+      const flatStoreSets = this.flatStoreSets();
+      const data = flatStoreSets.get(type);
+      // console.log('--->target?', target, targetKey, type, data);
+      if (data) {
+        this.setStoreSet(targetKey, data, type);
+      }
+      return {type: targetKey, instance: data};
+    } else {
+      return find;
+    }
+    // return find ?? this.getStoreSets(targetKey)[0];
+  }
+
+  setStoreSet(targetKey: ConstructorType<any> | Function, obj: any, target: ConstructorType<any> | Function = targetKey): void {
+    const itemMap = this.storage.get(targetKey) ?? new Map<ConstructorType<any>, any>();
+    itemMap.set(target, obj);
+    this.storage.set(targetKey, itemMap)
   }
 
   getStoreInstance<T>(targetKey: ConstructorType<T>, target?: ConstructorType<any>) {
@@ -120,22 +133,18 @@ export class SimstanceManager implements Runnable {
     this.storage.set(keyType, itemMap);
   }
 
-  set(targetKey: ConstructorType<any> | Function, obj: any, target: ConstructorType<any> | Function = targetKey): void {
-    const itemMap = this._storage.get(targetKey) ?? new Map<ConstructorType<any>, any>();
-    itemMap.set(target, obj);
-    this._storage.set(targetKey, itemMap)
-  }
-
   resolve<T>(targetKey: ConstructorType<any> | Function, target?: ConstructorType<any> | Function): T {
     const registed = this.getStoreSet(targetKey, target);
     if (registed?.instance) {
       return registed.instance;
     }
 
-    if (this._storage.has(targetKey) && undefined === registed?.instance) {
+    // console.log('resolve--', targetKey, target, registed?.instance);
+    if (this.storage.has(targetKey) && undefined === registed?.instance) {
       const newSim = this.newSim(registed?.type ?? targetKey, (data) => {
+        // console.log('resolve--newSim', targetKey, target, data);
         if (getSim(registed?.type ?? target ?? targetKey)?.scope === Lifecycle.Singleton) {
-          this.set(targetKey, data, target)
+          this.setStoreSet(targetKey, data, target)
         }
       });
       newSim?.onSimCreate?.();
@@ -298,7 +307,7 @@ export class SimstanceManager implements Runnable {
   run(otherInstanceSim?: Map<ConstructorType<any>, any>) {
     this.otherInstanceSim = otherInstanceSim;
     this.otherInstanceSim?.forEach((value, key) => {
-      this.set(key, value);
+      this.setStoreSet(key, value);
     })
     sims.forEach((regTypes, k) => {
       this.register(k, regTypes);

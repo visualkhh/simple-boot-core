@@ -27,7 +27,7 @@
         "semi": "off",
         "camelcase": "off",
         "no-trailing-spaces": "off",
-        "indent": ["error", 4],
+        "indent": ["error", 2],
         "no-redeclare": "off",
         "node/no-path-concat": "off",
         "import/no-webpack-loader-syntax": "off"

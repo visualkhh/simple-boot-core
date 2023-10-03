@@ -1,93 +1,94 @@
 import 'reflect-metadata'
-import {SimstanceManager} from './simstance/SimstanceManager';
-import {SimOption} from './SimOption';
-import {IntentManager} from './intent/IntentManager';
-import {RouterManager} from './route/RouterManager';
-import {Intent} from './intent/Intent';
-import {ConstructorType} from './types/Types';
-import {RouterModule} from './route/RouterModule';
-import {SimAtomic} from './simstance/SimAtomic';
-import {SimNoSuch} from './throwable/SimNoSuch';
+import { SimstanceManager } from './simstance/SimstanceManager';
+import { SimOption } from './SimOption';
+import { IntentManager } from './intent/IntentManager';
+import { RouterManager } from './route/RouterManager';
+import { Intent } from './intent/Intent';
+import { ConstructorType } from './types/Types';
+import { RouterModule } from './route/RouterModule';
+import { SimAtomic } from './simstance/SimAtomic';
+import { SimNoSuch } from './throwable/SimNoSuch';
 
 export class SimpleApplication {
-    public simstanceManager: SimstanceManager;
-    public intentManager: IntentManager;
-    public routerManager: RouterManager;
-    public rootRouter?: ConstructorType<Object> | Function;
-    public option: SimOption;
-    constructor();
-    constructor(option: SimOption);
-    constructor(rootRouter?: ConstructorType<Object> | Function);
-    constructor(rootRouter?: ConstructorType<Object> | Function, option?: SimOption);
-    constructor(rootRouter?: (ConstructorType<Object> | Function) | SimOption, option = new SimOption()) {
-        if (rootRouter instanceof SimOption) {
-            option = rootRouter;
-        } else if (typeof rootRouter === 'function') {
-            this.rootRouter = rootRouter;
-        }
-        this.option = option;
-        this.simstanceManager = new SimstanceManager(option);
-        this.simstanceManager.set(SimpleApplication, this);
-        this.simstanceManager.set(SimstanceManager, this.simstanceManager);
+  public simstanceManager: SimstanceManager;
+  public intentManager: IntentManager;
+  public routerManager: RouterManager;
+  public rootRouter?: ConstructorType<Object> | Function;
+  public option: SimOption;
 
-        this.intentManager = this.simstanceManager.proxy(new IntentManager(this.simstanceManager));
-        this.routerManager = this.simstanceManager.proxy(new RouterManager(this.simstanceManager, this.rootRouter));
-        this.simstanceManager.set(IntentManager, this.intentManager);
-        this.simstanceManager.set(RouterManager, this.routerManager);
+  constructor();
+  constructor(option: SimOption);
+  constructor(rootRouter?: ConstructorType<Object> | Function);
+  constructor(rootRouter?: ConstructorType<Object> | Function, option?: SimOption);
+  constructor(rootRouter?: (ConstructorType<Object> | Function) | SimOption, option = new SimOption()) {
+    if (rootRouter instanceof SimOption) {
+      option = rootRouter;
+    } else if (typeof rootRouter === 'function') {
+      this.rootRouter = rootRouter;
     }
+    this.option = option;
+    this.simstanceManager = new SimstanceManager(option);
+    this.simstanceManager.setStoreSet(SimpleApplication, this);
+    this.simstanceManager.setStoreSet(SimstanceManager, this.simstanceManager);
 
-    public getSimstanceManager() {
-        return this.simstanceManager;
-    }
+    this.intentManager = this.simstanceManager.proxy(new IntentManager(this.simstanceManager));
+    this.routerManager = this.simstanceManager.proxy(new RouterManager(this.simstanceManager, this.rootRouter));
+    this.simstanceManager.setStoreSet(IntentManager, this.intentManager);
+    this.simstanceManager.setStoreSet(RouterManager, this.routerManager);
+  }
 
-    public getIntentManager() {
-        return this.intentManager;
-    }
+  public getSimstanceManager() {
+    return this.simstanceManager;
+  }
 
-    public getRouterManager() {
-        return this.routerManager;
-    }
+  public getIntentManager() {
+    return this.intentManager;
+  }
 
-    public run(otherInstanceSim?: Map<ConstructorType<any>, any>) {
-        this.simstanceManager.run(otherInstanceSim);
-        return this.simstanceManager;
-    }
+  public getRouterManager() {
+    return this.routerManager;
+  }
 
-    public simAtomic<T>(type: ConstructorType<T> | Function) {
-        const routerAtomic = new SimAtomic<T>(type, this.simstanceManager);
-        return routerAtomic;
-    }
+  public run(otherInstanceSim?: Map<ConstructorType<any>, any>) {
+    this.simstanceManager.run(otherInstanceSim);
+    return this.simstanceManager;
+  }
 
-    public getInstance<T>(type: ConstructorType<T>) {
-        const i = this.sim<T>(type);
-        if (i) {
-            return i;
-        } else {
-            throw new SimNoSuch('SimNoSuch: no simple instance(getInstance) ' + 'name:' + type?.prototype?.constructor?.name + ',' + type)
-        }
-    }
+  public simAtomic<T>(type: ConstructorType<T> | Function) {
+    const routerAtomic = new SimAtomic<T>(type, this.simstanceManager);
+    return routerAtomic;
+  }
 
-    public sim<T>(type: ConstructorType<T> | Function) {
-        return this.simAtomic<T>(type).value;
+  public getInstance<T>(type: ConstructorType<T>) {
+    const i = this.sim<T>(type);
+    if (i) {
+      return i;
+    } else {
+      throw new SimNoSuch('SimNoSuch: no simple instance(getInstance) ' + 'name:' + type?.prototype?.constructor?.name + ',' + type)
     }
+  }
 
-    public publishIntent(i: string, data?: any): any[];
-    public publishIntent(i: Intent): any[];
-    public publishIntent(i: Intent | string, data?: any): any[] {
-        if (i instanceof Intent) {
-            return this.intentManager.publish(i);
-        } else {
-            return this.intentManager.publish(i, data);
-        }
-    }
+  public sim<T>(type: ConstructorType<T> | Function) {
+    return this.simAtomic<T>(type).value;
+  }
 
-    public routing<R = SimAtomic, M = any>(i: string, data?: any): Promise<RouterModule<R, M>>;
-    public routing<R = SimAtomic, M = any>(i: Intent): Promise<RouterModule<R, M>>;
-    public routing<R = SimAtomic, M = any>(i: Intent | string, data?: any): Promise<RouterModule<R, M>> {
-        if (i instanceof Intent) {
-            return this.routerManager.routing<R, M>(i);
-        } else {
-            return this.routerManager.routing<R, M>(new Intent(i, data));
-        }
+  public publishIntent(i: string, data?: any): any[];
+  public publishIntent(i: Intent): any[];
+  public publishIntent(i: Intent | string, data?: any): any[] {
+    if (i instanceof Intent) {
+      return this.intentManager.publish(i);
+    } else {
+      return this.intentManager.publish(i, data);
     }
+  }
+
+  public routing<R = SimAtomic, M = any>(i: string, data?: any): Promise<RouterModule<R, M>>;
+  public routing<R = SimAtomic, M = any>(i: Intent): Promise<RouterModule<R, M>>;
+  public routing<R = SimAtomic, M = any>(i: Intent | string, data?: any): Promise<RouterModule<R, M>> {
+    if (i instanceof Intent) {
+      return this.routerManager.routing<R, M>(i);
+    } else {
+      return this.routerManager.routing<R, M>(new Intent(i, data));
+    }
+  }
 }
