@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import { ConstructorType, GenericClassDecorator } from '../types/Types'
 import { ReflectUtils } from '../utils/reflect/ReflectUtils';
-import { SimpleApplication } from 'SimpleApplication';
+import { SimpleApplication } from '../SimpleApplication';
 
 export enum Lifecycle {
   /**
